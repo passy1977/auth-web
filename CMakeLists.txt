@@ -16,10 +16,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(${PROJECT_NAME} 
   src/main.cc
+  src/pods/user.h
+  src/pods/user.cc
   controllers/api_v1_User.h
   controllers/api_v1_User.cc
-  controllers/api_v1_User.h
-  controllers/api_v1_User.cc
+  controllers/api_v1_Auth.h
+  controllers/api_v1_Auth.cc
 )
 
 # ##############################################################################

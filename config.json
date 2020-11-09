@@ -6,12 +6,25 @@
             "https": false
         }
     ],
+    "db_clients": [
+        {
+            "rdbms": "mysql",
+            "host": "127.0.0.1",
+            "port": 3306,
+            "dbname": "web_auth",
+            "user": "web_auth",
+            "passwd": "web_auth123",
+            "is_fast": true,
+            "client_encoding": "",
+            "connection_number": 1
+        }
+    ],
     "app": {
         "threads_num": 1,
         "enable_session": false,
         "session_timeout": 0,
         "log": {
-            "logfile_base_name": "./log/",
+            "logfile_base_name": "auth.log",
             "log_size_limit": 100000000,
             "log_level": "DEBUG"
         },
