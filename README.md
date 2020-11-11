@@ -1,2 +1,2 @@
 # auth-web
- A C++ JWT auth server based on Drogon lib
+ A C++ JWT auth server based on Poco lib
