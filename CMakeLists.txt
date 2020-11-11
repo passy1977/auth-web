@@ -1,69 +1,30 @@
 cmake_minimum_required(VERSION 3.5)
 project(auth-web CXX)
 
-include(CheckIncludeFileCXX)
-
-check_include_file_cxx(any HAS_ANY)
-check_include_file_cxx(string_view HAS_STRING_VIEW)
-if(HAS_ANY AND HAS_STRING_VIEW)
-  set(CMAKE_CXX_STANDARD 17)
-else()
-  set(CMAKE_CXX_STANDARD 14)
-endif()
-
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(${PROJECT_NAME} 
+
+include_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/include)
+link_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/lib)
+include_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/include)
+link_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/lib)
+
+
+add_executable(auth-web
   src/main.cc
+  src/router.h
+  src/router.cc
   src/pods/user.h
   src/pods/user.cc
-  controllers/api_v1_User.h
-  controllers/api_v1_User.cc
-  controllers/api_v1_Auth.h
-  controllers/api_v1_Auth.cc
+  src/pods/domain.h
+  src/pods/domain.cc
+  src/controllers/authcontroller.h
+  src/controllers/authcontroller.cc
+  src/controllers/errorcontroller.h
+  src/controllers/errorcontroller.cc
 )
 
-# ##############################################################################
-# If you include the drogon source code locally in your project, use this method
-# to add drogon 
-# add_subdirectory(drogon) 
-# target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
-# ##############################################################################
-
-find_package(Drogon CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Drogon::Drogon)
-
-if(CMAKE_CXX_STANDARD LESS 17)
-  # With C++14, use boost to support any and string_view
-  message(STATUS "use c++14")
-  find_package(Boost 1.61.0 REQUIRED)
-  target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-else()
-  message(STATUS "use c++17")
-endif()
-
-aux_source_directory(controllers CTL_SRC)
-aux_source_directory(filters FILTER_SRC)
-aux_source_directory(plugins PLUGIN_SRC)
-aux_source_directory(models MODEL_SRC)
-
-drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
-                    ${CMAKE_CURRENT_BINARY_DIR})
-# use the following line to create views with namespaces.
-# drogon_create_views(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/views
-#                     ${CMAKE_CURRENT_BINARY_DIR} TRUE)
-
-target_include_directories(${PROJECT_NAME}
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/models)
-target_sources(${PROJECT_NAME}
-               PRIVATE
-               ${SRC_DIR}
-               ${CTL_SRC}
-               ${FILTER_SRC}
-               ${PLUGIN_SRC}
-               ${MODEL_SRC})
-# ##############################################################################
-# uncomment the following line for dynamically loading views 
-# set_property(TARGET ${PROJECT_NAME} PROPERTY ENABLE_EXPORTS ON)
+target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto ssl crypto)

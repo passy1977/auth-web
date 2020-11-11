@@ -1,11 +1,9 @@
 #pragma once
 
 #include <string>
-
+using namespace std;
 
 namespace auth::pods {
-
-using std::string;
 
 struct User final
 {

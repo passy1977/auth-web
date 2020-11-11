@@ -35,3 +35,9 @@ build
 cmake-build-debug
 .idea
 CMakeLists.txt.user
+*.bak
+CMakeFiles
+CMakeCache.txt
+CMakeCache
+CMakeLists.txt.user
+
