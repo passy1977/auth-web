@@ -22,16 +22,50 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 using namespace std;
+
+#include <Poco/MongoDB/Document.h>
+using Poco::MongoDB::Document;
+
+#import "domain.h"
 
 namespace auth::pods {
 
 struct User final
 {
+    enum class Status {
+        UNACTIVE = 0,
+        ACTIVE = 1,
+        LOCK = 1
+    };
 
+    int id;
+    string name;
+    string email;
+    string password;
+    string data;
+    Status status;
+    string lastLogin;
+    string expirationDate;
+    SPDomain domain;
+
+    inline Document toDocument() const noexcept
+    {
+        return Document()
+                .add("id", id)
+                .add("name", name)
+                .add("email", email)
+                .add("password", password)
+                .add("status", static_cast<int>(status))
+                .add("lastLogin", lastLogin)
+                .add("expirationDate", expirationDate);
+                //.add("domain", domain->toDocument());
+    }
 };
 
+typedef shared_ptr<User> SPUser;
 
 }
 

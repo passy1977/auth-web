@@ -22,44 +22,53 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-using namespace std;
+#include "../globals.h"
+#include "../pods/user.h"
+using namespace auth::pods;
 
-#include <Poco/MongoDB/Document.h>
-using Poco::MongoDB::Document;
-
-namespace auth::pods {
-
-struct Domain final
+namespace auth::dao
 {
-    enum class Status {
-        UNACTIVE = 0,
-        ACTIVE = 1,
-        LOCK = 1
-    };
 
-    int id;
-    string name;
-    string user;
-    string password;
-    string seecret;
-    Status status;
-    string expirationDate;
+/**
+ * @brief The DAOUser class is a singleton for CRUD operation on user struct
+ */
+class DAOUser final
+{
+public:
+    DAOUser() = default;
+    DAOUser(const DAOUser&) = delete;
+    DAOUser& operator = (const DAOUser&) = delete;
+    DAOUser(DAOUser&&) = delete;
+    DAOUser& operator = (DAOUser&&) = delete;
 
-    inline Document toDocument() const noexcept
+    static constexpr const char * COLLECTION = "users";
+
+    static inline const shared_ptr<DAOUser> &getInstance() noexcept
     {
-        return Document()
-                .add("id", id)
-                .add("name", name)
-                .add("user", user)
-                .add("password", password)
-                .add("seecret", seecret)
-                .add("status", static_cast<int>(status))
-                .add("expirationDate", expirationDate);
+        static shared_ptr<DAOUser> instance;
+        if (!instance) {
+            instance = make_shared<DAOUser>();
+        }
+        return instance;
     }
-};
 
-typedef shared_ptr<Domain> SPDomain;
+    /**
+     * @brief insert user
+     */
+    void insert(const SPUser &) const;
+
+    /**
+     * @brief update user
+     */
+    void update(const SPUser &) const;
+
+    /**
+     * @brief delete user
+     */
+    void remove(const SPUser &) const;
+
+
+
+};
 
 }

@@ -20,46 +20,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "daouser.h"
 
-#include <memory>
-#include <string>
-using namespace std;
+#include "Poco/MongoDB/Database.h"
+using namespace Poco::MongoDB;
 
-#include <Poco/MongoDB/Document.h>
-using Poco::MongoDB::Document;
+#include "Poco/SharedPtr.h"
+using Poco::SharedPtr;
 
-namespace auth::pods {
+using namespace auth::dao;
 
-struct Domain final
+void DAOUser::insert(const SPUser &user) const
 {
-    enum class Status {
-        UNACTIVE = 0,
-        ACTIVE = 1,
-        LOCK = 1
-    };
-
-    int id;
-    string name;
-    string user;
-    string password;
-    string seecret;
-    Status status;
-    string expirationDate;
-
-    inline Document toDocument() const noexcept
-    {
-        return Document()
-                .add("id", id)
-                .add("name", name)
-                .add("user", user)
-                .add("password", password)
-                .add("seecret", seecret)
-                .add("status", static_cast<int>(status))
-                .add("expirationDate", expirationDate);
+    if (!user) {
+        return;
     }
-};
 
-typedef shared_ptr<Domain> SPDomain;
+    Database db("sample");
+    SharedPtr<InsertRequest> insert = db.createInsertRequest(COLLECTION);
+
+
+
+    insert->addNewDocument()
+            .add("id", user->id)
+            .add("name", user->name)
+            .add("email", user->email)
+            .add("password", user->password)
+            .add("data", user->data)
+
+            .add("birthyear", 1982);
+
+}
+
+void DAOUser::update(const SPUser &) const
+{
+
+}
+
+void DAOUser::remove(const SPUser &) const
+{
 
 }

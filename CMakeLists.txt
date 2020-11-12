@@ -21,6 +21,8 @@ add_executable(auth-web
   src/globals.cpp
   src/router.h
   src/router.cpp
+  src/dao/daouser.h
+  src/dao/daouser.cpp
   src/pods/user.h
   src/pods/user.cpp
   src/pods/domain.h

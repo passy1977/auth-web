@@ -38,6 +38,9 @@ using Poco::AutoPtr;
 #include "Poco/MongoDB/Array.h"
 using namespace Poco::MongoDB;
 
+#include "dao/daouser.h"
+using auth::dao::DAOUser;
+
 using namespace auth;
 
 void Globals::init(const std::string &path) noexcept
@@ -51,7 +54,23 @@ void Globals::init(const std::string &path) noexcept
     try {
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
 
-        db = Connection(config->getString(CONFIG_DB_HOST), config->getInt(CONFIG_DB_PORT));
+        //build connection string
+        string uri = "mongodb://";
+        uri += config->getString(CONFIG_DB_USER);
+        uri += ":";
+        uri += config->getString(CONFIG_DB_PASSWORD);
+        uri += "@";
+        uri += config->getString(CONFIG_DB_HOST);
+        uri += ":";
+        uri += config->getString(CONFIG_DB_PORT);
+        uri += "/";
+        uri += config->getString(CONFIG_DB_DATABASE);
+
+        //copnnect to MongoDB
+        connection.connect(uri);
+
+
+
     }  catch (Poco::Exception &e) {
         poco_warning_f1(Logger::root(), "Read configuration error, load deafult params", e);
     }

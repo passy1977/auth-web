@@ -38,13 +38,12 @@ using Poco::MongoDB::Connection;
 
 namespace auth {
 
-class Globals
+class Globals final
 {
 
     AutoPtr<IniFileConfiguration> config;
 
-    Connection db;
-
+     Connection connection;
 public:
     Globals() = default;
     Globals(const Globals&) = delete;
@@ -69,9 +68,9 @@ public:
         return config;
     }
 
-    inline const Connection & getDb() const noexcept
+    inline const Connection & getConnection() const noexcept
     {
-        return db;
+        return connection;
     }
 };
 

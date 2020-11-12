@@ -43,7 +43,7 @@ namespace auth
 /**
  * @brief The Application class load configuration and start up server
  */
-class Application : public ServerApplication
+class Application final : public ServerApplication
 {
    Poco::UInt16 port = 9'100;
    int maxQueued = 100;
