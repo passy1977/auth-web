@@ -25,22 +25,43 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
 
-
 namespace auth::controllers
 {
 
-
-class AuthController final : public HTTPRequestHandler
+class HttpStatusController final : public HTTPRequestHandler
 {
 public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
+
+    enum class HttpStatus : uint16_t {
+        OK = 200,
+        CREATED = 201,
+        ACCEPTED = 202,
+        BAD_REQUEST = 400,
+        UNAUTHIRIZED = 401,
+        FORBIDDEN = 403,
+        NOT_FOUND = 404,
+        METHOD_NOT_ALOWED = 405,
+        INTERNAL_SERVER_ERROR = 500,
+        SERVICE_UNAVAILABLE = 503,
+    };
+
+    HttpStatusController() = delete;
+    HttpStatusController(const HttpStatusController&) = delete;
+    HttpStatusController& operator = (const HttpStatusController&) = delete;
+    HttpStatusController(HttpStatusController&&) = delete;
+    HttpStatusController& operator = (HttpStatusController&&) = delete;
 
     void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
+
+    static inline HttpStatusController * build(HttpStatus error) noexcept {
+        return new HttpStatusController(error);
+    }
+
+private:
+    HttpStatus httpStatus;
+
+    inline explicit HttpStatusController(HttpStatus httpStatus) : httpStatus(httpStatus) {}
 };
 
-
 }
+

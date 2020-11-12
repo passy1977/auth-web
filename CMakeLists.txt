@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(auth-web CXX)
+project(auth-web CXX LANGUAGES VERSION 1.2.3 HOMEPAGE_URL https://github.com/passy1977/auth-web)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
@@ -14,17 +14,22 @@ link_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/lib)
 
 
 add_executable(auth-web
-  src/main.cc
+  src/main.cpp
+  src/constants.h
+  src/application.h
+  src/application.cpp
+  src/globals.h
+  src/globals.cpp
   src/router.h
-  src/router.cc
+  src/router.cpp
   src/pods/user.h
-  src/pods/user.cc
+  src/pods/user.cpp
   src/pods/domain.h
-  src/pods/domain.cc
+  src/pods/domain.cpp
   src/controllers/authcontroller.h
-  src/controllers/authcontroller.cc
-  src/controllers/errorcontroller.h
-  src/controllers/errorcontroller.cc
+  src/controllers/authcontroller.cpp
+  src/controllers/httpstatuscontroller.h
+  src/controllers/httpstatuscontroller.cpp
 )
 
 target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto ssl crypto)

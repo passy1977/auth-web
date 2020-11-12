@@ -22,25 +22,51 @@
 
 #pragma once
 
-#include <Poco/Net/HTTPRequestHandler.h>
-using namespace Poco::Net;
+#include <memory>
+using namespace std;
 
+#include <Poco/AutoPtr.h>
+using Poco::AutoPtr;
 
-namespace auth::controllers
+#include <Poco/Util/IniFileConfiguration.h>
+using namespace Poco::Util;
+
+#include "constants.h"
+
+namespace auth {
+
+class Globals
 {
 
+    AutoPtr<IniFileConfiguration> config;
 
-class AuthController final : public HTTPRequestHandler
-{
+
 public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
+    Globals() = default;
+    Globals(const Globals&) = delete;
+    Globals& operator = (const Globals&) = delete;
+    Globals(Globals&&) = delete;
+    Globals& operator = (Globals&&) = delete;
 
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
+    static inline const shared_ptr<Globals> &getInstance() noexcept
+    {
+        static shared_ptr<Globals> instance;
+        if (!instance) {
+            instance = make_shared<Globals>();
+        }
+        return instance;
+    }
+
+    void init(const string & = PATH_CONFIG) noexcept;
+
+
+    inline const AutoPtr<IniFileConfiguration> getConfig() const noexcept
+    {
+        return config;
+    }
+
 };
 
-
 }
+
+

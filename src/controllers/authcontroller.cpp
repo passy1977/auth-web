@@ -20,27 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "authcontroller.h"
 
-#include <Poco/Net/HTTPRequestHandler.h>
-using namespace Poco::Net;
+using namespace auth::controllers;
 
-
-namespace auth::controllers
+void AuthController::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response)
 {
-
-
-class AuthController final : public HTTPRequestHandler
-{
-public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
-
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
-
 
 }

@@ -20,27 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "router.h"
 
-#include <Poco/Net/HTTPRequestHandler.h>
+#include <iostream>
+using namespace std;
+
+#include "controllers/httpstatuscontroller.h"
+using auth::controllers::HttpStatusController;
+
+#include <Poco/Net/HTTPServerRequest.h>
 using namespace Poco::Net;
 
+using namespace auth;
 
-namespace auth::controllers
+HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &request)
 {
 
 
-class AuthController final : public HTTPRequestHandler
-{
-public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
 
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
+    cout << "uri:" << request.getURI() << endl;
+
+     auto &r = const_cast<HTTPServerRequest &>(request);
+    cout << "body:" << string(std::istreambuf_iterator<char>(r.stream()), {}) << endl;
 
 
+
+
+    return HttpStatusController::build(HttpStatusController::HttpStatus::OK);
 }
+
+

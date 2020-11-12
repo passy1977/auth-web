@@ -20,27 +20,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "httpstatuscontroller.h"
 
-#include <Poco/Net/HTTPRequestHandler.h>
+#include <string>
+using namespace std;
+
+#include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
+using namespace auth::controllers;
 
-namespace auth::controllers
+void HttpStatusController::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response)
 {
+    response.setChunkedTransferEncoding(true);
 
+    //Sets mime type text/html application/json etc.
+    response.setContentType("application/json");
 
-class AuthController final : public HTTPRequestHandler
-{
-public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
-
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
-
-
+    //Sets the response status 404, 200 etc.
+    response.setStatus(to_string(static_cast<uint16_t>(httpStatus)));
 }

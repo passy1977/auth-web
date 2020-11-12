@@ -1,19 +1,27 @@
+// MIT License
+//
+// Copyright (c) 2020 Antonio Salsi
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-#include <iostream>
-#include <vector>
-using namespace std;
 
-#include <Poco/Util/ServerApplication.h>
-using namespace Poco::Util;
-
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Net/HTTPServer.h>
-#include <Poco/Net/HTTPRequestHandlerFactory.h>
-#include <Poco/Net/HTTPRequestHandler.h>
-#include <Poco/Net/HTTPServerRequest.h>
-#include <Poco/Net/HTTPServerResponse.h>
-using namespace Poco::Net;
-
+#include "application.h"
 #include "router.h"
 using auth::Router;
 
@@ -97,41 +105,5 @@ using auth::Router;
 //};
 
 
-// Server  Application
-class Application : public ServerApplication
-{
-protected:
-    int main(const std::vector<std::string> &args){
-
-         //Port to listen
-        Poco::UInt16 port = 9'100;
-
-        ServerSocket socket(port);
-
-        HTTPServerParams *params = new HTTPServerParams();
-
-
-        //Sets the maximum number of queued connections.
-        params->setMaxQueued(100);
-
-        //Sets the maximum number of simultaneous threads available for this Server
-        params->setMaxThreads(2);
-
-        // Instanciate HandlerFactory
-        HTTPServer server(new Router(), socket, params);
-
-        server.start();
-
-        waitForTerminationRequest();
-
-        server.stop();
-
-        return EXIT_OK;
-
-    }
-};
-
-
-
 // Macros to setup maim function to run as app or deamon (service in windows)
-POCO_SERVER_MAIN(::Application);
+POCO_SERVER_MAIN(auth::Application);

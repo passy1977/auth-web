@@ -20,27 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "globals.h"
 
-#include <Poco/Net/HTTPRequestHandler.h>
-using namespace Poco::Net;
+#include <Poco/Logger.h>
+using Poco::Logger;
 
+#include <Poco/SimpleFileChannel.h>
+using Poco::SimpleFileChannel;
 
-namespace auth::controllers
+#include <Poco/AutoPtr.h>
+using Poco::AutoPtr;
+
+using namespace auth;
+
+void Globals::init(const string &path) noexcept
 {
+    AutoPtr<SimpleFileChannel> channel(new SimpleFileChannel);
+    channel->setProperty("path", PATH_LOG);
+    channel->setProperty("rotation", LOG_ROTATION);
+    Logger::root().setChannel(channel);
 
-
-class AuthController final : public HTTPRequestHandler
-{
-public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
-
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
-
-
+    //init configuration
+    try {
+        config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
+    }  catch (...) {
+        poco_warning(Logger::root(), "Read configuration error, load deafult params");
+    }
 }

@@ -22,25 +22,19 @@
 
 #pragma once
 
-#include <Poco/Net/HTTPRequestHandler.h>
-using namespace Poco::Net;
 
-
-namespace auth::controllers
+namespace auth
 {
 
-
-class AuthController final : public HTTPRequestHandler
-{
-public:
-    AuthController() = default;
-    AuthController(const AuthController&) = delete;
-    AuthController& operator = (const AuthController&) = delete;
-    AuthController(AuthController&&) = delete;
-    AuthController& operator = (AuthController&&) = delete;
-
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
-
+constexpr const char* PATH_CONFIG = "./config.ini";
+constexpr const char* PATH_LOG = "log/auth_web.path";
+constexpr const char* LOG_ROTATION = "2 K";
+constexpr const char* CONFIG_SERVER_PORT = "server.port";
+constexpr const char* CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
+constexpr const char* CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
+constexpr const char* CONFIG_MYSQL_HOST= "mysql.host";
+constexpr const char* CONFIG_MYSQL_DATABASE = "mysql.database";
+constexpr const char* CONFIG_MYSQL_USER = "mysql.user";
+constexpr const char* CONFIG_MYSQL_PASSWORD = "mysql.password";
 
 }
