@@ -31,9 +31,16 @@ using Poco::SimpleFileChannel;
 #include <Poco/AutoPtr.h>
 using Poco::AutoPtr;
 
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Cursor.h"
+#include "Poco/MongoDB/Array.h"
+using namespace Poco::MongoDB;
+
 using namespace auth;
 
-void Globals::init(const string &path) noexcept
+void Globals::init(const std::string &path) noexcept
 {
     AutoPtr<SimpleFileChannel> channel(new SimpleFileChannel);
     channel->setProperty("path", PATH_LOG);
@@ -43,7 +50,10 @@ void Globals::init(const string &path) noexcept
     //init configuration
     try {
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
-    }  catch (...) {
-        poco_warning(Logger::root(), "Read configuration error, load deafult params");
+
+        db = Connection(config->getString(CONFIG_DB_HOST), config->getInt(CONFIG_DB_PORT));
+    }  catch (Poco::Exception &e) {
+        poco_warning_f1(Logger::root(), "Read configuration error, load deafult params", e);
     }
+
 }

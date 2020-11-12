@@ -32,9 +32,10 @@ constexpr const char* LOG_ROTATION = "2 K";
 constexpr const char* CONFIG_SERVER_PORT = "server.port";
 constexpr const char* CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
 constexpr const char* CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
-constexpr const char* CONFIG_MYSQL_HOST= "mysql.host";
-constexpr const char* CONFIG_MYSQL_DATABASE = "mysql.database";
-constexpr const char* CONFIG_MYSQL_USER = "mysql.user";
-constexpr const char* CONFIG_MYSQL_PASSWORD = "mysql.password";
+constexpr const char* CONFIG_DB_HOST= "db.host";
+constexpr const char* CONFIG_DB_PORT= "db.port";
+constexpr const char* CONFIG_DB_DATABASE = "db.database";
+constexpr const char* CONFIG_DB_USER = "db.user";
+constexpr const char* CONFIG_DB_PASSWORD = "db.password";
 
 }

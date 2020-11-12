@@ -31,6 +31,9 @@ using Poco::AutoPtr;
 #include <Poco/Util/IniFileConfiguration.h>
 using namespace Poco::Util;
 
+#include "Poco/MongoDB/Connection.h"
+using Poco::MongoDB::Connection;
+
 #include "constants.h"
 
 namespace auth {
@@ -40,6 +43,7 @@ class Globals
 
     AutoPtr<IniFileConfiguration> config;
 
+    Connection db;
 
 public:
     Globals() = default;
@@ -65,6 +69,10 @@ public:
         return config;
     }
 
+    inline const Connection & getDb() const noexcept
+    {
+        return db;
+    }
 };
 
 }

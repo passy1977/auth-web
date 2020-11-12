@@ -28,15 +28,27 @@ using namespace std;
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
+#include "Poco/JSON/Object.h"
+using Poco::JSON::Object;
+
 using namespace auth::controllers;
 
 void HttpStatusController::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response)
 {
     response.setChunkedTransferEncoding(true);
 
+    string &&httpError = to_string(static_cast<uint16_t>(httpStatus));
+
     //Sets mime type text/html application/json etc.
     response.setContentType("application/json");
 
     //Sets the response status 404, 200 etc.
-    response.setStatus(to_string(static_cast<uint16_t>(httpStatus)));
+    response.setStatus(httpError);
+
+    //opens the file stream
+    ostream& responseStream = response.send();
+
+    Object jsonError;
+    jsonError.set("httpError", httpError);
+    jsonError.stringify(responseStream);
 }

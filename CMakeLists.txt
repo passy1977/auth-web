@@ -12,7 +12,6 @@ link_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/lib)
 include_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/lib)
 
-
 add_executable(auth-web
   src/main.cpp
   src/constants.h
@@ -32,4 +31,4 @@ add_executable(auth-web
   src/controllers/httpstatuscontroller.cpp
 )
 
-target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto ssl crypto)
+target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto PocoMongoDB ssl crypto)

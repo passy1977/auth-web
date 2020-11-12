@@ -46,7 +46,7 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
 
 
 
-    return HttpStatusController::build(HttpStatusController::HttpStatus::OK);
+    return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
 }
 
 
