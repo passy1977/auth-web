@@ -38,6 +38,9 @@ using Poco::MongoDB::Connection;
 
 namespace auth {
 
+/**
+ * @brief The Globals conatin global param data container
+ */
 class Globals final
 {
 
@@ -46,11 +49,12 @@ class Globals final
      Connection connection;
 public:
     Globals() = default;
-    Globals(const Globals&) = delete;
-    Globals& operator = (const Globals&) = delete;
-    Globals(Globals&&) = delete;
-    Globals& operator = (Globals&&) = delete;
+    AUTH_NO_COPY_NO_MOVE(Globals)
 
+    /**
+     * @brief getInstance singleton patern
+     * @return
+     */
     static inline const shared_ptr<Globals> &getInstance() noexcept
     {
         static shared_ptr<Globals> instance;
@@ -60,14 +64,24 @@ public:
         return instance;
     }
 
+    /**
+     * @brief init for inializate subsystem like MongoDb connection, logs, load gonfig file, ...
+     */
     void init(const string & = PATH_CONFIG) noexcept;
 
-
-    inline const AutoPtr<IniFileConfiguration> getConfig() const noexcept
+    /**
+     * @brief getConfig get instance to config file file
+     * @return config file reference
+     */
+    inline const AutoPtr<IniFileConfiguration> & getConfig() const noexcept
     {
         return config;
     }
 
+    /**
+     * @brief getConnection get MongDb connection
+     * @return MongDb connection
+     */
     inline const Connection & getConnection() const noexcept
     {
         return connection;

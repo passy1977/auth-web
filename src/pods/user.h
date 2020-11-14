@@ -26,45 +26,101 @@
 #include <string>
 using namespace std;
 
-#include <Poco/MongoDB/Document.h>
-using Poco::MongoDB::Document;
-
+#import "pod.h"
 #import "domain.h"
 
 namespace auth::pods {
 
-struct User final
+/**
+ * @brief The Domain struct data rappresentation of User
+ */
+struct User final : public Pod
 {
+    static inline constexpr const char *FIELD_ID = "id";
+    static inline constexpr const char *FIELD_NAME = "name";
+    static inline constexpr const char *FIELD_EMAIL = "email";
+    static inline constexpr const char *FIELD_PASSWORD = "password";
+    static inline constexpr const char *FIELD_DATA = "data";
+    static inline constexpr const char *FIELD_STATUS = "status";
+    static inline constexpr const char *FIELD_LAST_LOGIN = "lastLogin";
+    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expirationDate";
+    static inline constexpr const char *FIELD_DOMAIN = "domain";
+
+    /**
+     * @brief The Status enum status of User
+     */
     enum class Status {
         UNACTIVE = 0,
         ACTIVE = 1,
         LOCK = 1
     };
 
+    /**
+     * @brief id PK
+     */
     int id;
-    string name;
-    string email;
-    string password;
-    string data;
-    Status status;
-    string lastLogin;
-    string expirationDate;
-    SPDomain domain;
 
-    inline Document toDocument() const noexcept
+    /**
+     * @brief user name like Antonio Salsi
+     */
+    string name;
+
+    /**
+     * @brief email composite key with domain
+     */
+    string email;
+
+    string password;
+
+    /**
+     * @brief additional data in json format
+     */
+    string data;
+
+    /**
+     * @brief user status
+     */
+    Status status;
+
+    /**
+     * @brief last login date,
+     * @details if nullptr never loged in
+     */
+    string lastLogin;
+
+    /**
+     * @brief lastLogin expiration date permit to maintain allows the user to log in until a specific data
+     * @details if nullptr the feature i disable
+     */
+    string expirationDate;
+
+    /**
+     * @brief composite key with email
+     * @details if nullptr the feature i disable
+     */
+    string domain;
+
+    /**
+     * @brief toDocument get document ready for MongoDb
+     * @return MongoDb doncument
+     */
+    inline Document toDocument() const noexcept override
     {
         return Document()
-                .add("id", id)
-                .add("name", name)
-                .add("email", email)
-                .add("password", password)
-                .add("status", static_cast<int>(status))
-                .add("lastLogin", lastLogin)
-                .add("expirationDate", expirationDate);
-                //.add("domain", domain->toDocument());
+                .add(FIELD_ID, id)
+                .add(FIELD_NAME, name)
+                .add(FIELD_EMAIL, email)
+                .add(FIELD_PASSWORD, password)
+                .add(FIELD_STATUS, static_cast<int>(status))
+                .add(FIELD_LAST_LOGIN, lastLogin)
+                .add(FIELD_EXPIRATION_DATE, expirationDate)
+                .add(FIELD_DOMAIN, domain);
     }
 };
 
+/**
+ * @brief SPUser shared pointer of User
+ */
 typedef shared_ptr<User> SPUser;
 
 }

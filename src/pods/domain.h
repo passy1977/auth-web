@@ -26,40 +26,77 @@
 #include <string>
 using namespace std;
 
-#include <Poco/MongoDB/Document.h>
-using Poco::MongoDB::Document;
+#import "pod.h"
 
-namespace auth::pods {
-
-struct Domain final
+namespace auth::pods
 {
+
+/**
+ * @brief The Domain struct data rappresentation of Domain
+ */
+struct Domain final : public Pod
+{
+
+    static inline constexpr const char *FIELD_ID = "id";
+    static inline constexpr const char *FIELD_NAME = "name";
+    static inline constexpr const char *FIELD_SEECRET = "seecret";
+    static inline constexpr const char *FIELD_STATUS = "status";
+    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expirationDate";
+
+    /**
+     * @brief The Status enum status of Domain
+     */
     enum class Status {
         UNACTIVE = 0,
         ACTIVE = 1,
         LOCK = 1
     };
 
+    /**
+     * @brief id PK
+     */
     int id;
+
+    /**
+     * @brief domain name
+     */
     string name;
-    string user;
-    string password;
+
+    /**
+     * @brief seecret password for JWT
+     */
     string seecret;
+
+    /**
+     * @brief last login date,
+     * @details if nullptr never loged in
+     */
     Status status;
+
+    /**
+     * @brief lastLogin expiration date permit to maintain allows the user to log in until a specific data
+     * @details if nullptr the feature i disable
+     */
     string expirationDate;
 
-    inline Document toDocument() const noexcept
+    /**
+     * @brief toDocument get document ready for MongoDb
+     * @return MongoDb doncument
+     */
+    inline Document toDocument() const noexcept override
     {
         return Document()
-                .add("id", id)
-                .add("name", name)
-                .add("user", user)
-                .add("password", password)
-                .add("seecret", seecret)
-                .add("status", static_cast<int>(status))
-                .add("expirationDate", expirationDate);
+                .add(FIELD_ID, id)
+                .add(FIELD_NAME, name)
+                .add(FIELD_SEECRET, seecret)
+                .add(FIELD_STATUS, static_cast<int>(status))
+                .add(FIELD_EXPIRATION_DATE, expirationDate);
     }
 };
 
+/**
+ * @brief SPDomain shared pointer of Domain
+ */
 typedef shared_ptr<Domain> SPDomain;
 
 }

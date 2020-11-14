@@ -25,18 +25,32 @@
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
 using namespace Poco::Net;
 
+#include "constants.h"
+
 namespace auth {
 
-//  Url Router
+/**
+ * @brief The Router class base compoment that manage routing to other con trotters
+ */
 class Router final : public HTTPRequestHandlerFactory
 {
 public:
     Router() = default;
-    Router(const Router&) = delete;
-    Router& operator = (const Router&) = delete;
-    Router(Router&&) = delete;
-    Router& operator = (Router&&) = delete;
+    AUTH_NO_COPY_NO_MOVE(Router)
 
+    /**
+     * @brief Creates a new request handler for the given HTTP request.
+     *
+     * The method should inspect the given HTTPServerRequest object (e.g., method
+     * and URI) and create an appropriate HTTPRequestHandler object to handle the
+     * request.
+     *
+     * If the request contains a "Expect: 100-continue" header, it's possible
+     * to prevent the server from sending the default 100 Continue response
+     * by setting the status of the response object that can be obtained through
+     * the request object (request.response()) to something other than 200 OK.
+     * @return Http frequest poiter
+     */
     HTTPRequestHandler* createRequestHandler(const HTTPServerRequest &) override;
 };
 

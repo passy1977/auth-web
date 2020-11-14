@@ -22,20 +22,29 @@
 
 #pragma once
 
+/// Disable copy and reference constructror
+#define AUTH_NO_COPY_NO_MOVE(claxx) \
+    claxx(const claxx&) = delete; \
+    claxx& operator = (const claxx&) = delete; \
+    claxx(claxx&&) = delete; \
+    claxx& operator = (claxx&&) = delete; \
 
 namespace auth
 {
 
-constexpr const char* PATH_CONFIG = "./config.ini";
-constexpr const char* PATH_LOG = "log/auth_web.path";
-constexpr const char* LOG_ROTATION = "2 K";
-constexpr const char* CONFIG_SERVER_PORT = "server.port";
-constexpr const char* CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
-constexpr const char* CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
-constexpr const char* CONFIG_DB_HOST= "db.host";
-constexpr const char* CONFIG_DB_PORT= "db.port";
-constexpr const char* CONFIG_DB_DATABASE = "db.database";
-constexpr const char* CONFIG_DB_USER = "db.user";
-constexpr const char* CONFIG_DB_PASSWORD = "db.password";
+///config global param
+inline constexpr const char* PATH_CONFIG = "./config.ini";
+inline constexpr const char* PATH_LOG = "log/auth_web.path";
+inline constexpr const char* LOG_ROTATION = "2 K";
+
+///config key param
+inline constexpr const char* CONFIG_SERVER_PORT = "server.port";
+inline constexpr const char* CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
+inline constexpr const char* CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
+inline constexpr const char* CONFIG_DB_HOST= "db.host";
+inline constexpr const char* CONFIG_DB_PORT= "db.port";
+inline constexpr const char* CONFIG_DB_DATABASE = "db.database";
+inline constexpr const char* CONFIG_DB_USER = "db.user";
+inline constexpr const char* CONFIG_DB_PASSWORD = "db.password";
 
 }

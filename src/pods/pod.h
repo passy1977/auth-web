@@ -22,49 +22,18 @@
 
 #pragma once
 
-#include "../globals.h"
-#include "../pods/user.h"
-using namespace auth::pods;
 
-#include "../constants.h"
-
-namespace auth::dao
-{
+#include <Poco/MongoDB/Document.h>
+using Poco::MongoDB::Document;
 
 /**
- * @brief The DAOUser class is a singleton for CRUD operation on User struct
+ * @brief The Pod interface common interface for all pods
  */
-template<typename T>
-class DAOUser final
+class Pod
 {
-public:
-    DAOUser() = default;
-    AUTH_NO_COPY_NO_MOVE(DAOUser)
-
-    static inline const shared_ptr<DAOUser> &getInstance() noexcept
-    {
-        static shared_ptr<DAOUser> instance;
-        if (!instance) {
-            instance = make_shared<DAOUser>();
-        }
-        return instance;
-    }
-
     /**
-     * @brief insert T
+     * @brief toDocument get document ready for MongoDb
+     * @return MongoDb doncument
      */
-    void insert(const T &) const;
-
-    /**
-     * @brief update T
-     */
-    void update(const T &) const;
-
-    /**
-     * @brief delete T
-     */
-    void remove(const T &) const;
-
+    virtual Document toDocument() const noexcept = 0;
 };
-
-}

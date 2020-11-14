@@ -30,34 +30,4 @@ using Poco::SharedPtr;
 
 using namespace auth::dao;
 
-void DAOUser::insert(const SPUser &user) const
-{
-    if (!user) {
-        return;
-    }
 
-    Database db("sample");
-    SharedPtr<InsertRequest> insert = db.createInsertRequest(COLLECTION);
-
-
-
-    insert->addNewDocument()
-            .add("id", user->id)
-            .add("name", user->name)
-            .add("email", user->email)
-            .add("password", user->password)
-            .add("data", user->data)
-
-            .add("birthyear", 1982);
-
-}
-
-void DAOUser::update(const SPUser &) const
-{
-
-}
-
-void DAOUser::remove(const SPUser &) const
-{
-
-}
