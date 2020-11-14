@@ -20,14 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "daouser.h"
+#pragma once
 
-#include "Poco/MongoDB/Database.h"
-using namespace Poco::MongoDB;
+#include<string>
+using std::string;
 
-#include "Poco/SharedPtr.h"
-using Poco::SharedPtr;
+#include <Poco/File.h>
+using namespace Poco;
 
-using namespace auth::dao;
+namespace auth::services
+{
 
+/**
+ * @brief The LockService class avoid the execution of multiple service instances
+ */
+class LockService
+{
+    File lockFile;
+
+    string serrviceOnMessage = "";
+public:
+    LockService() noexcept;
+
+    /**
+     * @brief start create the lock on application starup
+     * @return true if all ok
+     */
+    bool start() noexcept;
+
+    /**
+     * @brief stop remove lock on application destoy
+     */
+    void stop() noexcept;
+
+    /**
+     * @brief getSerrviceOnMessage check if a service it'a already run
+     * @return "" if not run
+     */
+    inline const string & getSerrviceOnMessage() const noexcept
+    {
+        return serrviceOnMessage;
+    }
+};
+
+}
 

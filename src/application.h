@@ -42,6 +42,7 @@ namespace auth
 
 /**
  * @brief The Application class load configuration and start up server
+ * @author Antonio Salsi
  */
 class Application final : public ServerApplication
 {

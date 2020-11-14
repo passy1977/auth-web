@@ -36,17 +36,19 @@ using Poco::MongoDB::Connection;
 
 #include "constants.h"
 
-namespace auth {
+namespace auth
+{
 
 /**
  * @brief The Globals conatin global param data container
+ * @author Antonio Salsi
  */
 class Globals final
 {
 
     AutoPtr<IniFileConfiguration> config;
 
-     Connection connection;
+    Connection connection;
 public:
     Globals() = default;
     AUTH_NO_COPY_NO_MOVE(Globals)

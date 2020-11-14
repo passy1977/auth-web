@@ -22,6 +22,10 @@
 
 #include "globals.h"
 
+#include <memory>
+using std::move;
+
+
 #include <Poco/Logger.h>
 using Poco::Logger;
 
@@ -38,23 +42,26 @@ using Poco::AutoPtr;
 #include "Poco/MongoDB/Array.h"
 using namespace Poco::MongoDB;
 
-#include "dao/daouser.h"
-using auth::dao::DAOUser;
-
 using namespace auth;
 
 void Globals::init(const std::string &path) noexcept
 {
-    AutoPtr<SimpleFileChannel> channel(new SimpleFileChannel);
-    channel->setProperty("path", PATH_LOG);
-    channel->setProperty("rotation", LOG_ROTATION);
-    Logger::root().setChannel(channel);
 
-    //init configuration
     try {
+        ///init configuration
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
 
-        //build connection string
+
+        ///configure log if needed
+        if (config->has(CONFIG_PATH_LOG) && config->has(CONFIG_LOG_ROTATION))
+        {
+            AutoPtr<SimpleFileChannel> channel(new SimpleFileChannel);
+            channel->setProperty("path", move(config->getString(CONFIG_PATH_LOG)));
+            channel->setProperty("rotation", move(config->getString(CONFIG_LOG_ROTATION)));
+            Logger::root().setChannel(channel);
+        }
+
+        ///build connection string for MongoDb
         string uri = "mongodb://";
         uri += config->getString(CONFIG_DB_USER);
         uri += ":";
@@ -66,13 +73,12 @@ void Globals::init(const std::string &path) noexcept
         uri += "/";
         uri += config->getString(CONFIG_DB_DATABASE);
 
-        //copnnect to MongoDB
+        ///copnnect to MongoDB
         connection.connect(uri);
 
 
-
     }  catch (Poco::Exception &e) {
-        poco_warning_f1(Logger::root(), "Read configuration error, load deafult params", e);
+        poco_warning_f1(Logger::root(), "Read configuration error, load deafult params %s", e);
     }
 
 }

@@ -21,13 +21,14 @@ add_executable(auth-web
   src/globals.cpp
   src/router.h
   src/router.cpp
-  src/dao/daouser.h
-  src/dao/daouser.cpp
+  src/dao/dao.h
   src/pods/pod.h
   src/pods/user.h
   src/pods/user.cpp
   src/pods/domain.h
   src/pods/domain.cpp
+  src/services/lockservice.h
+  src/services/lockservice.cpp
   src/controllers/authcontroller.h
   src/controllers/authcontroller.cpp
   src/controllers/httpstatuscontroller.h

@@ -22,4 +22,17 @@
 
 #include "domain.h"
 
+#include <Poco/MongoDB/Document.h>
+using Poco::MongoDB::Document;
+
 using namespace auth::pods;
+
+inline Document Domain::toDocument() const noexcept
+{
+    return Document()
+            .add(FIELD_ID, id)
+            .add(FIELD_NAME, name)
+            .add(FIELD_SEECRET, seecret)
+            .add(FIELD_STATUS, static_cast<int>(status))
+            .add(FIELD_EXPIRATION_DATE, expirationDate);
+}

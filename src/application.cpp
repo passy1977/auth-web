@@ -22,39 +22,56 @@
 
 #include "application.h"
 #include "globals.h"
-
 using namespace auth;
+
+#include "services/lockservice.h"
+using auth::services::LockService;
 
 int auth::Application::main(const vector<string> &args)
 {
 
-    //initialize global params
+
+    LockService lockService;
+
+    ///check if service alterady run
+    if (!lockService.start()) {
+        poco_warning_f1(Logger::root(), "Unable start the process: %s",  lockService.getSerrviceOnMessage());
+        return EXIT_NOINPUT;
+    }
+
+    ///initialize global params
     Globals::getInstance()->init(args.empty() ? PATH_CONFIG : args[0]);
 
 
-    //load config from globa configuration
+    ///load config from global configuration
     auto &&config = Globals::getInstance()->getConfig();
-    if (!config.isNull()) {
-        if (config->has(CONFIG_SERVER_PORT)) {
+    if (!config.isNull())
+    {
+        if (config->has(CONFIG_SERVER_PORT))
+        {
             port = config->getInt(CONFIG_SERVER_PORT);
         }
-        if (config->has(CONFIG_SERVER_MAX_QUEUED)) {
+
+        if (config->has(CONFIG_SERVER_MAX_QUEUED))
+        {
             maxQueued = config->getInt(CONFIG_SERVER_MAX_QUEUED);
         }
-        if (config->has(CONFIG_SERVER_MAX_THREAD)) {
+
+        if (config->has(CONFIG_SERVER_MAX_THREAD))
+        {
             maxThreads = config->getInt(CONFIG_SERVER_MAX_THREAD);
         }
     }
 
     HTTPServerParams *params = new HTTPServerParams();
 
-    //Sets the maximum number of queued connections.
+    ///Sets the maximum number of queued connections.
     params->setMaxQueued(maxQueued);
 
-    //Sets the maximum number of simultaneous threads available for this Server
+    ///Sets the maximum number of simultaneous threads available for this Server
     params->setMaxThreads(maxThreads);
 
-    // Instanciate HandlerFactory
+    ///Instanciate HandlerFactory
     HTTPServer server(new Router(), ServerSocket(port), params);
 
     server.start();
@@ -62,6 +79,8 @@ int auth::Application::main(const vector<string> &args)
     waitForTerminationRequest();
 
     server.stop();
+
+    lockService.stop();
 
     return EXIT_OK;
 

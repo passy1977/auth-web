@@ -23,11 +23,19 @@
 #pragma once
 
 
-#include <Poco/MongoDB/Document.h>
+namespace Poco::MongoDB
+{
+class Document;
+}
+
+namespace auth::pods
+{
+
 using Poco::MongoDB::Document;
 
 /**
  * @brief The Pod interface common interface for all pods
+ * @author Antonio Salsi
  */
 class Pod
 {
@@ -37,3 +45,5 @@ class Pod
      */
     virtual Document toDocument() const noexcept = 0;
 };
+
+}

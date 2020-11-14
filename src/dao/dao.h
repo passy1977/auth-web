@@ -23,47 +23,85 @@
 #pragma once
 
 #include "../globals.h"
-#include "../pods/user.h"
-using namespace auth::pods;
-
-#include "../constants.h"
 
 namespace auth::dao
 {
 
 /**
  * @brief The DAOUser class is a singleton for CRUD operation on User struct
+ * @author Antonio Salsi
  */
 template<typename T>
 class DAOUser final
 {
+
+    const Connection &connection;
+
 public:
-    DAOUser() = default;
+    inline explicit DAOUser(const Connection &connection) :
+        connection(connection)
+    {}
+
     AUTH_NO_COPY_NO_MOVE(DAOUser)
 
-    static inline const shared_ptr<DAOUser> &getInstance() noexcept
+    /**
+     * @brief insert T
+     * @exceptions
+     */
+    void insert(T &&t) const
     {
-        static shared_ptr<DAOUser> instance;
-        if (!instance) {
-            instance = make_shared<DAOUser>();
-        }
-        return instance;
+        insert(t);
     }
 
     /**
      * @brief insert T
+     * @exceptions
      */
-    void insert(const T &) const;
+    void insert(const T &) const
+    {
+
+    }
+
 
     /**
      * @brief update T
+     * @exceptions
      */
-    void update(const T &) const;
+    void update(T &&t) const
+    {
+        update(t);
+    }
+
+
+    /**
+     * @brief update T
+     * @exceptions
+     */
+    void update(const T &) const
+    {
+
+    }
 
     /**
      * @brief delete T
+     * @exceptions
      */
-    void remove(const T &) const;
+    inline void remove(T &&t) const
+    {
+        remove(t);
+    }
+
+    /**
+     * @brief delete T
+     * @exceptions
+     */
+    void remove(const T &) const
+    {
+
+    }
+
+protected:
+    string collection;
 
 };
 

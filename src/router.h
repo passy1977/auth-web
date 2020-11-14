@@ -27,10 +27,12 @@ using namespace Poco::Net;
 
 #include "constants.h"
 
-namespace auth {
+namespace auth
+{
 
 /**
  * @brief The Router class base compoment that manage routing to other con trotters
+ * @author Antonio Salsi
  */
 class Router final : public HTTPRequestHandlerFactory
 {

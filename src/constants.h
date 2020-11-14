@@ -34,10 +34,12 @@ namespace auth
 
 ///config global param
 inline constexpr const char* PATH_CONFIG = "./config.ini";
-inline constexpr const char* PATH_LOG = "log/auth_web.path";
-inline constexpr const char* LOG_ROTATION = "2 K";
+inline constexpr const char* FILE_LOCK_SERVICE = "./auth.pin";
+
 
 ///config key param
+inline constexpr const char* CONFIG_PATH_LOG = "log.path";
+inline constexpr const char* CONFIG_LOG_ROTATION = "log.rotation";
 inline constexpr const char* CONFIG_SERVER_PORT = "server.port";
 inline constexpr const char* CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
 inline constexpr const char* CONFIG_SERVER_MAX_THREAD = "server.maxThreads";

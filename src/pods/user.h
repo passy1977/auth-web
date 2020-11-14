@@ -29,7 +29,8 @@ using namespace std;
 #import "pod.h"
 #import "domain.h"
 
-namespace auth::pods {
+namespace auth::pods
+{
 
 /**
  * @brief The Domain struct data rappresentation of User
@@ -104,18 +105,7 @@ struct User final : public Pod
      * @brief toDocument get document ready for MongoDb
      * @return MongoDb doncument
      */
-    inline Document toDocument() const noexcept override
-    {
-        return Document()
-                .add(FIELD_ID, id)
-                .add(FIELD_NAME, name)
-                .add(FIELD_EMAIL, email)
-                .add(FIELD_PASSWORD, password)
-                .add(FIELD_STATUS, static_cast<int>(status))
-                .add(FIELD_LAST_LOGIN, lastLogin)
-                .add(FIELD_EXPIRATION_DATE, expirationDate)
-                .add(FIELD_DOMAIN, domain);
-    }
+    Document toDocument() const noexcept override;
 };
 
 /**

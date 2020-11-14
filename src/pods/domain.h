@@ -33,6 +33,7 @@ namespace auth::pods
 
 /**
  * @brief The Domain struct data rappresentation of Domain
+ * @author Antonio Salsi
  */
 struct Domain final : public Pod
 {
@@ -83,15 +84,7 @@ struct Domain final : public Pod
      * @brief toDocument get document ready for MongoDb
      * @return MongoDb doncument
      */
-    inline Document toDocument() const noexcept override
-    {
-        return Document()
-                .add(FIELD_ID, id)
-                .add(FIELD_NAME, name)
-                .add(FIELD_SEECRET, seecret)
-                .add(FIELD_STATUS, static_cast<int>(status))
-                .add(FIELD_EXPIRATION_DATE, expirationDate);
-    }
+     Document toDocument() const noexcept override;
 };
 
 /**
