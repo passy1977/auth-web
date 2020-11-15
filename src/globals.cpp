@@ -38,10 +38,6 @@ using namespace Poco::MongoDB;
 using namespace auth;
 
 
-
-
-
-
 void Globals::init(const std::string &path) noexcept
 {
 

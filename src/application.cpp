@@ -71,11 +71,10 @@ int auth::Application::main(const vector<string> &args)
     msg += "maxThreads:";
     msg += std::to_string(maxThreads);
 
-    Globals::getInstance()->getLog()->write(
-                LogService::Level::DBG,
-                __LINE__,
-                __FILE__,
-                msg);
+//    log->write(LogService::Level::DBG,
+//                __LINE__,
+//                __FILE__,
+//                msg);
 
     HTTPServerParams *params = new HTTPServerParams();
 

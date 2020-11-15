@@ -36,6 +36,7 @@ using namespace Poco::Net;
 #include "router.h"
 using auth::Router;
 
+#include "globals.h"
 
 namespace auth
 {
@@ -50,8 +51,13 @@ class Application final : public ServerApplication
    int maxQueued = 100;
    int maxThreads = 2;
 
-protected:
+   LogService *log = nullptr;
 
+public:
+   inline Application() : log(new LogService(Globals::getInstance()->getConfig()))
+   {}
+
+protected:
     /**
      * @brief main override of ServerApplication
      * @return status of application

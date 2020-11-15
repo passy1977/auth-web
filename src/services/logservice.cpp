@@ -37,13 +37,13 @@ using namespace auth::services;
 LogService::LogService(const AutoPtr<IniFileConfiguration> &config) noexcept : config(config)
 {
     ///configure log if needed
-    if (config->has(CONFIG_PATH_LOG) && config->has(CONFIG_LOG_ROTATION))
-    {
-        AutoPtr<SimpleFileChannel> logChannel = AutoPtr<SimpleFileChannel>(new SimpleFileChannel);
-        logChannel->setProperty("path", move(config->getString(CONFIG_PATH_LOG)));
-        logChannel->setProperty("rotation", move(config->getString(CONFIG_LOG_ROTATION)));
-        Logger::root().setChannel(logChannel);
-    }
+//    if (config->has(CONFIG_PATH_LOG) && config->has(CONFIG_LOG_ROTATION))
+//    {
+//        AutoPtr<SimpleFileChannel> logChannel = AutoPtr<SimpleFileChannel>(new SimpleFileChannel);
+//        logChannel->setProperty("path", move(config->getString(CONFIG_PATH_LOG)));
+//        logChannel->setProperty("rotation", move(config->getString(CONFIG_LOG_ROTATION)));
+//        Logger::root().setChannel(logChannel);
+//    }
 }
 
 

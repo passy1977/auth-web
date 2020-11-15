@@ -34,11 +34,10 @@ using namespace Poco::Util;
 #include "Poco/MongoDB/Connection.h"
 using Poco::MongoDB::Connection;
 
-#include "constants.h"
-
 #include "services/logservice.h"
 using auth::services::LogService;
 
+#include "constants.h"
 
 namespace auth
 {
@@ -102,14 +101,6 @@ public:
         return connection;
     }
 
-    /**
-     * @brief getLog get log
-     * @return configured log
-     */
-    inline const LogService *getLog() const noexcept
-    {
-        return log;
-    }
 };
 
 }
