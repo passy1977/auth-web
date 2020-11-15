@@ -22,9 +22,31 @@
 
 #include "authcontroller.h"
 
+#include <string>
+using namespace std;
+
+#include <Poco/Net/HTTPServerResponse.h>
+using namespace Poco::Net;
+
+#include "Poco/JSON/Object.h"
+using Poco::JSON::Object;
+
 using namespace auth::controllers;
 
-void AuthController::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response)
+void AuthController::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
 {
+    response.setChunkedTransferEncoding(true);
 
+    //Sets mime type text/html application/json etc.
+    response.setContentType("application/json");
+
+    //Sets the response status 404, 200 etc.
+    response.setStatus("200");
+
+    //opens the file stream
+    ostream& responseStream = response.send();
+
+    Object jsonError;
+    jsonError.set("type", "auth");
+    jsonError.stringify(responseStream);
 }

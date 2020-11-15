@@ -20,24 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "usercontroller.h"
 
-#include <Poco/Net/HTTPRequestHandler.h>
+#include <string>
+using namespace std;
+
+#include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
-#include "../constants.h"
+#include "Poco/JSON/Object.h"
+using Poco::JSON::Object;
 
-namespace auth::controllers
+using namespace auth::controllers;
+
+void UserController::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
 {
+    response.setChunkedTransferEncoding(true);
 
-class AuthController final : public HTTPRequestHandler
-{
-public:
-    AuthController() = default;
-    AUTH_NO_COPY_NO_MOVE(AuthController)
+    //Sets mime type text/html application/json etc.
+    response.setContentType("application/json");
 
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
+    //Sets the response status 404, 200 etc.
+    response.setStatus("200");
 
+    //opens the file stream
+    ostream& responseStream = response.send();
 
+    Object jsonError;
+    jsonError.set("type", "user");
+    jsonError.stringify(responseStream);
 }

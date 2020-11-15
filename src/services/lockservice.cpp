@@ -45,10 +45,11 @@ LockService::LockService() noexcept :
         auto &&createdTime = Timestamp::fromUtcTime(lockFile.created().utcTime());
 
         ///read pid
+        string pid;
         FileInputStream istr(lockFile.path());
         CountingInputStream countingIstr(istr);
-        string pid;
         StreamCopier::copyToString(countingIstr, pid);
+        istr.close();
 
         ///build message
         serrviceOnMessage = "pid: " + pid + " created:" + DateTimeFormatter::format(createdTime,  DateTimeFormat::SORTABLE_FORMAT);
@@ -66,7 +67,7 @@ bool LockService::start() noexcept
     ///then write lock file whith porocess pid
     FileOutputStream out;
 
-
+    ///write pid
     FileOutputStream ostr(lockFile.path());
     CountingOutputStream countingOstr(ostr);
     TeeOutputStream tos(countingOstr);

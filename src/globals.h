@@ -36,6 +36,10 @@ using Poco::MongoDB::Connection;
 
 #include "constants.h"
 
+#include "services/logservice.h"
+using auth::services::LogService;
+
+
 namespace auth
 {
 
@@ -49,8 +53,17 @@ class Globals final
     AutoPtr<IniFileConfiguration> config;
 
     Connection connection;
+
+    LogService *log = nullptr;
+
 public:
     Globals() = default;
+    inline ~Globals() noexcept
+    {
+        delete log;
+        log = nullptr;
+    }
+
     AUTH_NO_COPY_NO_MOVE(Globals)
 
     /**
@@ -87,6 +100,15 @@ public:
     inline const Connection & getConnection() const noexcept
     {
         return connection;
+    }
+
+    /**
+     * @brief getLog get log
+     * @return configured log
+     */
+    inline const LogService *getLog() const noexcept
+    {
+        return log;
     }
 };
 

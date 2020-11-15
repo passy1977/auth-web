@@ -63,6 +63,20 @@ int auth::Application::main(const vector<string> &args)
         }
     }
 
+
+    string msg = "Server conf port:";
+    msg += std::to_string(port);
+    msg += " maxQueued:";
+    msg += std::to_string(maxQueued);
+    msg += "maxThreads:";
+    msg += std::to_string(maxThreads);
+
+    Globals::getInstance()->getLog()->write(
+                LogService::Level::DBG,
+                __LINE__,
+                __FILE__,
+                msg);
+
     HTTPServerParams *params = new HTTPServerParams();
 
     ///Sets the maximum number of queued connections.

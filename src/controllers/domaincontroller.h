@@ -30,14 +30,13 @@ using namespace Poco::Net;
 namespace auth::controllers
 {
 
-class AuthController final : public HTTPRequestHandler
+class DomainController final : public HTTPRequestHandler
 {
 public:
-    AuthController() = default;
-    AUTH_NO_COPY_NO_MOVE(AuthController)
+    DomainController() = default;
+    AUTH_NO_COPY_NO_MOVE(DomainController)
 
     void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
 };
-
 
 }

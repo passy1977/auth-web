@@ -33,7 +33,7 @@ using Poco::JSON::Object;
 
 using namespace auth::controllers;
 
-void HttpStatusController::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response)
+void HttpStatusController::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
 {
     response.setChunkedTransferEncoding(true);
 

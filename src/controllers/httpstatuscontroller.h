@@ -25,6 +25,8 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
 
+#include "../constants.h"
+
 namespace auth::controllers
 {
 
@@ -46,10 +48,7 @@ public:
     };
 
     HttpStatusController() = delete;
-    HttpStatusController(const HttpStatusController&) = delete;
-    HttpStatusController& operator = (const HttpStatusController&) = delete;
-    HttpStatusController(HttpStatusController&&) = delete;
-    HttpStatusController& operator = (HttpStatusController&&) = delete;
+    AUTH_NO_COPY_NO_MOVE(HttpStatusController)
 
     void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
 

@@ -25,11 +25,15 @@
 #include <iostream>
 using namespace std;
 
-#include "controllers/httpstatuscontroller.h"
-using auth::controllers::HttpStatusController;
-
 #include <Poco/Net/HTTPServerRequest.h>
 using namespace Poco::Net;
+
+#include "globals.h"
+#include "controllers/authcontroller.h"
+#include "controllers/usercontroller.h"
+#include "controllers/domaincontroller.h"
+#include "controllers/httpstatuscontroller.h"
+using namespace auth::controllers;
 
 using namespace auth;
 
@@ -37,13 +41,13 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
 {
 
 
-
-    cout << "uri:" << request.getURI() << endl;
-
-     auto &r = const_cast<HTTPServerRequest &>(request);
-    cout << "body:" << string(std::istreambuf_iterator<char>(r.stream()), {}) << endl;
-
-
+    if (request.getURI().rfind("/api/v1/auth", 0) == 0) {
+        return new AuthController;
+    } else if (request.getURI().rfind("/api/v1/user", 0) == 0) {
+        return new UserController;
+    } else if (request.getURI().rfind("/api/v1/domain", 0) == 0) {
+        return new DomainController;
+    }
 
 
     return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);

@@ -22,22 +22,58 @@
 
 #pragma once
 
-#include <Poco/Net/HTTPRequestHandler.h>
-using namespace Poco::Net;
+#include<string>
+using std::string;
 
-#include "../constants.h"
+#include <Poco/SimpleFileChannel.h>
+using Poco::SimpleFileChannel;
 
-namespace auth::controllers
+#include <Poco/AutoPtr.h>
+using Poco::AutoPtr;
+
+#include <Poco/Util/IniFileConfiguration.h>
+using namespace Poco::Util;
+
+namespace auth::services
 {
 
-class AuthController final : public HTTPRequestHandler
+
+/**
+ * @brief The LogService class Log helper fo berer log managing
+ * @author Antonio Salsi
+ */
+class LogService
 {
+
+    const AutoPtr<IniFileConfiguration> &config;
+
 public:
-    AuthController() = default;
-    AUTH_NO_COPY_NO_MOVE(AuthController)
 
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
+    /**
+     * @brief The LogLevel enum to manage log sowing
+     * @author Antonio Salsi
+     */
+    enum class Level {
+        TRACE,
+        DBG,
+        INFO,
+        WARN,
+        ERROR,
+        FATAL
+    };
+
+    LogService(const AutoPtr<IniFileConfiguration> &) noexcept;
+
+    /**
+     * @brief LogService::write message to log
+     * @param level of log
+     * @param line in soure
+     * @param source file
+     * @param message to wite
+     */
+    void write(Level &&level, unsigned int line, const string& source, string message) const noexcept;
 };
 
 
+//unsigned int line, const string& source, string message
 }

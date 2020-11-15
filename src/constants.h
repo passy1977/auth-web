@@ -27,26 +27,26 @@
     claxx(const claxx&) = delete; \
     claxx& operator = (const claxx&) = delete; \
     claxx(claxx&&) = delete; \
-    claxx& operator = (claxx&&) = delete; \
+    claxx& operator = (claxx&&) = delete;
 
 namespace auth
 {
 
 ///config global param
-inline constexpr const char* PATH_CONFIG = "./config.ini";
-inline constexpr const char* FILE_LOCK_SERVICE = "./auth.pin";
+inline constexpr const char *PATH_CONFIG = "./config.ini";
+inline constexpr const char *FILE_LOCK_SERVICE = "./auth.pin";
 
 
 ///config key param
-inline constexpr const char* CONFIG_PATH_LOG = "log.path";
-inline constexpr const char* CONFIG_LOG_ROTATION = "log.rotation";
-inline constexpr const char* CONFIG_SERVER_PORT = "server.port";
-inline constexpr const char* CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
-inline constexpr const char* CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
-inline constexpr const char* CONFIG_DB_HOST= "db.host";
-inline constexpr const char* CONFIG_DB_PORT= "db.port";
-inline constexpr const char* CONFIG_DB_DATABASE = "db.database";
-inline constexpr const char* CONFIG_DB_USER = "db.user";
-inline constexpr const char* CONFIG_DB_PASSWORD = "db.password";
+inline constexpr const char *CONFIG_PATH_LOG = "log.path";
+inline constexpr const char *CONFIG_LOG_ROTATION = "log.rotation";
+inline constexpr const char *CONFIG_SERVER_PORT = "server.port";
+inline constexpr const char *CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
+inline constexpr const char *CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
+inline constexpr const char *CONFIG_DB_HOST= "db.host";
+inline constexpr const char *CONFIG_DB_PORT= "db.port";
+inline constexpr const char *CONFIG_DB_DATABASE = "db.database";
+inline constexpr const char *CONFIG_DB_USER = "db.user";
+inline constexpr const char *CONFIG_DB_PASSWORD = "db.password";
 
 }

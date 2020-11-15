@@ -25,13 +25,6 @@
 #include <memory>
 using std::move;
 
-
-#include <Poco/Logger.h>
-using Poco::Logger;
-
-#include <Poco/SimpleFileChannel.h>
-using Poco::SimpleFileChannel;
-
 #include <Poco/AutoPtr.h>
 using Poco::AutoPtr;
 
@@ -44,6 +37,11 @@ using namespace Poco::MongoDB;
 
 using namespace auth;
 
+
+
+
+
+
 void Globals::init(const std::string &path) noexcept
 {
 
@@ -51,15 +49,7 @@ void Globals::init(const std::string &path) noexcept
         ///init configuration
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
 
-
-        ///configure log if needed
-        if (config->has(CONFIG_PATH_LOG) && config->has(CONFIG_LOG_ROTATION))
-        {
-            AutoPtr<SimpleFileChannel> channel(new SimpleFileChannel);
-            channel->setProperty("path", move(config->getString(CONFIG_PATH_LOG)));
-            channel->setProperty("rotation", move(config->getString(CONFIG_LOG_ROTATION)));
-            Logger::root().setChannel(channel);
-        }
+        log = new LogService(config);
 
         ///build connection string for MongoDb
         string uri = "mongodb://";
@@ -78,7 +68,7 @@ void Globals::init(const std::string &path) noexcept
 
 
     }  catch (Poco::Exception &e) {
-        poco_warning_f1(Logger::root(), "Read configuration error, load deafult params %s", e);
+        log->write(LogService::Level::ERROR, __LINE__, __FILE__, e.message());
     }
 
 }
