@@ -22,8 +22,10 @@
 
 #include "logservice.h"
 
-#include <Poco/Logger.h>
-using Poco::Logger;
+//#include <Poco/Logger.h>
+//using Poco::Logger;
+#include<iostream>
+using namespace std;
 
 #include<Poco/DateTimeFormatter.h>
 #include<Poco/DateTimeFormat.h>
@@ -44,49 +46,51 @@ LogService::LogService(const AutoPtr<IniFileConfiguration> &config) noexcept : c
 //        logChannel->setProperty("rotation", move(config->getString(CONFIG_LOG_ROTATION)));
 //        Logger::root().setChannel(logChannel);
 //    }
+
 }
 
 
-void LogService::write(LogService::Level &&level, unsigned int line, const string &source, string message) const noexcept
+void LogService::write(LogService::Level &&level, unsigned int line, const string & source, string message) const noexcept
 {
 
-    string sourceCopy = source;
-//    string delimiter = "/";
-//    size_t pos = 0;
-//    string token;
-//    while ((pos = source.find(delimiter)) != string::npos) {
-//        token = source.substr(0, pos);
-//        sourceCopy.erase(0, pos + delimiter.length());
-//    }
-
     ///message building
+    string src;
+    size_t position = source.rfind('/');
+    if (position) {
+        position++;
+        src = source.substr(position, source.size());
+    }
+
+    string strLevel;
+    switch (level) {
+    case LogService::Level::TRACE:
+        strLevel = "TRACE";
+        break;
+    case LogService::Level::DBG:
+        strLevel = "DEBUG";
+        break;
+    case LogService::Level::INFO:
+        strLevel = "INFO";
+        break;
+    case LogService::Level::WARN:
+        strLevel = "WARN";
+        break;
+    case LogService::Level::ERROR:
+        strLevel = "ERROR";
+        break;
+    case LogService::Level::FATAL:
+        strLevel = "FATAL";
+        break;
+    }
     string ret = DateTimeFormatter::format(Timestamp(),  DateTimeFormat::SORTABLE_FORMAT);
+    ret += " level:";
+    ret += strLevel;
     ret += " line:";
     ret += std::to_string(line);
     ret += " source:";
-    ret += sourceCopy;
-    ret += ":";
+    ret += src;
+    ret += " message:";
     ret += message;
 
-    switch (level) {
-    case LogService::Level::TRACE:
-        poco_trace(Logger::root(), ret);
-        break;
-    case LogService::Level::DBG:
-        poco_debug(Logger::root(), ret);
-        break;
-    case LogService::Level::INFO:
-        poco_information(Logger::root(), ret);
-        break;
-    case LogService::Level::WARN:
-        poco_warning(Logger::root(), ret);
-        break;
-    case LogService::Level::ERROR:
-        poco_error(Logger::root(), ret);
-        break;
-    case LogService::Level::FATAL:
-        poco_fatal(Logger::root(), ret);
-        break;
-    }
-
+    cout << ret << endl;
 }

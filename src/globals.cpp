@@ -59,9 +59,31 @@ void Globals::init(const std::string &path) noexcept
         uri += "/";
         uri += config->getString(CONFIG_DB_DATABASE);
 
-        ///copnnect to MongoDB
-        connection.connect(uri);
+        log->write(LogService::Level::DBG, __LINE__, __FILE__, uri);
 
+        ///copnnect to MongoDB
+        Connection::SocketFactory sf;
+        connection.connect(uri, sf);
+
+        Poco::MongoDB::Document::Ptr player = new Poco::MongoDB::Document();
+        player->add("lastname", std::string("Braem"));
+        player->add("firstname", std::string("Franky"));
+
+        Poco::DateTime birthdate;
+        birthdate.assign(1969, 3, 9);
+        player->add("birthdate", birthdate.timestamp());
+
+        player->add("start", 1993);
+        player->add("active", false);
+
+        Poco::DateTime now;
+        player->add("lastupdated", now.timestamp());
+
+        player->add("unknown", NullValue());
+
+        Poco::MongoDB::InsertRequest request("team.players");
+        request.documents().push_back(player);
+        connection.sendRequest(request);
 
     }  catch (Poco::Exception &e) {
         log->write(LogService::Level::ERROR, __LINE__, __FILE__, e.message());

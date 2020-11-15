@@ -65,16 +65,16 @@ int auth::Application::main(const vector<string> &args)
 
 
     string msg = "Server conf port:";
-    msg += std::to_string(port);
+    msg += to_string(port);
     msg += " maxQueued:";
-    msg += std::to_string(maxQueued);
+    msg += to_string(maxQueued);
     msg += "maxThreads:";
-    msg += std::to_string(maxThreads);
+    msg += to_string(maxThreads);
 
-//    log->write(LogService::Level::DBG,
-//                __LINE__,
-//                __FILE__,
-//                msg);
+     log->write(LogService::Level::DBG,
+                __LINE__,
+                __FILE__,
+                msg);
 
     HTTPServerParams *params = new HTTPServerParams();
 

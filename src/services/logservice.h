@@ -71,7 +71,7 @@ public:
      * @param source file
      * @param message to wite
      */
-    void write(Level &&level, unsigned int line, const string& source, string message) const noexcept;
+    void write(Level &&level, unsigned int line, const string &source, string message) const noexcept;
 };
 
 

@@ -1,16 +1,10 @@
 
 use admin;
 db.createUser({ 
-    user:"web-auth", 
-    pwd:"web-auth123",
-    roles:[{ role: "readWrite", db: "auth"  }]  
+    user:"auth-web", 
+    pwd:"auth-web123",
+    roles:[{ role: "readWrite", db: "auth-web"  }]  
 });
 
 
-db.auth.findAndModify({
-    query: { _id: "UNIQUE COUNT DOCUMENT IDENTIFIER" },
-    update: {
-        $inc: {COUNT: 1 },
-    }
-    writeConcern: 'majority'
-});
+db.auth.createIndex( { "email": 1, "domain": 1 }, { unique: true } )
