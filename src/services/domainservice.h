@@ -22,42 +22,16 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-using namespace std;
+#include "../daos/domaindao.h"
+using namespace auth::daos;
 
-#include <Poco/Util/ServerApplication.h>
-using namespace Poco::Util;
-
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Net/HTTPServer.h>
-using namespace Poco::Net;
-
-#include "router.h"
-using auth::Router;
-
-#include "globals.h"
-
-namespace auth
+namespace auth::services
 {
 
-/**
- * @brief The Application class load configuration and start up server
- * @author Antonio Salsi
- */
-class Application final : public ServerApplication
+class DomainService
 {
-   Poco::UInt16 port = 9'100;
-   int maxQueued = 100;
-   int maxThreads = 2;
-
-protected:
-
-    /**
-     * @brief main override of ServerApplication
-     * @return status of application
-     */
-    int main(const vector<string> &) override;
+public:
+    AUTH_NO_COPY_NO_MOVE(DomainService)
 };
 
 }

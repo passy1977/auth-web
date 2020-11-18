@@ -33,12 +33,12 @@ using Poco::JSON::Object;
 
 using namespace auth::controllers;
 
-void DomainController::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
+void DomainController::handleRESTRequest(const string &method, const string &url, HTTPServerRequest &, HTTPServerResponse &response)
 {
     response.setChunkedTransferEncoding(true);
 
     //Sets mime type text/html application/json etc.
-    response.setContentType("application/json");
+    response.setContentType(CONTENT_TYPE);
 
     //Sets the response status 404, 200 etc.
     response.setStatus("200");
@@ -48,5 +48,7 @@ void DomainController::handleRequest(HTTPServerRequest &, HTTPServerResponse &re
 
     Object jsonError;
     jsonError.set("type", "domain");
+    jsonError.set("method", method);
+    jsonError.set("url", url);
     jsonError.stringify(responseStream);
 }

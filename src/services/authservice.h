@@ -22,87 +22,27 @@
 
 #pragma once
 
-#include "../globals.h"
+#include "../daos/userdao.h"
+#include "../daos/domaindao.h"
+using namespace auth::daos;
 
-namespace auth::dao
+#include"../globals.h"
+
+namespace auth::services
 {
 
-/**
- * @brief The DAOUser class is a singleton for CRUD operation on User struct
- * @author Antonio Salsi
- */
-template<typename T>
-class DAOUser final
+class AuthService
 {
 
-    const Connection &connection;
+    const UserDAO userDao;
+    const DomainDAO domainDao;
 
 public:
-    inline explicit DAOUser(const Connection &connection) :
-        connection(connection)
+    inline AuthService() :
+        userDao(Globals::getInstance()->getConnection()),
+        domainDao(Globals::getInstance()->getConnection())
     {}
-
-    AUTH_NO_COPY_NO_MOVE(DAOUser)
-
-    /**
-     * @brief insert T
-     * @exceptions
-     */
-    void insert(T &&t) const
-    {
-        insert(t);
-    }
-
-    /**
-     * @brief insert T
-     * @exceptions
-     */
-    void insert(const T &) const
-    {
-
-    }
-
-
-    /**
-     * @brief update T
-     * @exceptions
-     */
-    void update(T &&t) const
-    {
-        update(t);
-    }
-
-
-    /**
-     * @brief update T
-     * @exceptions
-     */
-    void update(const T &) const
-    {
-
-    }
-
-    /**
-     * @brief delete T
-     * @exceptions
-     */
-    inline void remove(T &&t) const
-    {
-        remove(t);
-    }
-
-    /**
-     * @brief delete T
-     * @exceptions
-     */
-    void remove(const T &) const
-    {
-
-    }
-
-protected:
-    string collection;
-
+    AUTH_NO_COPY_NO_MOVE(AuthService)
 };
 
 }

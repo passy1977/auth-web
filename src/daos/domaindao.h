@@ -22,42 +22,27 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-using namespace std;
+#include "dao.h"
 
-#include <Poco/Util/ServerApplication.h>
-using namespace Poco::Util;
+#include "../pods/domain.h"
+using auth::pods::Domain;
 
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Net/HTTPServer.h>
-using namespace Poco::Net;
 
-#include "router.h"
-using auth::Router;
-
-#include "globals.h"
-
-namespace auth
+namespace auth::daos
 {
 
 /**
- * @brief The Application class load configuration and start up server
- * @author Antonio Salsi
+ * @brief The DomainDAO class CRUD oparetion on Domain
  */
-class Application final : public ServerApplication
+class DomainDAO final : public DAO<Domain>
 {
-   Poco::UInt16 port = 9'100;
-   int maxQueued = 100;
-   int maxThreads = 2;
+    static const constexpr inline char* COLLECTION_NAME = "domains";
 
-protected:
-
-    /**
-     * @brief main override of ServerApplication
-     * @return status of application
-     */
-    int main(const vector<string> &) override;
+public:
+    DomainDAO() = delete;
+    explicit DomainDAO(const Connection &connection) : DAO(COLLECTION_NAME, connection)
+    {}
+    AUTH_NO_COPY_NO_MOVE(DomainDAO)
 };
 
 }

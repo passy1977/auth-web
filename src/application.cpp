@@ -30,7 +30,6 @@ using auth::services::LockService;
 int auth::Application::main(const vector<string> &args)
 {
 
-
     LockService lockService;
 
     ///check if service alterady run
@@ -68,13 +67,10 @@ int auth::Application::main(const vector<string> &args)
     msg += to_string(port);
     msg += " maxQueued:";
     msg += to_string(maxQueued);
-    msg += "maxThreads:";
+    msg += " maxThreads:";
     msg += to_string(maxThreads);
 
-     log->write(LogService::Level::DBG,
-                __LINE__,
-                __FILE__,
-                msg);
+    AUTH_GLOBAL_LOG(DBG, msg);
 
     HTTPServerParams *params = new HTTPServerParams();
 

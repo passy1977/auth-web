@@ -23,7 +23,8 @@
 #include "user.h"
 
 #include <Poco/MongoDB/Document.h>
-using Poco::MongoDB::Document;
+#include <Poco/MongoDB/Array.h>
+using namespace Poco::MongoDB;
 
 using namespace auth::pods;
 
@@ -37,5 +38,6 @@ Document User::toDocument() const noexcept
             .add(FIELD_STATUS, static_cast<int>(status))
             .add(FIELD_LAST_LOGIN, lastLogin)
             .add(FIELD_EXPIRATION_DATE, expirationDate)
-            .add(FIELD_DOMAIN, domain);
+            .add(FIELD_DOMAIN, domain)
+            .add(FIELD_PERMISSIONS, "");
 }

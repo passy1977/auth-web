@@ -22,22 +22,25 @@
 
 #pragma once
 
-#include <Poco/Net/HTTPRequestHandler.h>
-using namespace Poco::Net;
-
-#include "../constants.h"
+#include "controller.h"
 
 namespace auth::controllers
 {
 
-class AuthController final : public HTTPRequestHandler
+class AuthController final : public Controller
 {
+    const AuthService authService;
+
 public:
-    AuthController() = default;
+    static inline constexpr const char *PATH = "/api/v1/auth";
+    static inline constexpr const char *NAME = "auth";
+
+    inline explicit AuthController(const string &method, const string &uri) : Controller(uri, method)
+    {}
     AUTH_NO_COPY_NO_MOVE(AuthController)
 
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-};
+    void handleRESTRequest(const string &, const string &, HTTPServerRequest &, HTTPServerResponse &) override;
 
+};
 
 }

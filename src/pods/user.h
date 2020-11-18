@@ -24,6 +24,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 using namespace std;
 
 #import "pod.h"
@@ -42,10 +43,12 @@ struct User final : public Pod
     static inline constexpr const char *FIELD_EMAIL = "email";
     static inline constexpr const char *FIELD_PASSWORD = "password";
     static inline constexpr const char *FIELD_DATA = "data";
+    static inline constexpr const char *FIELD_PERMISSIONS = "permissions";
     static inline constexpr const char *FIELD_STATUS = "status";
     static inline constexpr const char *FIELD_LAST_LOGIN = "lastLogin";
     static inline constexpr const char *FIELD_EXPIRATION_DATE = "expirationDate";
     static inline constexpr const char *FIELD_DOMAIN = "domain";
+
 
     /**
      * @brief The Status enum status of User
@@ -77,6 +80,11 @@ struct User final : public Pod
      * @brief additional data in json format
      */
     string data;
+
+    /**
+     * @brief permissions to service access
+     */
+    vector<string> permissions;
 
     /**
      * @brief user status

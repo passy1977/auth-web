@@ -40,7 +40,7 @@ void HttpStatusController::handleRequest(HTTPServerRequest &, HTTPServerResponse
     string &&httpError = to_string(static_cast<uint16_t>(httpStatus));
 
     //Sets mime type text/html application/json etc.
-    response.setContentType("application/json");
+    response.setContentType(CONTENT_TYPE);
 
     //Sets the response status 404, 200 etc.
     response.setStatus(httpError);

@@ -34,9 +34,10 @@ using Poco::AutoPtr;
 #include <Poco/Util/IniFileConfiguration.h>
 using namespace Poco::Util;
 
+#include "../constants.h"
+
 namespace auth::services
 {
-
 
 /**
  * @brief The LogService class Log helper fo berer log managing
@@ -63,6 +64,7 @@ public:
     };
 
     LogService(const AutoPtr<IniFileConfiguration> &) noexcept;
+    AUTH_NO_COPY_NO_MOVE(LogService)
 
     /**
      * @brief LogService::write message to log
@@ -74,6 +76,4 @@ public:
     void write(Level &&level, unsigned int line, const string &source, string message) const noexcept;
 };
 
-
-//unsigned int line, const string& source, string message
 }

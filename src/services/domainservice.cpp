@@ -20,44 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "domainservice.h"
 
-#include <iostream>
-#include <vector>
-using namespace std;
+using namespace auth::services;
 
-#include <Poco/Util/ServerApplication.h>
-using namespace Poco::Util;
-
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Net/HTTPServer.h>
-using namespace Poco::Net;
-
-#include "router.h"
-using auth::Router;
-
-#include "globals.h"
-
-namespace auth
-{
-
-/**
- * @brief The Application class load configuration and start up server
- * @author Antonio Salsi
- */
-class Application final : public ServerApplication
-{
-   Poco::UInt16 port = 9'100;
-   int maxQueued = 100;
-   int maxThreads = 2;
-
-protected:
-
-    /**
-     * @brief main override of ServerApplication
-     * @return status of application
-     */
-    int main(const vector<string> &) override;
-};
-
-}

@@ -22,42 +22,35 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-using namespace std;
-
-#include <Poco/Util/ServerApplication.h>
-using namespace Poco::Util;
-
-#include <Poco/Net/ServerSocket.h>
-#include <Poco/Net/HTTPServer.h>
+#include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
 
-#include "router.h"
-using auth::Router;
+#include "../services/authservice.h"
+using auth::services::AuthService;
 
-#include "globals.h"
+#include "../constants.h"
 
-namespace auth
+namespace auth::controllers
 {
 
-/**
- * @brief The Application class load configuration and start up server
- * @author Antonio Salsi
- */
-class Application final : public ServerApplication
+class Controller : public HTTPRequestHandler
 {
-   Poco::UInt16 port = 9'100;
-   int maxQueued = 100;
-   int maxThreads = 2;
+    const string method;
+    const string uri;
 
-protected:
+public:
+    inline explicit Controller(const string &method, const string &uri) : method(method), uri(uri)
+    {}
+    AUTH_NO_COPY_NO_MOVE(Controller)
 
-    /**
-     * @brief main override of ServerApplication
-     * @return status of application
-     */
-    int main(const vector<string> &) override;
+    virtual void handleRESTRequest(const string &, const string &, HTTPServerRequest &, HTTPServerResponse &) = 0;
+
+    inline void handleRequest(HTTPServerRequest &request, HTTPServerResponse &response) override
+    {
+        handleRESTRequest(method, uri, request, response);
+    }
+
 };
+
 
 }

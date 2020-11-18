@@ -28,7 +28,6 @@ using namespace std;
 #include <Poco/Net/HTTPServerRequest.h>
 using namespace Poco::Net;
 
-#include "globals.h"
 #include "controllers/authcontroller.h"
 #include "controllers/usercontroller.h"
 #include "controllers/domaincontroller.h"
@@ -40,15 +39,16 @@ using namespace auth;
 HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &request)
 {
 
+    auto method = request.getMethod();
+    auto uri = request.getURI();
 
-    if (request.getURI().rfind("/api/v1/auth", 0) == 0) {
-        return new AuthController;
-    } else if (request.getURI().rfind("/api/v1/user", 0) == 0) {
-        return new UserController;
-    } else if (request.getURI().rfind("/api/v1/domain", 0) == 0) {
-        return new DomainController;
+    if (uri.rfind(AuthController::PATH, 0) == 0) {
+        return new AuthController(uri, method);
+    } else if (uri.rfind(UserController::PATH, 0) == 0) {
+        return new UserController(uri, method);
+    } else if (uri.rfind(DomainController::PATH, 0) == 0) {
+        return new DomainController(uri, method);
     }
-
 
     return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
 }

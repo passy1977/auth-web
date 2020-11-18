@@ -22,6 +22,8 @@
 
 #pragma once
 
+#define AUTH_GLOBAL_LOG(_level_, msg) Globals::getInstance()->getLog()->write(LogService::Level::_level_, __LINE__, __FILE__, msg)
+
 #include <memory>
 using namespace std;
 
@@ -87,7 +89,7 @@ public:
      * @brief getConfig get instance to config file file
      * @return config file reference
      */
-    inline const AutoPtr<IniFileConfiguration> & getConfig() const noexcept
+    inline const AutoPtr<IniFileConfiguration> &getConfig() const noexcept
     {
         return config;
     }
@@ -96,9 +98,18 @@ public:
      * @brief getConnection get MongDb connection
      * @return MongDb connection
      */
-    inline const Connection & getConnection() const noexcept
+    inline const Connection &getConnection() const noexcept
     {
         return connection;
+    }
+
+    /**
+     * @brief getLog get log
+     * @return
+     */
+    inline const LogService *getLog() const noexcept
+    {
+        return log;
     }
 
 };
