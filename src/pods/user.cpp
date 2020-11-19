@@ -22,22 +22,25 @@
 
 #include "user.h"
 
-#include <Poco/MongoDB/Document.h>
-#include <Poco/MongoDB/Array.h>
-using namespace Poco::MongoDB;
+#include <Poco/JSON/Object.h>
+using Poco::JSON::Object;
 
 using namespace auth::pods;
 
-Document User::toDocument() const noexcept
+Object User::toDocument() const noexcept
 {
-    return Document()
-            .add(FIELD_ID, id)
-            .add(FIELD_NAME, name)
-            .add(FIELD_EMAIL, email)
-            .add(FIELD_PASSWORD, password)
-            .add(FIELD_STATUS, static_cast<int>(status))
-            .add(FIELD_LAST_LOGIN, lastLogin)
-            .add(FIELD_EXPIRATION_DATE, expirationDate)
-            .add(FIELD_DOMAIN, domain)
-            .add(FIELD_PERMISSIONS, "");
+
+    Object object;
+
+    return object;
+//    return Document()
+//            .add(FIELD_ID, id)
+//            .add(FIELD_NAME, name)
+//            .add(FIELD_EMAIL, email)
+//            .add(FIELD_PASSWORD, password)
+//            .add(FIELD_STATUS, static_cast<int>(status))
+//            .add(FIELD_LAST_LOGIN, lastLogin)
+//            .add(FIELD_EXPIRATION_DATE, expirationDate)
+//            .add(FIELD_DOMAIN, domain)
+//            .add(FIELD_PERMISSIONS, "");
 }

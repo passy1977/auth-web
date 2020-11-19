@@ -22,4 +22,15 @@
 
 #include "authservice.h"
 
+//#include <Poco/JSON/Object.h>
+//using Poco::JSON::Object;
+
+#include "../globals.h"
+
 using namespace auth::services;
+
+void AuthService::testDB(HTTPServerResponse &response) const noexcept
+{
+
+    domainDao.testDb();
+}

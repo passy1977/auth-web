@@ -33,14 +33,19 @@ int auth::Application::main(const vector<string> &args)
     LockService lockService;
 
     ///check if service alterady run
-    if (!lockService.start()) {
+    if (!lockService.start())
+    {
         poco_warning_f1(Logger::root(), "Unable start the process: %s",  lockService.getSerrviceOnMessage());
-        return EXIT_NOINPUT;
+
     }
 
     ///initialize global params
-    Globals::getInstance()->init(args.empty() ? PATH_CONFIG : args[0]);
+    if (!Globals::getInstance()->init(args.empty() ? PATH_CONFIG : args[0]))
+    {
+        lockService.stop();
 
+        return EXIT_CONFIG;
+    }
 
     ///load config from global configuration
     auto &&config = Globals::getInstance()->getConfig();

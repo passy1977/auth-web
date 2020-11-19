@@ -80,11 +80,25 @@ struct Domain final : public Pod
      */
     string expirationDate;
 
+    inline Domain(
+            int id,
+            string name,
+            string seecret,
+            Status status,
+            string expirationDate
+            ) :
+        id(id),
+        name(name),
+        seecret(seecret),
+        status(status),
+        expirationDate(expirationDate)
+    {}
+
     /**
      * @brief toDocument get document ready for MongoDb
      * @return MongoDb doncument
      */
-     Document toDocument() const noexcept override;
+     Object toDocument() const noexcept override;
 };
 
 /**

@@ -92,5 +92,12 @@ void LogService::write(LogService::Level &&level, unsigned int line, const strin
     ret += " message:";
     ret += message;
 
-    cout << ret << endl;
+    if (level == LogService::Level::ERROR || level == LogService::Level::FATAL)
+    {
+        cerr << ret << endl;
+    }
+    else
+    {
+        cout << ret << endl;
+    }
 }

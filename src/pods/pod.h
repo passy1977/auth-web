@@ -23,15 +23,15 @@
 #pragma once
 
 
-namespace Poco::MongoDB
+namespace Poco::JSON
 {
-class Document;
+class Object;
 }
 
 namespace auth::pods
 {
 
-using Poco::MongoDB::Document;
+using Poco::JSON::Object;
 
 /**
  * @brief The Pod interface common interface for all pods
@@ -43,7 +43,7 @@ class Pod
      * @brief toDocument get document ready for MongoDb
      * @return MongoDb doncument
      */
-    virtual Document toDocument() const noexcept = 0;
+    virtual Object toDocument() const noexcept = 0;
 };
 
 }

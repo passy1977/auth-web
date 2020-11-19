@@ -22,10 +22,6 @@
 
 #pragma once
 
-#include<Poco/MongoDB/Database.h>
-using namespace Poco::MongoDB;
-using namespace Poco;
-
 #include "../globals.h"
 
 namespace auth::pods {
@@ -47,20 +43,27 @@ template<typename T>
 class DAO
 {
 
-    static const constexpr inline char* DATABASE_NAME = "auth-web";
+//    static const constexpr inline char* DATABASE_NAME = "auth-web";
+
+protected:
+
+    const string databaseName;
 
     const string collectionName;
 
-    const Connection &connection;
+    shared_ptr<mysqlx::Client> client;
 
-    Database db;
+
 public:
     DAO() = delete;
-    inline explicit DAO(const string &&collectionName, const Connection &connection) :
-        collectionName(collectionName),
-        connection(connection),
-        db(DATABASE_NAME)
-    {}
+    inline explicit DAO(const string &databaseName, const string &collectionName, const shared_ptr<mysqlx::Client> &client)
+        : databaseName(databaseName),
+          collectionName(collectionName),
+          client(client)
+        {
+
+        }
+
 
     AUTH_NO_COPY_NO_MOVE(DAO)
 
@@ -79,18 +82,18 @@ public:
      */
     void insert(const T &t) const
     {
-        auto &&insertRequest = db.createInsertRequest(collectionName);
+//        auto &&insertRequest = db.createInsertRequest(collectionName);
 
         if constexpr (!std::is_same_v<T, auth::pods::User> && !std::is_same_v<T, auth::pods::Domain> )
         {
-            insertRequest =  t.toDocument();
-            connection.sendRequest(insertRequest);
+//            insertRequest =  t.toDocument();
+//            connection.sendRequest(insertRequest);
 
-            string lastError = db.getLastError(connection);
-            if (!lastError.empty())
-            {
-                std::cout << "Last Error: " << db.getLastError(connection) << std::endl;
-            }
+//            string lastError = db.getLastError(connection);
+//            if (!lastError.empty())
+//            {
+//                std::cout << "Last Error: " << db.getLastError(connection) << std::endl;
+//            }
         }
 
 

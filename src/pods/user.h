@@ -113,7 +113,7 @@ struct User final : public Pod
      * @brief toDocument get document ready for MongoDb
      * @return MongoDb doncument
      */
-    Document toDocument() const noexcept override;
+    Object toDocument() const noexcept override;
 };
 
 /**

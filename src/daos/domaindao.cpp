@@ -23,3 +23,14 @@
 #include "domaindao.h"
 
 using namespace auth::daos;
+
+void DomainDAO::testDb() const
+{
+    auto &&session = client->getSession();
+
+    auto &&schema = session.getSchema(databaseName);
+
+    schema.createCollection("pippo");
+
+    session.close();
+}

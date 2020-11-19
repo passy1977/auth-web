@@ -1,18 +1,18 @@
 -- -----------------------------------------------------
--- Schema web_auth
+-- Schema auth_web
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `web_auth` ;
+DROP SCHEMA IF EXISTS `auth_web` ;
 
 -- -----------------------------------------------------
--- Schema web_auth
+-- Schema auth_web
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `web_auth` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
-USE `web_auth` ;
+CREATE SCHEMA IF NOT EXISTS `auth_web` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
+USE `auth_web` ;
 
 -- -----------------------------------------------------
--- Table `web_auth`.`domains`
+-- Table `auth_web`.`domains`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `web_auth`.`domains` (
+CREATE TABLE IF NOT EXISTS `auth_web`.`domains` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(254) NOT NULL,
   `user` VARCHAR(254) NOT NULL COMMENT 'Connection user auth',
@@ -27,9 +27,9 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `web_auth`.`users`
+-- Table `auth_web`.`users`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `web_auth`.`users` (
+CREATE TABLE IF NOT EXISTS `auth_web`.`users` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_domain` INT UNSIGNED NOT NULL,
   `email` VARCHAR(254) NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `web_auth`.`users` (
   UNIQUE INDEX `unique_email_domain` (`id_domain` ASC, `email` ASC),
   CONSTRAINT `fk_users_domains`
     FOREIGN KEY (`id_domain`)
-    REFERENCES `web_auth`.`domains` (`id`)
+    REFERENCES `auth_web`.`domains` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

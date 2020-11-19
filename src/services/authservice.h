@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <Poco/Net/HTTPServerResponse.h>
+using namespace Poco::Net;
+
 #include "../daos/userdao.h"
 #include "../daos/domaindao.h"
 using namespace auth::daos;
@@ -34,15 +37,27 @@ namespace auth::services
 class AuthService
 {
 
+    shared_ptr<mysqlx::Client> client;
+    const string &dbName;
     const UserDAO userDao;
     const DomainDAO domainDao;
 
 public:
-    inline AuthService() :
-        userDao(Globals::getInstance()->getConnection()),
-        domainDao(Globals::getInstance()->getConnection())
-    {}
+    inline AuthService() try :
+        client(Globals::getInstance()->getClient()),
+        dbName(move(Globals::getInstance()->getConfig()->getString(CONFIG_DB_DATABASE))),
+        userDao(dbName, client),
+        domainDao(dbName, client)
+    {
+
+    }
+    catch (...)
+    {
+        throw ;
+    }
     AUTH_NO_COPY_NO_MOVE(AuthService)
+
+    void testDB(HTTPServerResponse &) const noexcept;
 };
 
 }

@@ -28,7 +28,7 @@ using namespace std;
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
-#include "Poco/JSON/Object.h"
+#include <Poco/JSON/Object.h>
 using Poco::JSON::Object;
 
 using namespace auth::controllers;
@@ -43,11 +43,13 @@ void AuthController::handleRESTRequest(const string &method, const string &url, 
     //Sets the response status 404, 200 etc.
     response.setStatus("200");
 
-    Object jsonError;
-    jsonError.set("type", "auth");
-    jsonError.set("method", method);
-    jsonError.set("url", url);
-    jsonError.stringify(response.send());
+    authService.testDB(response);
+
+//    Object jsonError;
+//    jsonError.set("type", "auth");
+//    jsonError.set("method", method);
+//    jsonError.set("url", url);
+//    jsonError.stringify(response.send());
 }
 
 

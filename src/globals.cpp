@@ -28,16 +28,9 @@ using std::move;
 #include <Poco/AutoPtr.h>
 using Poco::AutoPtr;
 
-#include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/Connection.h"
-#include "Poco/MongoDB/Database.h"
-#include "Poco/MongoDB/Cursor.h"
-#include "Poco/MongoDB/Array.h"
-using namespace Poco::MongoDB;
-
 using namespace auth;
 
-void Globals::init(const std::string &path) noexcept
+bool Globals::init(const std::string &path) noexcept
 {
 
     try {
@@ -46,8 +39,21 @@ void Globals::init(const std::string &path) noexcept
 
         log = new LogService(config);
 
+//        auto && host = config->getString(CONFIG_DB_HOST);
+//        auto && port = config->getInt(CONFIG_DB_PORT);
+//        auto && user = config->getString(CONFIG_DB_USER);
+//        auto && password = config->getString(CONFIG_DB_PASSWORD);
+
+//        AUTH_GLOBAL_LOG(DBG, "host:" + host);
+//        AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
+//        AUTH_GLOBAL_LOG(DBG, "user:" + user);
+//        AUTH_GLOBAL_LOG(DBG, "password:" + password);
+
+//        ///copnnect to MySql
+//        session = new mysqlx::Session(host, port, user, password);
+
         ///build connection string for MongoDb
-        string uri = "mongodb://";
+        string uri = "mysqlx://";
         uri += config->getString(CONFIG_DB_USER);
         uri += ":";
         uri += config->getString(CONFIG_DB_PASSWORD);
@@ -60,13 +66,16 @@ void Globals::init(const std::string &path) noexcept
 
         AUTH_GLOBAL_LOG(DBG, uri);
 
-        ///copnnect to MongoDB
-        Connection::SocketFactory sf;
-        connection.connect(uri, sf);
+        client = make_shared<mysqlx::Client>(uri);
 
 
-    }  catch (Poco::Exception &e) {
+    } catch (const mysqlx::abi2::r0::Error &e) {
+        AUTH_GLOBAL_LOG(ERROR, e.what());
+        return false;
+    } catch (Poco::Exception &e) {
         AUTH_GLOBAL_LOG(ERROR, e.message());
+        return false;
     }
 
+    return true;
 }

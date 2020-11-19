@@ -33,8 +33,7 @@ using Poco::AutoPtr;
 #include <Poco/Util/IniFileConfiguration.h>
 using namespace Poco::Util;
 
-#include "Poco/MongoDB/Connection.h"
-using Poco::MongoDB::Connection;
+#include <mysqlx/xdevapi.h>
 
 #include "services/logservice.h"
 using auth::services::LogService;
@@ -53,7 +52,7 @@ class Globals final
 
     AutoPtr<IniFileConfiguration> config;
 
-    Connection connection;
+    shared_ptr<mysqlx::Client> client;
 
     LogService *log = nullptr;
 
@@ -63,6 +62,8 @@ public:
     {
         delete log;
         log = nullptr;
+
+        client->close();
     }
 
     AUTH_NO_COPY_NO_MOVE(Globals)
@@ -83,7 +84,7 @@ public:
     /**
      * @brief init for inializate subsystem like MongoDb connection, logs, load gonfig file, ...
      */
-    void init(const string & = PATH_CONFIG) noexcept;
+    bool init(const string & = PATH_CONFIG) noexcept;
 
     /**
      * @brief getConfig get instance to config file file
@@ -95,12 +96,12 @@ public:
     }
 
     /**
-     * @brief getConnection get MongDb connection
-     * @return MongDb connection
+     * @brief getConnection get MySql connection
+     * @return MySql connection
      */
-    inline const Connection &getConnection() const noexcept
+    inline shared_ptr<mysqlx::Client> getClient() const noexcept
     {
-        return connection;
+        return client;
     }
 
     /**
