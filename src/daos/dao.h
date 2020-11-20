@@ -47,19 +47,18 @@ class DAO
 
 protected:
 
-    const string databaseName;
+    const string &table;
 
-    const string collectionName;
+    MYSQL *connection;
 
-    shared_ptr<mysqlx::Client> client;
+
 
 
 public:
     DAO() = delete;
-    inline explicit DAO(const string &databaseName, const string &collectionName, const shared_ptr<mysqlx::Client> &client)
-        : databaseName(databaseName),
-          collectionName(collectionName),
-          client(client)
+    inline explicit DAO(const string &table, MYSQL *connection)
+        : table(table),
+          connection(connection)
         {
 
         }
@@ -135,6 +134,12 @@ public:
      */
     void remove(const T &) const
     {
+
+    }
+
+    void testDb()
+    {
+
 
     }
 

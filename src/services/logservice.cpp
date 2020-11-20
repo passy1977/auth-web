@@ -89,7 +89,7 @@ void LogService::write(LogService::Level &&level, unsigned int line, const strin
     ret += std::to_string(line);
     ret += " source:";
     ret += src;
-    ret += " message:";
+    ret += " - ";
     ret += message;
 
     if (level == LogService::Level::ERROR || level == LogService::Level::FATAL)

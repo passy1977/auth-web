@@ -16,8 +16,8 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/lib)
 include_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/lib)
-include_directories(${CMAKE_SOURCE_DIR}/lib/macos/mysql-connector/include)
-link_directories(${CMAKE_SOURCE_DIR}/lib/macos/mysql-connector/lib)
+include_directories(${CMAKE_SOURCE_DIR}/lib/macos/mariadb/include)
+link_directories(${CMAKE_SOURCE_DIR}/lib/macos/mariadb/lib)
 
 #source definitions
 add_executable(
@@ -62,4 +62,4 @@ add_executable(
 )
 
 #linking
-target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto mysqlcppconn8 ssl crypto)
+target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto mariadb ssl crypto)

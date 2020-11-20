@@ -38,8 +38,8 @@ class UserDAO final : public DAO<User>
     static const constexpr inline char* COLLECTION_NAME = "users";
 public:
     UserDAO() = delete;
-    UserDAO(const string &databaseName, const shared_ptr<mysqlx::Client> &client)
-        : DAO(COLLECTION_NAME, databaseName, client)
+    UserDAO(MYSQL *connection) :
+        DAO(COLLECTION_NAME, connection)
     {}
     AUTH_NO_COPY_NO_MOVE(UserDAO)
 };

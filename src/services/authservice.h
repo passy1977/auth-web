@@ -37,23 +37,15 @@ namespace auth::services
 class AuthService
 {
 
-    shared_ptr<mysqlx::Client> client;
-    const string &dbName;
     const UserDAO userDao;
     const DomainDAO domainDao;
 
 public:
-    inline AuthService() try :
-        client(Globals::getInstance()->getClient()),
-        dbName(move(Globals::getInstance()->getConfig()->getString(CONFIG_DB_DATABASE))),
-        userDao(dbName, client),
-        domainDao(dbName, client)
+    inline AuthService() :
+        userDao(Globals::getInstance()->getConnection()),
+        domainDao(Globals::getInstance()->getConnection())
     {
 
-    }
-    catch (...)
-    {
-        throw ;
     }
     AUTH_NO_COPY_NO_MOVE(AuthService)
 

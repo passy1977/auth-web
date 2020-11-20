@@ -42,7 +42,7 @@ struct User final : public Pod
     static inline constexpr const char *FIELD_NAME = "name";
     static inline constexpr const char *FIELD_EMAIL = "email";
     static inline constexpr const char *FIELD_PASSWORD = "password";
-    static inline constexpr const char *FIELD_DATA = "data";
+    static inline constexpr const char *FIELD_JSON_DATA = "json_data";
     static inline constexpr const char *FIELD_PERMISSIONS = "permissions";
     static inline constexpr const char *FIELD_STATUS = "status";
     static inline constexpr const char *FIELD_LAST_LOGIN = "lastLogin";
@@ -79,7 +79,7 @@ struct User final : public Pod
     /**
      * @brief additional data in json format
      */
-    string data;
+    string jsonData;
 
     /**
      * @brief permissions to service access
@@ -108,6 +108,7 @@ struct User final : public Pod
      * @details if nullptr the feature i disable
      */
     string domain;
+
 
     /**
      * @brief toDocument get document ready for MongoDb

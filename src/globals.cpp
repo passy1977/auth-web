@@ -39,39 +39,47 @@ bool Globals::init(const std::string &path) noexcept
 
         log = new LogService(config);
 
-//        auto && host = config->getString(CONFIG_DB_HOST);
-//        auto && port = config->getInt(CONFIG_DB_PORT);
-//        auto && user = config->getString(CONFIG_DB_USER);
-//        auto && password = config->getString(CONFIG_DB_PASSWORD);
+        connection = mysql_init(NULL);
 
-//        AUTH_GLOBAL_LOG(DBG, "host:" + host);
-//        AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
-//        AUTH_GLOBAL_LOG(DBG, "user:" + user);
-//        AUTH_GLOBAL_LOG(DBG, "password:" + password);
+        if (connection == nullptr)
+          {
+            AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
+            connection = nullptr;
+            return false;
+          }
 
-//        ///copnnect to MySql
-//        session = new mysqlx::Session(host, port, user, password);
+        auto && host = config->getString(CONFIG_DB_HOST);
+        auto && port = config->getInt(CONFIG_DB_PORT);
+        auto && user = config->getString(CONFIG_DB_USER);
+        auto && password = config->getString(CONFIG_DB_PASSWORD);
+        auto && database = config->getString(CONFIG_DB_DATABASE);
 
-        ///build connection string for MongoDb
-        string uri = "mysqlx://";
-        uri += config->getString(CONFIG_DB_USER);
-        uri += ":";
-        uri += config->getString(CONFIG_DB_PASSWORD);
-        uri += "@";
-        uri += config->getString(CONFIG_DB_HOST);
-        uri += ":";
-        uri += config->getString(CONFIG_DB_PORT);
-        uri += "/";
-        uri += config->getString(CONFIG_DB_DATABASE);
+        AUTH_GLOBAL_LOG(DBG, "host:" + host);
+        AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
+        AUTH_GLOBAL_LOG(DBG, "user:" + user);
+        AUTH_GLOBAL_LOG(DBG, "password:" + password);
+        AUTH_GLOBAL_LOG(DBG, "database:" + database);
 
-        AUTH_GLOBAL_LOG(DBG, uri);
+        ///copnnect to MySql
+        if (mysql_real_connect(connection,
+                               host.c_str(),
+                               user.c_str(),
+                               password.c_str(),
+                               database.c_str(),
+                               port,
+                               nullptr,
+                               0
+                               ) == NULL)
+          {
+            AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
+            mysql_close(connection);
+            connection = nullptr;
+            return false;
+          }
 
-        client = make_shared<mysqlx::Client>(uri);
+        AUTH_GLOBAL_LOG(DBG, "server info:" + string(mysql_get_client_info()));
 
 
-    } catch (const mysqlx::abi2::r0::Error &e) {
-        AUTH_GLOBAL_LOG(ERROR, e.what());
-        return false;
     } catch (Poco::Exception &e) {
         AUTH_GLOBAL_LOG(ERROR, e.message());
         return false;

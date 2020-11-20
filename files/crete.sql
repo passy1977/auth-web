@@ -1,3 +1,7 @@
+-- User creation
+# GRANT ALL PRIVILEGES ON auth_web.* TO 'auth_web'@localhost IDENTIFIED BY 'auth_web';
+# FLUSH PRIVILEGES;
+
 -- -----------------------------------------------------
 -- Schema auth_web
 -- -----------------------------------------------------
@@ -15,8 +19,6 @@ USE `auth_web` ;
 CREATE TABLE IF NOT EXISTS `auth_web`.`domains` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(254) NOT NULL,
-  `user` VARCHAR(254) NOT NULL COMMENT 'Connection user auth',
-  `password` VARCHAR(254) NOT NULL COMMENT 'Connection user auth',
   `secret` VARCHAR(254) NOT NULL COMMENT 'JWT secret key',
   `status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
   `expiration` DATETIME NULL,
@@ -35,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `auth_web`.`users` (
   `email` VARCHAR(254) NOT NULL,
   `password` VARCHAR(254) NOT NULL,
   `json_data` VARCHAR(254) NULL,
+  `permissions` VARCHAR(254) NULL,
   `status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
   `last_login` DATETIME NULL,
   `expiration` DATETIME NULL,

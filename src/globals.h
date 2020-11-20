@@ -33,7 +33,7 @@ using Poco::AutoPtr;
 #include <Poco/Util/IniFileConfiguration.h>
 using namespace Poco::Util;
 
-#include <mysqlx/xdevapi.h>
+#include <mysql/mysql.h>
 
 #include "services/logservice.h"
 using auth::services::LogService;
@@ -52,7 +52,7 @@ class Globals final
 
     AutoPtr<IniFileConfiguration> config;
 
-    shared_ptr<mysqlx::Client> client;
+    MYSQL *connection = nullptr;
 
     LogService *log = nullptr;
 
@@ -63,7 +63,10 @@ public:
         delete log;
         log = nullptr;
 
-        client->close();
+        ///colose db connection
+        if (connection) {
+            mysql_close(connection);
+        }
     }
 
     AUTH_NO_COPY_NO_MOVE(Globals)
@@ -99,9 +102,9 @@ public:
      * @brief getConnection get MySql connection
      * @return MySql connection
      */
-    inline shared_ptr<mysqlx::Client> getClient() const noexcept
+    inline MYSQL *getConnection() noexcept
     {
-        return client;
+        return connection;
     }
 
     /**
