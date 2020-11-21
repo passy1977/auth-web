@@ -5,13 +5,13 @@
 -- -----------------------------------------------------
 -- Schema auth_web
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `auth_web` ;
+# DROP SCHEMA IF EXISTS `auth_web` ;
 
 -- -----------------------------------------------------
 -- Schema auth_web
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `auth_web` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
-USE `auth_web` ;
+# CREATE SCHEMA IF NOT EXISTS `auth_web` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin ;
+# USE `auth_web` ;
 
 -- -----------------------------------------------------
 -- Table `auth_web`.`domains`

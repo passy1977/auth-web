@@ -22,8 +22,6 @@
 
 #include "logservice.h"
 
-//#include <Poco/Logger.h>
-//using Poco::Logger;
 #include<iostream>
 using namespace std;
 

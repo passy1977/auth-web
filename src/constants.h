@@ -36,6 +36,7 @@ namespace auth
 inline constexpr const char *PATH_CONFIG = "./config.ini";
 inline constexpr const char *FILE_LOCK_SERVICE = "./auth.pin";
 inline constexpr const char *CONTENT_TYPE = "application/json";
+inline constexpr const char *CHECK_DB = "SHOW TABLES LIKE 'users';";
 
 ///config key param
 inline constexpr const char *CONFIG_PATH_LOG = "log.path";
@@ -48,5 +49,6 @@ inline constexpr const char *CONFIG_DB_PORT= "db.port";
 inline constexpr const char *CONFIG_DB_DATABASE = "db.database";
 inline constexpr const char *CONFIG_DB_USER = "db.user";
 inline constexpr const char *CONFIG_DB_PASSWORD = "db.password";
+inline constexpr const char *CONFIG_DB_SCRIPT = "db.script";
 
 }

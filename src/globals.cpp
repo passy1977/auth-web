@@ -25,8 +25,15 @@
 #include <memory>
 using std::move;
 
+#include <Poco/FileStream.h>
+#include <Poco/CountingStream.h>
+#include <Poco/TeeStream.h>
+#include <Poco/StreamCopier.h>
 #include <Poco/AutoPtr.h>
-using Poco::AutoPtr;
+using namespace Poco;
+
+
+
 
 using namespace auth;
 
@@ -37,10 +44,11 @@ bool Globals::init(const std::string &path) noexcept
         ///init configuration
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
 
+        ///init log service
         log = new LogService(config);
 
+        ///init mysql
         connection = mysql_init(NULL);
-
         if (connection == nullptr)
           {
             AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
@@ -48,11 +56,11 @@ bool Globals::init(const std::string &path) noexcept
             return false;
           }
 
-        auto && host = config->getString(CONFIG_DB_HOST);
-        auto && port = config->getInt(CONFIG_DB_PORT);
-        auto && user = config->getString(CONFIG_DB_USER);
-        auto && password = config->getString(CONFIG_DB_PASSWORD);
-        auto && database = config->getString(CONFIG_DB_DATABASE);
+        auto &&host = config->getString(CONFIG_DB_HOST);
+        auto &&port = config->getInt(CONFIG_DB_PORT);
+        auto &&user = config->getString(CONFIG_DB_USER);
+        auto &&password = config->getString(CONFIG_DB_PASSWORD);
+        auto &&database = config->getString(CONFIG_DB_DATABASE);
 
         AUTH_GLOBAL_LOG(DBG, "host:" + host);
         AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
@@ -79,6 +87,49 @@ bool Globals::init(const std::string &path) noexcept
 
         AUTH_GLOBAL_LOG(DBG, "server info:" + string(mysql_get_client_info()));
 
+        ///load creation script
+        if (config->has(CONFIG_DB_SCRIPT))
+        {
+            /// check il db exist
+            if (mysql_query(connection, CHECK_DB))
+            {
+                AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
+                mysql_close(connection);
+                connection = nullptr;
+            }
+
+            MYSQL_RES *result = mysql_store_result(connection);
+            if (result == NULL)
+            {
+                AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
+                mysql_close(connection);
+                connection = nullptr;
+            }
+
+
+             MYSQL_ROW row;
+             if (!(row = mysql_fetch_row(result)))
+             {
+                 ///read sql script
+                 string script;
+                 FileInputStream istr(move(config->getString(CONFIG_DB_SCRIPT)));
+                 CountingInputStream countingIstr(istr);
+                 StreamCopier::copyToString(countingIstr, script);
+                 istr.close();
+
+                 ///create db
+                 if (mysql_query(connection, script.c_str())) {
+                     AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
+                     mysql_close(connection);
+                     connection = nullptr;
+                 }
+
+                 AUTH_GLOBAL_LOG(DBG, "db created");
+             }
+
+             mysql_free_result(result);
+
+        }
 
     } catch (Poco::Exception &e) {
         AUTH_GLOBAL_LOG(ERROR, e.message());
