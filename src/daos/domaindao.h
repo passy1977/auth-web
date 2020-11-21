@@ -35,7 +35,7 @@ namespace auth::daos
 /**
  * @brief The DomainDAO class CRUD oparetion on Domain
  */
-class DomainDAO final : public DAO<Domain>
+class DomainDAO final : protected DAO<Domain>
 {
     static const constexpr inline char* COLLECTION_NAME = "domains";
 
@@ -48,15 +48,16 @@ public:
     }
     AUTH_NO_COPY_NO_MOVE(DomainDAO)
 
+    void testDb() const;
+
+private:
+
     /**
      * @brief deserialize data from db into Domain
      * @param rs curret valid record result_set_tef
      * @return DomainPtr
      */
     virtual DomainPtr deserialize(const result_set_ref &rs) const;
-
-    void testDb() const;
-
 
 };
 

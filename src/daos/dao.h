@@ -137,8 +137,8 @@ public:
 
     }
 
-
-
+protected:
+    string collection;
 
     /**
      * @brief deserialize data from db into pod
@@ -146,10 +146,6 @@ public:
      * @return shared_pointer<pod>
      */
     virtual shared_ptr<T> deserialize(const result_set_ref &) const = 0;
-
-protected:
-    string collection;
-
 };
 
 }
