@@ -22,16 +22,50 @@
 
 #include "domaindao.h"
 
+#include <mariadb++/exceptions.hpp>
+
 using namespace auth::daos;
+
+DomainPtr DomainDAO::deserialize(const result_set_ref &rs) const
+{
+    return make_shared<Domain>(
+                rs->get_signed32(Domain::FIELD_ID),
+                rs->get_string(Domain::FIELD_NAME),
+                rs->get_string(Domain::FIELD_SECRET),
+                static_cast<Domain::Status>(rs->get_signed8(Domain::FIELD_STATUS)),
+                rs->get_string(Domain::FIELD_EXPIRATION_DATE)
+                );
+}
 
 void DomainDAO::testDb() const
 {
     auto &&stm = connection->create_statement("SELECT * FROM domains");
 
-    auto &&queryResult = stm->query();
+    result_set_ref rs = stm->query();
 
-    while (queryResult->next())
+    while (rs->next())
     {
-        AUTH_GLOBAL_LOG(DBG, queryResult->get_string("name"));
+
+
+
+
+        try
+        {
+//            string name = rs->get_string("name");
+//            AUTH_GLOBAL_LOG(DBG, name);
+
+//            name = rs->get_string("name");
+//            AUTH_GLOBAL_LOG(DBG, name);
+            auto && domain = deserialize(rs);
+
+
+
+            AUTH_GLOBAL_LOG(DBG, to_string(domain->id));
+
+
+
+
+        }
+        AUTH_CATCH_EXCEPTIONS
     }
 }

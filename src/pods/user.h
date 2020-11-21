@@ -27,7 +27,6 @@
 #include <vector>
 using namespace std;
 
-#import "pod.h"
 #import "domain.h"
 
 namespace auth::pods
@@ -36,7 +35,7 @@ namespace auth::pods
 /**
  * @brief The Domain struct data rappresentation of User
  */
-struct User final : public Pod
+struct User final
 {
     static inline constexpr const char *FIELD_ID = "id";
     static inline constexpr const char *FIELD_NAME = "name";
@@ -45,18 +44,18 @@ struct User final : public Pod
     static inline constexpr const char *FIELD_JSON_DATA = "json_data";
     static inline constexpr const char *FIELD_PERMISSIONS = "permissions";
     static inline constexpr const char *FIELD_STATUS = "status";
-    static inline constexpr const char *FIELD_LAST_LOGIN = "lastLogin";
-    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expirationDate";
+    static inline constexpr const char *FIELD_LAST_LOGIN = "last_login";
+    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration";
     static inline constexpr const char *FIELD_DOMAIN = "domain";
 
 
     /**
      * @brief The Status enum status of User
      */
-    enum class Status {
+    enum class Status : uint8_t {
         UNACTIVE = 0,
         ACTIVE = 1,
-        LOCK = 1
+        LOCK = 2
     };
 
     /**
@@ -107,20 +106,39 @@ struct User final : public Pod
      * @brief composite key with email
      * @details if nullptr the feature i disable
      */
-    string domain;
+    DomainPtr domain;
 
 
-    /**
-     * @brief toDocument get document ready for MongoDb
-     * @return MongoDb doncument
-     */
-    Object toDocument() const noexcept override;
+    inline User(
+            int id,
+            string name,
+            string email,
+            string password,
+            string jsonData,
+            vector<string> permissions,
+            Status status,
+            string lastLogin,
+            string expirationDate,
+            DomainPtr domain
+            ) :
+        id(move(id)),
+        name(move(name)),
+        email(move(email)),
+        password(move(password)),
+        jsonData(move(jsonData)),
+        permissions(move(permissions)),
+        status(move(status)),
+        lastLogin(move(lastLogin)),
+        expirationDate(move(expirationDate)),
+        domain(move(domain))
+    {}
+
 };
 
 /**
  * @brief SPUser shared pointer of User
  */
-typedef shared_ptr<User> SPUser;
+typedef shared_ptr<User> UserPtr;
 
 }
 

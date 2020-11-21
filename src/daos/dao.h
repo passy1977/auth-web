@@ -97,9 +97,6 @@ public:
 //                std::cout << "Last Error: " << db.getLastError(connection) << std::endl;
 //            }
         }
-
-
-
     }
 
 
@@ -139,6 +136,16 @@ public:
     {
 
     }
+
+
+
+
+    /**
+     * @brief deserialize data from db into pod
+     * @param rs curret valid record result_set_tef
+     * @return shared_pointer<pod>
+     */
+    virtual shared_ptr<T> deserialize(const result_set_ref &) const = 0;
 
 protected:
     string collection;

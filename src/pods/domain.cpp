@@ -27,18 +27,27 @@ using Poco::JSON::Object;
 
 using namespace auth::pods;
 
-inline Object Domain::toDocument() const noexcept
-{
+//inline Object Domain::toDocument() const noexcept
+//{
 
-    Object object;
+//    Object object;
 
-    return object;
+//    return object;
 
 
-//    return Object()
-//            .add(FIELD_ID, id)
-//            .add(FIELD_NAME, name)
-//            .add(FIELD_SEECRET, seecret)
-//            .add(FIELD_STATUS, static_cast<int>(status))
-//            .add(FIELD_EXPIRATION_DATE, expirationDate);
-}
+////    return Object()
+////            .add(FIELD_ID, id)
+////            .add(FIELD_NAME, name)
+////            .add(FIELD_SEECRET, seecret)
+////            .add(FIELD_STATUS, static_cast<int>(status))
+////            .add(FIELD_EXPIRATION_DATE, expirationDate);
+//}
+
+//void Domain::deserialize(const result_set *rs)
+//{
+//    //id = rs->get_signed64(FIELD_ID);
+//    name = rs->get_string(FIELD_NAME);
+//    seecret = rs->get_string(FIELD_SEECRET);
+//    status = static_cast<Status>(rs->get_unsigned8(FIELD_STATUS));
+//    expirationDate = rs->get_string(FIELD_EXPIRATION_DATE);
+//}

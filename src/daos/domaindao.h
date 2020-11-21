@@ -26,6 +26,7 @@
 
 #include "../pods/domain.h"
 using auth::pods::Domain;
+using auth::pods::DomainPtr;
 
 
 namespace auth::daos
@@ -45,10 +46,18 @@ public:
     {
 
     }
+    AUTH_NO_COPY_NO_MOVE(DomainDAO)
+
+    /**
+     * @brief deserialize data from db into Domain
+     * @param rs curret valid record result_set_tef
+     * @return DomainPtr
+     */
+    virtual DomainPtr deserialize(const result_set_ref &rs) const;
 
     void testDb() const;
 
-    AUTH_NO_COPY_NO_MOVE(DomainDAO)
+
 };
 
 }

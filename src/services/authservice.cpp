@@ -29,4 +29,5 @@ using namespace auth::services;
 void AuthService::testDB(HTTPServerResponse &response) const noexcept
 {
     domainDao.testDb();
+    userDao.testDb();
 }

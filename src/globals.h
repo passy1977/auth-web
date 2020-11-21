@@ -23,6 +23,12 @@
 #pragma once
 
 #define AUTH_GLOBAL_LOG(_level_, msg) Globals::getInstance()->getLog()->write(LogService::Level::_level_, __LINE__, __FILE__, msg)
+#define AUTH_CATCH_EXCEPTIONS \
+    catch (const mariadb::exception::base &e) { \
+        AUTH_GLOBAL_LOG(ERROR, e.what()); \
+    }  catch (const out_of_range &e) { \
+        AUTH_GLOBAL_LOG(ERROR, e.what());\
+    }
 
 #include <memory>
 using namespace std;

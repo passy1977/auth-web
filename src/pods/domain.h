@@ -26,8 +26,6 @@
 #include <string>
 using namespace std;
 
-#import "pod.h"
-
 namespace auth::pods
 {
 
@@ -35,22 +33,22 @@ namespace auth::pods
  * @brief The Domain struct data rappresentation of Domain
  * @author Antonio Salsi
  */
-struct Domain final : public Pod
+struct Domain final
 {
 
     static inline constexpr const char *FIELD_ID = "id";
     static inline constexpr const char *FIELD_NAME = "name";
-    static inline constexpr const char *FIELD_SEECRET = "seecret";
+    static inline constexpr const char *FIELD_SECRET = "secret";
     static inline constexpr const char *FIELD_STATUS = "status";
-    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expirationDate";
+    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration";
 
     /**
      * @brief The Status enum status of Domain
      */
-    enum class Status {
+    enum class Status : u_int8_t {
         UNACTIVE = 0,
         ACTIVE = 1,
-        LOCK = 1
+        LOCK = 2
     };
 
     /**
@@ -87,23 +85,18 @@ struct Domain final : public Pod
             Status status,
             string expirationDate
             ) :
-        id(id),
-        name(name),
-        seecret(seecret),
-        status(status),
-        expirationDate(expirationDate)
+        id(move(id)),
+        name(move(name)),
+        seecret(move(seecret)),
+        status(move(status)),
+        expirationDate(move(expirationDate))
     {}
 
-    /**
-     * @brief toDocument get document ready for MongoDb
-     * @return MongoDb doncument
-     */
-     Object toDocument() const noexcept override;
 };
 
 /**
  * @brief SPDomain shared pointer of Domain
  */
-typedef shared_ptr<Domain> SPDomain;
+typedef shared_ptr<Domain> DomainPtr;
 
 }

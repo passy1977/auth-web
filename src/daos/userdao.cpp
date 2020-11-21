@@ -22,4 +22,73 @@
 
 #include "userdao.h"
 
+#include <algorithm>    // copy
+#include <iterator>     // back_inserter
+#include <regex>        // regex, sregex_token_iterator
+#include <mariadb++/exceptions.hpp>
+
+#include "domaindao.h"
+
 using namespace auth::daos;
+
+UserPtr UserDAO::deserialize(const result_set_ref &rs) const
+{
+    vector<string> permissions;
+    string str = rs->get_string(User::FIELD_EXPIRATION_DATE);
+    regex re(",d+");
+
+    sregex_token_iterator
+        begin(str.begin(), str.end(), re),
+        end;
+
+    copy(begin, end, back_inserter(permissions));
+
+
+    DomainDAO domainDAO(connection);
+
+    return make_shared<User>(
+                rs->get_signed32(User::FIELD_ID),
+                rs->get_string(User::FIELD_NAME),
+                rs->get_string(User::FIELD_EMAIL),
+                rs->get_string(User::FIELD_PASSWORD),
+                rs->get_string(User::FIELD_JSON_DATA),
+                permissions,
+                static_cast<User::Status>(rs->get_signed8(User::FIELD_STATUS)),
+                rs->get_string(User::FIELD_LAST_LOGIN),
+                rs->get_string(User::FIELD_EXPIRATION_DATE),
+                nullptr
+                );
+}
+
+void UserDAO::testDb() const
+{
+    auto &&stm = connection->create_statement("SELECT * FROM users");
+
+    result_set_ref rs = stm->query();
+
+    while (rs->next())
+    {
+
+
+
+
+        try
+        {
+//            string name = rs->get_string("name");
+//            AUTH_GLOBAL_LOG(DBG, name);
+
+//            name = rs->get_string("name");
+//            AUTH_GLOBAL_LOG(DBG, name);
+            auto && user = deserialize(rs);
+
+
+
+            AUTH_GLOBAL_LOG(DBG, to_string(user->id));
+
+
+
+
+        }
+        AUTH_CATCH_EXCEPTIONS
+    }
+}

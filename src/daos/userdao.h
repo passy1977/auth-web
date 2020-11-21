@@ -26,6 +26,7 @@
 
 #include "../pods/user.h"
 using auth::pods::User;
+using auth::pods::UserPtr;
 
 namespace auth::daos
 {
@@ -42,6 +43,15 @@ public:
         DAO(COLLECTION_NAME, connection)
     {}
     AUTH_NO_COPY_NO_MOVE(UserDAO)
+
+    /**
+     * @brief deserialize data from db into User
+     * @param rs curret valid record result_set_tef
+     * @return UserPtr
+     */
+    virtual UserPtr deserialize(const result_set_ref &rs) const;
+
+    void testDb() const;
 };
 
 }
