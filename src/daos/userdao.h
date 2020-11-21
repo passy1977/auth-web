@@ -38,7 +38,7 @@ class UserDAO final : public DAO<User>
     static const constexpr inline char* COLLECTION_NAME = "users";
 public:
     UserDAO() = delete;
-    UserDAO(MYSQL *connection) :
+    UserDAO(const connection_ref &connection) :
         DAO(COLLECTION_NAME, connection)
     {}
     AUTH_NO_COPY_NO_MOVE(UserDAO)

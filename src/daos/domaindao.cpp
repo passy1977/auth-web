@@ -23,3 +23,15 @@
 #include "domaindao.h"
 
 using namespace auth::daos;
+
+void DomainDAO::testDb() const
+{
+    auto &&stm = connection->create_statement("SELECT * FROM domains");
+
+    auto &&queryResult = stm->query();
+
+    while (queryResult->next())
+    {
+        AUTH_GLOBAL_LOG(DBG, queryResult->get_string("name"));
+    }
+}

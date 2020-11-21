@@ -36,7 +36,7 @@ int auth::Application::main(const vector<string> &args)
     if (!lockService.start())
     {
         poco_warning_f1(Logger::root(), "Unable start the process: %s",  lockService.getSerrviceOnMessage());
-
+        return EXIT_NOINPUT;
     }
 
     ///initialize global params

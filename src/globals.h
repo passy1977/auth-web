@@ -33,7 +33,8 @@ using Poco::AutoPtr;
 #include <Poco/Util/IniFileConfiguration.h>
 using namespace Poco::Util;
 
-#include <mysql/mysql.h>
+#include <mariadb++/connection.hpp>
+using namespace mariadb;
 
 #include "services/logservice.h"
 using auth::services::LogService;
@@ -52,7 +53,7 @@ class Globals final
 
     AutoPtr<IniFileConfiguration> config;
 
-    MYSQL *connection = nullptr;
+    connection_ref connection = nullptr;
 
     LogService *log = nullptr;
 
@@ -65,7 +66,7 @@ public:
 
         ///colose db connection
         if (connection) {
-            mysql_close(connection);
+            connection->disconnect();
         }
     }
 
@@ -102,7 +103,7 @@ public:
      * @brief getConnection get MySql connection
      * @return MySql connection
      */
-    inline MYSQL *getConnection() noexcept
+    inline const connection_ref &getConnection() noexcept
     {
         return connection;
     }

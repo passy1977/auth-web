@@ -33,6 +33,8 @@ using std::move;
 using namespace Poco;
 
 
+#include <mariadb++/exceptions.hpp>
+using mariadb::exception::base;
 
 
 using namespace auth;
@@ -40,7 +42,8 @@ using namespace auth;
 bool Globals::init(const std::string &path) noexcept
 {
 
-    try {
+    try
+    {
         ///init configuration
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
 
@@ -48,14 +51,6 @@ bool Globals::init(const std::string &path) noexcept
         log = new LogService(config);
 
         ///init mysql
-        connection = mysql_init(NULL);
-        if (connection == nullptr)
-          {
-            AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
-            connection = nullptr;
-            return false;
-          }
-
         auto &&host = config->getString(CONFIG_DB_HOST);
         auto &&port = config->getInt(CONFIG_DB_PORT);
         auto &&user = config->getString(CONFIG_DB_USER);
@@ -65,74 +60,74 @@ bool Globals::init(const std::string &path) noexcept
         AUTH_GLOBAL_LOG(DBG, "host:" + host);
         AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
         AUTH_GLOBAL_LOG(DBG, "user:" + user);
-        AUTH_GLOBAL_LOG(DBG, "password:" + password);
+        AUTH_GLOBAL_LOG(DBG, "password num char:" + to_string(password.size()));
         AUTH_GLOBAL_LOG(DBG, "database:" + database);
 
+        auto &&account = account::create(host,
+                                        user,
+                                        password,
+                                        database,
+                                        port);
+
+        this->connection = connection::create(account);
+
         ///copnnect to MySql
-        if (mysql_real_connect(connection,
-                               host.c_str(),
-                               user.c_str(),
-                               password.c_str(),
-                               database.c_str(),
-                               port,
-                               nullptr,
-                               0
-                               ) == NULL)
-          {
-            AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
-            mysql_close(connection);
+        if (!connection->connect())
+        {
+            AUTH_GLOBAL_LOG(FATAL, connection->error());
+            connection->disconnect();
             connection = nullptr;
             return false;
-          }
+        }
 
-        AUTH_GLOBAL_LOG(DBG, "server info:" + string(mysql_get_client_info()));
+
+        AUTH_GLOBAL_LOG(DBG, "server version:" + string(mysql_get_client_info()));
 
         ///load creation script
         if (config->has(CONFIG_DB_SCRIPT))
         {
             /// check il db exist
-            if (mysql_query(connection, CHECK_DB))
+            if (connection->query(CHECK_DB))
             {
-                AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
-                mysql_close(connection);
+                AUTH_GLOBAL_LOG(FATAL, connection->error());
+                connection->disconnect();
                 connection = nullptr;
-            }
-
-            MYSQL_RES *result = mysql_store_result(connection);
-            if (result == NULL)
-            {
-                AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
-                mysql_close(connection);
-                connection = nullptr;
+                return false;
             }
 
 
-             MYSQL_ROW row;
-             if (!(row = mysql_fetch_row(result)))
-             {
-                 ///read sql script
-                 string script;
-                 FileInputStream istr(move(config->getString(CONFIG_DB_SCRIPT)));
-                 CountingInputStream countingIstr(istr);
-                 StreamCopier::copyToString(countingIstr, script);
-                 istr.close();
+            try
+            {
+                auto &&res = connection->query(CHECK_DB);
+                if (!res->next())
+                {
+                    ///read sql script
+                    string script;
+                    FileInputStream istr(move(config->getString(CONFIG_DB_SCRIPT)));
+                    CountingInputStream countingIstr(istr);
+                    StreamCopier::copyToString(countingIstr, script);
+                    istr.close();
 
-                 ///create db
-                 if (mysql_query(connection, script.c_str())) {
-                     AUTH_GLOBAL_LOG(ERROR, mysql_error(connection));
-                     mysql_close(connection);
-                     connection = nullptr;
-                 }
-
-                 AUTH_GLOBAL_LOG(DBG, "db created");
-             }
-
-             mysql_free_result(result);
-
+                    ///execute script
+                    connection->query(script);
+                }
+            }
+            catch (const base &e)
+            {
+                AUTH_GLOBAL_LOG(FATAL, connection->error());
+                return false;
+            }
         }
 
-    } catch (Poco::Exception &e) {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
+    }
+    catch (const mariadb::exception::connection &e)
+    {
+        AUTH_GLOBAL_LOG(FATAL, e.what());
+        return false;
+    }
+    catch (Poco::Exception &e)
+    {
+        AUTH_GLOBAL_LOG(FATAL, e.message());
         return false;
     }
 

@@ -10,6 +10,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #macro area
 #add_compile_definitions(POCO_LOG_DEBUG)
 
+#add mariadbpp cmake extension path
+#list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/3thparty/mariadbpp/cmake)
 
 #lib include
 include_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/include)
@@ -19,9 +21,18 @@ link_directories(${CMAKE_SOURCE_DIR}/lib/macos/openssl/lib)
 include_directories(${CMAKE_SOURCE_DIR}/lib/macos/mariadb/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib/macos/mariadb/lib)
 
+# add mariadbclientpp 3thparty sources
+include_directories(${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/include)
+file(GLOB mariadbclientpp_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/include/mariadb++/*)
+file(GLOB mariadbclientpp_PRIVATE_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/src/*.hpp)
+file(GLOB mariadbclientpp_SOURCES ${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/src/*.cpp)
+
 #source definitions
 add_executable(
     auth-web
+    ${mariadbclientpp_SOURCES}
+    ${mariadbclientpp_PUBLIC_HEADERS}
+    ${mariadbclientpp_PRIVATE_HEADERS}
     src/main.cpp
     src/constants.h
     src/application.h

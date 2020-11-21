@@ -40,11 +40,13 @@ class DomainDAO final : public DAO<Domain>
 
 public:
     DomainDAO() = delete;
-    explicit DomainDAO(MYSQL *connection) :
+    explicit DomainDAO(const connection_ref &connection) :
         DAO(COLLECTION_NAME, connection)
     {
 
     }
+
+    void testDb() const;
 
     AUTH_NO_COPY_NO_MOVE(DomainDAO)
 };
