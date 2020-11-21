@@ -22,6 +22,14 @@
 
 #pragma once
 
+///default catch exceptions
+#define AUTH_CATCH_EXCEPTIONS \
+    catch (const mariadb::exception::base &e) { \
+        AUTH_GLOBAL_LOG(ERROR, e.what()); \
+    }  catch (const std::out_of_range &e) { \
+        AUTH_GLOBAL_LOG(ERROR, e.what());\
+    }
+
 /// Disable copy and reference constructror
 #define AUTH_NO_COPY_NO_MOVE(claxx) \
     claxx(const claxx&) = delete; \
@@ -44,6 +52,7 @@ inline constexpr const char *CONFIG_LOG_ROTATION = "log.rotation";
 inline constexpr const char *CONFIG_SERVER_PORT = "server.port";
 inline constexpr const char *CONFIG_SERVER_MAX_QUEUED = "server.maxQueued";
 inline constexpr const char *CONFIG_SERVER_MAX_THREAD = "server.maxThreads";
+inline constexpr const char *CONFIG_SERVER_PASSWORD = "server.password";
 inline constexpr const char *CONFIG_DB_HOST= "db.host";
 inline constexpr const char *CONFIG_DB_PORT= "db.port";
 inline constexpr const char *CONFIG_DB_DATABASE = "db.database";

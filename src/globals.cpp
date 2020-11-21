@@ -36,7 +36,6 @@ using namespace Poco;
 #include <mariadb++/exceptions.hpp>
 using mariadb::exception::base;
 
-
 using namespace auth;
 
 bool Globals::init(const std::string &path) noexcept
@@ -44,80 +43,22 @@ bool Globals::init(const std::string &path) noexcept
 
     try
     {
+
         ///init configuration
         config = AutoPtr<IniFileConfiguration>(new IniFileConfiguration(path));
-
-        ///init log service
-        log = new LogService(config);
-
-        ///init mysql
-        auto &&host = config->getString(CONFIG_DB_HOST);
-        auto &&port = config->getInt(CONFIG_DB_PORT);
-        auto &&user = config->getString(CONFIG_DB_USER);
-        auto &&password = config->getString(CONFIG_DB_PASSWORD);
-        auto &&database = config->getString(CONFIG_DB_DATABASE);
-
-        AUTH_GLOBAL_LOG(DBG, "host:" + host);
-        AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
-        AUTH_GLOBAL_LOG(DBG, "user:" + user);
-        AUTH_GLOBAL_LOG(DBG, "password num char:" + to_string(password.size()));
-        AUTH_GLOBAL_LOG(DBG, "database:" + database);
-
-        auto &&account = account::create(host,
-                                        user,
-                                        password,
-                                        database,
-                                        port);
-
-        this->connection = connection::create(account);
-
-        ///copnnect to MySql
-        if (!connection->connect())
-        {
-            AUTH_GLOBAL_LOG(FATAL, connection->error());
-            connection->disconnect();
-            connection = nullptr;
+        if (config->has(CONFIG_SERVER_PASSWORD))
+            password = config->getString(CONFIG_SERVER_PASSWORD);
+        else {
+            AUTH_GLOBAL_LOG(FATAL, "server.password not set in config file");
             return false;
         }
 
 
-        AUTH_GLOBAL_LOG(DBG, "server version:" + string(mysql_get_client_info()));
+        ///init log service
+        log = new LogService(config);
 
-        ///load creation script
-        if (config->has(CONFIG_DB_SCRIPT))
-        {
-            /// check il db exist
-            if (connection->query(CHECK_DB))
-            {
-                AUTH_GLOBAL_LOG(FATAL, connection->error());
-                connection->disconnect();
-                connection = nullptr;
-                return false;
-            }
-
-
-            try
-            {
-                auto &&res = connection->query(CHECK_DB);
-                if (!res->next())
-                {
-                    ///read sql script
-                    string script;
-                    FileInputStream istr(move(config->getString(CONFIG_DB_SCRIPT)));
-                    CountingInputStream countingIstr(istr);
-                    StreamCopier::copyToString(countingIstr, script);
-                    istr.close();
-
-                    ///execute script
-                    connection->query(script);
-                }
-            }
-            catch (const base &e)
-            {
-                AUTH_GLOBAL_LOG(FATAL, connection->error());
-                return false;
-            }
-        }
+        ///init mysql connection
+        initConnection();
 
     }
     catch (const mariadb::exception::connection &e)
@@ -132,4 +73,85 @@ bool Globals::init(const std::string &path) noexcept
     }
 
     return true;
+}
+
+bool Globals::initConnection()
+{
+
+    if (!config->has(CONFIG_DB_HOST)
+            || !config->has(CONFIG_DB_PORT)
+            || !config->has(CONFIG_DB_USER)
+            || !config->has(CONFIG_DB_PASSWORD)
+            || !config->has(CONFIG_DB_DATABASE))
+    {
+        throw Poco::Exception("all db parameters are mandatory");
+    }
+    auto &&host = config->getString(CONFIG_DB_HOST);
+    auto &&port = config->getInt(CONFIG_DB_PORT);
+    auto &&user = config->getString(CONFIG_DB_USER);
+    auto &&password = config->getString(CONFIG_DB_PASSWORD);
+    auto &&database = config->getString(CONFIG_DB_DATABASE);
+
+    AUTH_GLOBAL_LOG(DBG, "host:" + host);
+    AUTH_GLOBAL_LOG(DBG, "port:" + to_string(port));
+    AUTH_GLOBAL_LOG(DBG, "user:" + user);
+    AUTH_GLOBAL_LOG(DBG, "password num char:" + to_string(password.size()));
+    AUTH_GLOBAL_LOG(DBG, "database:" + database);
+
+    auto &&account = account::create(host,
+                                    user,
+                                    password,
+                                    database,
+                                    port);
+
+    this->connection = connection::create(account);
+
+    ///copnnect to MySql
+    if (!connection->connect())
+    {
+        AUTH_GLOBAL_LOG(FATAL, connection->error());
+        connection->disconnect();
+        connection = nullptr;
+        return false;
+    }
+
+
+    AUTH_GLOBAL_LOG(DBG, "server version:" + string(mysql_get_client_info()));
+
+    ///load creation script
+    if (config->has(CONFIG_DB_SCRIPT))
+    {
+        /// check il db exist
+        if (connection->query(CHECK_DB))
+        {
+            AUTH_GLOBAL_LOG(FATAL, connection->error());
+            connection->disconnect();
+            connection = nullptr;
+            return false;
+        }
+
+        try
+        {
+            auto &&res = connection->query(CHECK_DB);
+            if (!res->next())
+            {
+                ///read sql script
+                string script;
+                FileInputStream istr(move(config->getString(CONFIG_DB_SCRIPT)));
+                CountingInputStream countingIstr(istr);
+                StreamCopier::copyToString(countingIstr, script);
+                istr.close();
+
+                ///execute script
+                connection->query(script);
+            }
+        }
+        catch (const base &e)
+        {
+            AUTH_GLOBAL_LOG(FATAL, connection->error());
+            return false;
+        }
+    }
+    return true;
+
 }

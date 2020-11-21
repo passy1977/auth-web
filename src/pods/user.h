@@ -46,7 +46,7 @@ struct User final
     static inline constexpr const char *FIELD_STATUS = "status";
     static inline constexpr const char *FIELD_LAST_LOGIN = "last_login";
     static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration";
-    static inline constexpr const char *FIELD_DOMAIN = "domain";
+    static inline constexpr const char *FIELD_DOMAIN = "id_domain";
 
 
     /**

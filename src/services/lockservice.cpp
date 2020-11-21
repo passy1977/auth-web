@@ -52,7 +52,7 @@ LockService::LockService() noexcept :
         istr.close();
 
         ///build message
-        serrviceOnMessage = "pid: " + pid + " created:" + DateTimeFormatter::format(createdTime,  DateTimeFormat::SORTABLE_FORMAT);
+        serrviceOnMessage = "pid:" + pid + " created:" + DateTimeFormatter::format(createdTime,  DateTimeFormat::SORTABLE_FORMAT);
     }
 
 }

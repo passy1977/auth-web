@@ -32,10 +32,13 @@ using auth::pods::DomainPtr;
 namespace auth::daos
 {
 
+///forward declaration
+class UserDAO;
+
 /**
  * @brief The DomainDAO class CRUD oparetion on Domain
  */
-class DomainDAO final : protected DAO<Domain>
+class DomainDAO final : public DAO<Domain>
 {
     static const constexpr inline char* COLLECTION_NAME = "domains";
 
@@ -48,17 +51,30 @@ public:
     }
     AUTH_NO_COPY_NO_MOVE(DomainDAO)
 
-    void testDb() const;
+    /**
+     * @brief update T
+     * @exceptions mariadb::exception::base, std::out_of_range
+     */
+    void insert(const DomainPtr &) const override;
+
+    /**
+     * @brief update T
+     * @exceptions mariadb::exception::base, std::out_of_range
+     */
+    void update(const DomainPtr &) const override;
 
 private:
 
     /**
      * @brief deserialize data from db into Domain
-     * @param rs curret valid record result_set_tef
+     * @param first curret valid record result_set_tef
+     * @param second optional prefix field
      * @return DomainPtr
+     * @exceptions mariadb::exception::base, std::out_of_range
      */
-    virtual DomainPtr deserialize(const result_set_ref &rs) const;
+    virtual DomainPtr deserialize(const result_set_ref &, const string & = "") const override;
 
+    friend UserDAO;
 };
 
 }

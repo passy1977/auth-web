@@ -37,13 +37,13 @@ namespace auth::services
 class AuthService
 {
 
-    const UserDAO userDao;
-    const DomainDAO domainDao;
+    const UserDAO userDAO;
+    const DomainDAO domainDAO;
 
 public:
     inline AuthService() :
-        userDao(Globals::getInstance()->getConnection()),
-        domainDao(Globals::getInstance()->getConnection())
+        userDAO(Globals::getInstance()->getConnection()),
+        domainDAO(Globals::getInstance()->getConnection())
     {
 
     }

@@ -22,13 +22,8 @@
 
 #pragma once
 
+///convenience macro for quick logging
 #define AUTH_GLOBAL_LOG(_level_, msg) Globals::getInstance()->getLog()->write(LogService::Level::_level_, __LINE__, __FILE__, msg)
-#define AUTH_CATCH_EXCEPTIONS \
-    catch (const mariadb::exception::base &e) { \
-        AUTH_GLOBAL_LOG(ERROR, e.what()); \
-    }  catch (const out_of_range &e) { \
-        AUTH_GLOBAL_LOG(ERROR, e.what());\
-    }
 
 #include <memory>
 using namespace std;
@@ -63,6 +58,8 @@ class Globals final
 
     LogService *log = nullptr;
 
+    string password;
+
 public:
     Globals() = default;
     inline ~Globals() noexcept
@@ -74,6 +71,8 @@ public:
         if (connection) {
             connection->disconnect();
         }
+
+        password.clear();
     }
 
     AUTH_NO_COPY_NO_MOVE(Globals)
@@ -122,7 +121,13 @@ public:
     {
         return log;
     }
+private:
 
+    /**
+     * @brief init mysql connection
+     * @return true if success
+     */
+    bool initConnection();
 };
 
 }

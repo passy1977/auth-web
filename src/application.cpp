@@ -35,7 +35,7 @@ int auth::Application::main(const vector<string> &args)
     ///check if service alterady run
     if (!lockService.start())
     {
-        poco_warning_f1(Logger::root(), "Unable start the process: %s",  lockService.getSerrviceOnMessage());
+        poco_critical_f1(Logger::root(), "Service already run on %s",  lockService.getSerrviceOnMessage());
         return EXIT_NOINPUT;
     }
 

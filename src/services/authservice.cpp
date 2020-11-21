@@ -28,6 +28,17 @@ using namespace auth::services;
 
 void AuthService::testDB(HTTPServerResponse &response) const noexcept
 {
-    domainDao.testDb();
-    userDao.testDb();
+
+    try
+    {
+        auto &&user = userDAO.get(1);
+
+        AUTH_GLOBAL_LOG(DBG, user->email);
+        AUTH_GLOBAL_LOG(DBG, user->domain->name);
+    }
+    catch(const std::bad_alloc &e)
+    {
+         AUTH_GLOBAL_LOG(DBG, e.what());
+    }
+
 }

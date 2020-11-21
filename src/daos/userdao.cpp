@@ -31,7 +31,7 @@
 
 using namespace auth::daos;
 
-UserPtr UserDAO::deserialize(const result_set_ref &rs) const
+UserPtr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
 {
     vector<string> permissions;
     string str = rs->get_string(User::FIELD_EXPIRATION_DATE);
@@ -43,52 +43,33 @@ UserPtr UserDAO::deserialize(const result_set_ref &rs) const
 
     copy(begin, end, back_inserter(permissions));
 
-
-    DomainDAO domainDAO(connection);
+    DomainPtr domain = nullptr;
+    if (fieldPrefix != "")
+    {
+        DomainDAO domainDAO(connection);
+        domain = domainDAO.deserialize(rs, fieldPrefix);
+    }
 
     return make_shared<User>(
-                rs->get_signed32(User::FIELD_ID),
+                rs->get_unsigned32(User::FIELD_ID),
                 rs->get_string(User::FIELD_NAME),
                 rs->get_string(User::FIELD_EMAIL),
                 rs->get_string(User::FIELD_PASSWORD),
                 rs->get_string(User::FIELD_JSON_DATA),
                 permissions,
-                static_cast<User::Status>(rs->get_signed8(User::FIELD_STATUS)),
+                static_cast<User::Status>(rs->get_unsigned8(User::FIELD_STATUS)),
                 rs->get_string(User::FIELD_LAST_LOGIN),
                 rs->get_string(User::FIELD_EXPIRATION_DATE),
-                nullptr
+                domain
                 );
 }
 
-void UserDAO::testDb() const
+void UserDAO::insert(const UserPtr &) const
 {
-    auto &&stm = connection->create_statement("SELECT * FROM users");
 
-    result_set_ref rs = stm->query();
+}
 
-    while (rs->next())
-    {
+void UserDAO::update(const UserPtr &) const
+{
 
-
-
-
-        try
-        {
-//            string name = rs->get_string("name");
-//            AUTH_GLOBAL_LOG(DBG, name);
-
-//            name = rs->get_string("name");
-//            AUTH_GLOBAL_LOG(DBG, name);
-            auto && user = deserialize(rs);
-
-
-
-            AUTH_GLOBAL_LOG(DBG, to_string(user->id));
-
-
-
-
-        }
-        AUTH_CATCH_EXCEPTIONS
-    }
 }

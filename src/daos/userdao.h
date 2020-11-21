@@ -34,7 +34,7 @@ namespace auth::daos
 /**
  * @brief The UserDAO class CRUD oparetion on User
  */
-class UserDAO final : protected DAO<User>
+class UserDAO final : public DAO<User>
 {
     static const constexpr inline char* COLLECTION_NAME = "users";
 public:
@@ -44,15 +44,27 @@ public:
     {}
     AUTH_NO_COPY_NO_MOVE(UserDAO)
 
-    void testDb() const;
+    /**
+     * @brief update T
+     * @exceptions
+     */
+    void insert(const UserPtr &) const override;
+
+    /**
+     * @brief update T
+     * @exceptions
+     */
+    void update(const UserPtr &) const override;
 
 private:
     /**
      * @brief deserialize data from db into User
-     * @param rs curret valid record result_set_tef
+     * @param first curret valid record result_set_tef
+     * @param second optional prefix field
      * @return UserPtr
+     * @exceptions mariadb::exception::base, std::out_of_range
      */
-    virtual UserPtr deserialize(const result_set_ref &rs) const;
+    virtual UserPtr deserialize(const result_set_ref &, const string & = "") const override;
 };
 
 }

@@ -26,46 +26,23 @@
 
 using namespace auth::daos;
 
-DomainPtr DomainDAO::deserialize(const result_set_ref &rs) const
+DomainPtr DomainDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
 {
     return make_shared<Domain>(
-                rs->get_signed32(Domain::FIELD_ID),
-                rs->get_string(Domain::FIELD_NAME),
-                rs->get_string(Domain::FIELD_SECRET),
-                static_cast<Domain::Status>(rs->get_signed8(Domain::FIELD_STATUS)),
-                rs->get_string(Domain::FIELD_EXPIRATION_DATE)
+                rs->get_unsigned32(fieldPrefix + Domain::FIELD_ID),
+                rs->get_string(fieldPrefix + Domain::FIELD_NAME),
+                rs->get_string(fieldPrefix + Domain::FIELD_SECRET),
+                static_cast<Domain::Status>(rs->get_unsigned8(fieldPrefix + Domain::FIELD_STATUS)),
+                rs->get_string(fieldPrefix + Domain::FIELD_EXPIRATION_DATE)
                 );
 }
 
-void DomainDAO::testDb() const
+void DomainDAO::insert(const DomainPtr &) const
 {
-    auto &&stm = connection->create_statement("SELECT * FROM domains");
 
-    result_set_ref rs = stm->query();
+}
 
-    while (rs->next())
-    {
+void DomainDAO::update(const DomainPtr &) const
+{
 
-
-
-
-        try
-        {
-//            string name = rs->get_string("name");
-//            AUTH_GLOBAL_LOG(DBG, name);
-
-//            name = rs->get_string("name");
-//            AUTH_GLOBAL_LOG(DBG, name);
-            auto && domain = deserialize(rs);
-
-
-
-            AUTH_GLOBAL_LOG(DBG, to_string(domain->id));
-
-
-
-
-        }
-        AUTH_CATCH_EXCEPTIONS
-    }
 }

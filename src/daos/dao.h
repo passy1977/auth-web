@@ -71,40 +71,26 @@ public:
 
     /**
      * @brief insert T
-     * @exceptions
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    void insert(T &&t) const
+    void insert(shared_ptr<T> &&t) const
     {
         insert(t);
     }
 
     /**
      * @brief insert T
-     * @exceptions
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    void insert(const T &t) const
-    {
-//        auto &&insertRequest = db.createInsertRequest(collectionName);
+    virtual void insert(const shared_ptr<T> &t) const = 0;
 
-        if constexpr (!std::is_same_v<T, auth::pods::User> && !std::is_same_v<T, auth::pods::Domain> )
-        {
-//            insertRequest =  t.toDocument();
-//            connection.sendRequest(insertRequest);
-
-//            string lastError = db.getLastError(connection);
-//            if (!lastError.empty())
-//            {
-//                std::cout << "Last Error: " << db.getLastError(connection) << std::endl;
-//            }
-        }
-    }
 
 
     /**
      * @brief update T
-     * @exceptions
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    void update(T &&t) const
+    void update(shared_ptr<T> &&t) const
     {
         update(t);
     }
@@ -112,29 +98,64 @@ public:
 
     /**
      * @brief update T
-     * @exceptions
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    void update(const T &) const
-    {
-
-    }
+    virtual void update(const shared_ptr<T> &) const = 0;
 
     /**
      * @brief delete T
-     * @exceptions
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    inline void remove(T &&t) const
+    inline void remove(shared_ptr<T> &&t) const
     {
         remove(t);
     }
 
     /**
      * @brief delete T
-     * @exceptions
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    void remove(const T &) const
+    void remove(const shared_ptr<T> &t) const
     {
+        if constexpr (!std::is_same_v<T, auth::pods::User> && !std::is_same_v<T, auth::pods::Domain> )
+        {
+            string query = "DELETE FROM " + table + " WHERE id = " + t.id;
+            AUTH_GLOBAL_LOG(DBG, query);
+            connection->query(query);
+        }
+        else
+            throw Poco::Exception("Not valid object");
+    }
 
+    /**
+     * @brief get T by id
+     * @return T instance, can be nullptr if not find T
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
+     */
+    shared_ptr<T> get(uint32_t id) const
+    {
+        shared_ptr<T> t = nullptr;
+        if constexpr (is_same_v<T, auth::pods::User> || is_same_v<T, auth::pods::Domain> )
+        {
+            string fieldPrefix = "";
+            string query = "SELECT * FROM " + table + " WHERE id = " + to_string(id);
+            if constexpr (is_same_v<T, auth::pods::User>) {
+                query = "SELECT a.*, b.id b_id, b.name b_name, b.secret b_secret, b.status b_status, b.expiration b_expiration  FROM users a "
+                        "LEFT JOIN domains b ON a.id_domain  = b.id "
+                        "WHERE a.id = " + to_string(id);
+                fieldPrefix = "b_";
+            }
+            AUTH_GLOBAL_LOG(DBG, query);
+            auto && rs = connection->query(query);
+
+            if (rs->next()) {
+                t = deserialize(rs, fieldPrefix);
+            }
+
+        }
+        else
+            throw Poco::Exception("Not valid object");
+        return t;
     }
 
 protected:
@@ -144,8 +165,9 @@ protected:
      * @brief deserialize data from db into pod
      * @param rs curret valid record result_set_tef
      * @return shared_pointer<pod>
+     * @exceptions mariadb::exception::base, std::out_of_range
      */
-    virtual shared_ptr<T> deserialize(const result_set_ref &) const = 0;
+    virtual shared_ptr<T> deserialize(const result_set_ref &, const string &fieldPrefix = "") const = 0;
 };
 
 }
