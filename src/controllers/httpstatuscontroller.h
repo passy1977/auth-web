@@ -25,6 +25,9 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
 
+#include <string>
+using std::string;
+
 #include "../constants.h"
 
 namespace auth::controllers
@@ -50,11 +53,22 @@ public:
     HttpStatusController() = delete;
     AUTH_NO_COPY_NO_MOVE(HttpStatusController)
 
+
     void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
 
+    /**
+     * @brief build error constroller
+     * @param error HttpStatus
+     * @return controller
+     */
     static inline HttpStatusController * build(HttpStatus error) noexcept {
         return new HttpStatusController(error);
     }
+
+    /**
+     * @brief getErrorObject
+     */
+    static void sendObject(HTTPServerResponse &, HttpStatus, const string & = "") noexcept;
 
 private:
     HttpStatus httpStatus;

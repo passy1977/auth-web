@@ -36,18 +36,20 @@ namespace auth::controllers
 class Controller : public HTTPRequestHandler
 {
     const string method;
-    const string uri;
+    string partialUri;
 
 public:
-    inline explicit Controller(const string &method, const string &uri) : method(method), uri(uri)
-    {}
+    inline Controller(const string &method, const string &uri) : method(method)
+    {
+        this->partialUri = move(uri.substr(strlen(API_V1), uri.size()));
+    }
     AUTH_NO_COPY_NO_MOVE(Controller)
 
     virtual void handleRESTRequest(const string &, const string &, HTTPServerRequest &, HTTPServerResponse &) = 0;
 
     inline void handleRequest(HTTPServerRequest &request, HTTPServerResponse &response) override
     {
-        handleRESTRequest(method, uri, request, response);
+        handleRESTRequest(method, partialUri, request, response);
     }
 
 };

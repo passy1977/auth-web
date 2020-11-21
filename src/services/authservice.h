@@ -26,30 +26,44 @@
 using namespace Poco::Net;
 
 #include "../daos/userdao.h"
-#include "../daos/domaindao.h"
 using namespace auth::daos;
+
+#include <Poco/Dynamic/Var.h>
+using Poco::Dynamic::Var;
+
+#include <tuple>
+using std::tuple;
 
 #include"../globals.h"
 
 namespace auth::services
 {
 
+/**
+ * @brief In AuthService class
+ */
 class AuthService
 {
 
     const UserDAO userDAO;
-    const DomainDAO domainDAO;
 
 public:
     inline AuthService() :
-        userDAO(Globals::getInstance()->getConnection()),
-        domainDAO(Globals::getInstance()->getConnection())
+        userDAO(Globals::getInstance()->getConnection())
     {
 
     }
     AUTH_NO_COPY_NO_MOVE(AuthService)
 
     void testDB(HTTPServerResponse &) const noexcept;
+
+    /**
+     * @brief login with email, password and domain
+     * @param jsonParsed from body
+     * @throw Poco::Exception
+     */
+    tuple<bool, string> login(Var &&jsonParsed) const;
+
 };
 
 }

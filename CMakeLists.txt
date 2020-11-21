@@ -41,6 +41,8 @@ add_executable(
     src/globals.cpp
     src/router.h
     src/router.cpp
+    src/utils.h
+    src/utils.cpp
     src/daos/dao.h
     src/daos/userdao.h
     src/daos/userdao.cpp

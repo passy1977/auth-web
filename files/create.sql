@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS `auth_web`.`domains` (
   `name` VARCHAR(254) NOT NULL,
   `secret` VARCHAR(254) NOT NULL COMMENT 'JWT secret key',
   `status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
-  `expiration` VARCHAR(254) NULL,
+  `expiration_date` VARCHAR(254) NULL,
+  `expiration_jwt` VARCHAR(254) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC))
@@ -41,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `auth_web`.`users` (
   `permissions` VARCHAR(254) NULL,
   `status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
   `last_login` VARCHAR(254) NULL,
-  `expiration` VARCHAR(254) NULL,
+  `expiration_date` VARCHAR(254) NULL,
   PRIMARY KEY (`id`, `id_domain`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   INDEX `fk_users_domains_idx` (`id_domain` ASC),

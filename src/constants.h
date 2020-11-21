@@ -45,6 +45,7 @@ inline constexpr const char *PATH_CONFIG = "./config.ini";
 inline constexpr const char *FILE_LOCK_SERVICE = "./auth-web.pin";
 inline constexpr const char *CONTENT_TYPE = "application/json";
 inline constexpr const char *CHECK_DB = "SHOW TABLES LIKE 'users';";
+inline constexpr const char *API_V1 = "/api/v1/";
 
 ///config key param
 inline constexpr const char *CONFIG_PATH_LOG = "log.path";

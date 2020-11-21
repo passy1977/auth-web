@@ -37,18 +37,23 @@ void HttpStatusController::handleRequest(HTTPServerRequest &, HTTPServerResponse
 {
     response.setChunkedTransferEncoding(true);
 
-    string &&httpError = to_string(static_cast<uint16_t>(httpStatus));
+    sendObject(response, httpStatus);
+}
 
+void HttpStatusController::sendObject(HTTPServerResponse &response, HttpStatus httpStatus, const string &errorMsg) noexcept
+{
     //Sets mime type text/html application/json etc.
     response.setContentType(CONTENT_TYPE);
 
-    //Sets the response status 404, 200 etc.
-    response.setStatus(httpError);
+    //Sets mime type text/html application/json etc.
+    response.setStatus(to_string(static_cast<uint16_t>(httpStatus)));
 
-    //opens the file stream
-    ostream& responseStream = response.send();
 
     Object jsonError;
-    jsonError.set("httpError", httpError);
-    jsonError.stringify(responseStream);
+    jsonError.set("type", "error");
+    if (errorMsg != "") {
+        jsonError.set("data", errorMsg);
+    }
+    jsonError.stringify(response.send());
 }
+

@@ -139,7 +139,8 @@ public:
         {
             string fieldPrefix = "";
             string query = "SELECT * FROM " + table + " WHERE id = " + to_string(id);
-            if constexpr (is_same_v<T, auth::pods::User>) {
+            if constexpr (is_same_v<T, auth::pods::User>)
+            {
                 query = "SELECT a.*, b.id b_id, b.name b_name, b.secret b_secret, b.status b_status, b.expiration b_expiration  FROM users a "
                         "LEFT JOIN domains b ON a.id_domain  = b.id "
                         "WHERE a.id = " + to_string(id);
@@ -148,7 +149,8 @@ public:
             AUTH_GLOBAL_LOG(DBG, query);
             auto && rs = connection->query(query);
 
-            if (rs->next()) {
+            if (rs->next())
+            {
                 t = deserialize(rs, fieldPrefix);
             }
 

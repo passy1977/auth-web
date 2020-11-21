@@ -40,7 +40,8 @@ struct Domain final
     static inline constexpr const char *FIELD_NAME = "name";
     static inline constexpr const char *FIELD_SECRET = "secret";
     static inline constexpr const char *FIELD_STATUS = "status";
-    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration";
+    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration_date";
+    static inline constexpr const char *FIELD_EXPIRATION_JWT = "expiration_jwt";
 
     /**
      * @brief The Status enum status of Domain
@@ -73,23 +74,31 @@ struct Domain final
     Status status;
 
     /**
-     * @brief lastLogin expiration date permit to maintain allows the user to log in until a specific data
+     * @brief expiration date permit to all user of domain the login
      * @details if nullptr the feature i disable
      */
     string expirationDate;
+
+    /**
+     * @brief expiration JWT in millis after this date the token expire
+     * @details if nullptr the feature i disable
+     */
+    string expirationJWT;
 
     inline Domain(
             int id,
             string name,
             string seecret,
             Status status,
-            string expirationDate
+            string expirationDate,
+            string expirationJWT
             ) :
         id(move(id)),
         name(move(name)),
         seecret(move(seecret)),
         status(move(status)),
-        expirationDate(move(expirationDate))
+        expirationDate(move(expirationDate)),
+        expirationJWT(move(expirationJWT))
     {}
 
 };

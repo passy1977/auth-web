@@ -33,7 +33,8 @@ DomainPtr DomainDAO::deserialize(const result_set_ref &rs, const string &fieldPr
                 rs->get_string(fieldPrefix + Domain::FIELD_NAME),
                 rs->get_string(fieldPrefix + Domain::FIELD_SECRET),
                 static_cast<Domain::Status>(rs->get_unsigned8(fieldPrefix + Domain::FIELD_STATUS)),
-                rs->get_string(fieldPrefix + Domain::FIELD_EXPIRATION_DATE)
+                rs->get_string(fieldPrefix + Domain::FIELD_EXPIRATION_DATE),
+                rs->get_string(fieldPrefix + Domain::FIELD_EXPIRATION_JWT)
                 );
 }
 

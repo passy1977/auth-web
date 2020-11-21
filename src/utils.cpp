@@ -20,39 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "router.h"
+#include "utils.h"
 
-#include <iostream>
-using namespace std;
 
-#include <Poco/Net/HTTPServerRequest.h>
-using namespace Poco::Net;
 
-#include "controllers/authcontroller.h"
-#include "controllers/usercontroller.h"
-#include "controllers/domaincontroller.h"
-#include "controllers/httpstatuscontroller.h"
-using namespace auth::controllers;
-
-using namespace auth;
-
-extern bool endWith(const string &str, const string &suffix) noexcept;
-
-HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &request)
+bool endWith(const string &str, const string &suffix) noexcept
 {
-
-    auto method = request.getMethod();
-    auto uri = request.getURI();
-
-    if (uri.rfind(AuthController::PATH, 0) == 0) {
-        return new AuthController(uri, method);
-    } else if (uri.rfind(UserController::PATH, 0) == 0) {
-        return new UserController(uri, method);
-    } else if (uri.rfind(DomainController::PATH, 0) == 0) {
-        return new DomainController(uri, method);
-    }
-
-    return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+    return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
-
-

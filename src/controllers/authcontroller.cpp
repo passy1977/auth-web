@@ -25,15 +25,22 @@
 #include <string>
 using namespace std;
 
+#include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
 #include <Poco/JSON/Object.h>
-using Poco::JSON::Object;
+#include <Poco/JSON/Parser.h>
+using namespace Poco::JSON;
+
+#include <Poco/Dynamic/Var.h>
+using Poco::Dynamic::Var;
+
+#include "httpstatuscontroller.h"
 
 using namespace auth::controllers;
 
-void AuthController::handleRESTRequest(const string &method, const string &url, HTTPServerRequest &, HTTPServerResponse &response)
+void AuthController::handleRESTRequest(const string &method, const string &partialUri, HTTPServerRequest &request, HTTPServerResponse &response)
 {
     response.setChunkedTransferEncoding(true);
 
@@ -43,13 +50,42 @@ void AuthController::handleRESTRequest(const string &method, const string &url, 
     //Sets the response status 404, 200 etc.
     response.setStatus("200");
 
-    authService.testDB(response);
 
-//    Object jsonError;
-//    jsonError.set("type", "auth");
-//    jsonError.set("method", method);
-//    jsonError.set("url", url);
-//    jsonError.stringify(response.send());
+    string body(std::istreambuf_iterator<char>(request.stream()), {});
+
+
+    try
+    {
+        if (method == HTTPServerRequest::HTTP_POST && partialUri == "auth")
+        {
+
+            auto &&[check, data] = authService.login(Parser().parse(body));
+            if(check)
+            {
+                Object jsonError;
+                jsonError.set("type", "ok");
+                jsonError.set("data", data);
+                jsonError.stringify(response.send());
+            }
+            else
+            {
+                HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::UNAUTHIRIZED);
+            }
+
+        } else
+            HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+
+    }
+    catch(const JSONException& e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.what());
+        HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+    }
+    catch(const Poco::Exception& e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.what());
+        HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+    }
 }
 
 

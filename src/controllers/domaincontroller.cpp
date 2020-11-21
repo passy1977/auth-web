@@ -33,7 +33,7 @@ using Poco::JSON::Object;
 
 using namespace auth::controllers;
 
-void DomainController::handleRESTRequest(const string &method, const string &url, HTTPServerRequest &, HTTPServerResponse &response)
+void DomainController::handleRESTRequest(const string &method, const string &partialUri, HTTPServerRequest &, HTTPServerResponse &response)
 {
     response.setChunkedTransferEncoding(true);
 
@@ -49,6 +49,6 @@ void DomainController::handleRESTRequest(const string &method, const string &url
     Object jsonError;
     jsonError.set("type", "domain");
     jsonError.set("method", method);
-    jsonError.set("url", url);
+    jsonError.set("partialUri", partialUri);
     jsonError.stringify(responseStream);
 }

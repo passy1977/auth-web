@@ -56,6 +56,39 @@ public:
      */
     void update(const UserPtr &) const override;
 
+    /**
+     * @brief get T by id
+     * @return T instance, can be nullptr if not find T
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
+     */
+    UserPtr get(const string email, const string password, const string domain) const
+    {
+        UserPtr ret = nullptr;
+
+            string query = "SELECT a.*, b.id b_id, b.name b_name, b.secret b_secret, b.status b_status, b.expiration b_expiration FROM users a "
+                        "LEFT JOIN domains b ON a.id_domain  = b.id "
+                        "WHERE a.email = ? "
+                        "AND a.password = ? "
+                        "AND b_name = ?";
+            string fieldPrefix = "b_";
+
+            AUTH_GLOBAL_LOG(DBG, query);
+
+            auto &&stm = connection->create_statement(query);
+            stm->set_string(0, email);
+            stm->set_string(1, password);
+            stm->set_string(2, domain);
+
+            auto &&rs = stm->query();
+            if (rs->next())
+            {
+                ret = deserialize(rs, fieldPrefix);
+            }
+
+
+        return ret;
+    }
+
 private:
     /**
      * @brief deserialize data from db into User

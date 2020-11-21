@@ -20,39 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "router.h"
+#pragma once
 
-#include <iostream>
-using namespace std;
+#include <string>
+using std::string;
 
-#include <Poco/Net/HTTPServerRequest.h>
-using namespace Poco::Net;
 
-#include "controllers/authcontroller.h"
-#include "controllers/usercontroller.h"
-#include "controllers/domaincontroller.h"
-#include "controllers/httpstatuscontroller.h"
-using namespace auth::controllers;
+/**
+ * @brief endWith check il the string end with suffix
+ * @param str to check
+ * @param suffix to end
+ * @return true if str end whit suffix
+ */
+bool endWith(const string &str, const string &suffix) noexcept;
 
-using namespace auth;
-
-extern bool endWith(const string &str, const string &suffix) noexcept;
-
-HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &request)
+/**
+ * @brief endWith check il the string end with suffix
+ * @param str to check
+ * @param suffix to end
+ * @return true if str end whit suffix
+ */
+bool endWith(const string &str, const string &&suffix) noexcept
 {
-
-    auto method = request.getMethod();
-    auto uri = request.getURI();
-
-    if (uri.rfind(AuthController::PATH, 0) == 0) {
-        return new AuthController(uri, method);
-    } else if (uri.rfind(UserController::PATH, 0) == 0) {
-        return new UserController(uri, method);
-    } else if (uri.rfind(DomainController::PATH, 0) == 0) {
-        return new DomainController(uri, method);
-    }
-
-    return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+    return endWith(str, suffix);
 }
-
-
