@@ -25,6 +25,9 @@
 #include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
 
+#include <Poco/JSON/Object.h>
+using Poco::JSON::Object;
+
 #include <string>
 using std::string;
 
@@ -66,14 +69,37 @@ public:
     }
 
     /**
-     * @brief getErrorObject
+     * @brief sendErrorObject to client JSON error
      */
-    static void sendObject(HTTPServerResponse &, HttpStatus, const string & = "") noexcept;
+    inline static void sendErrorObject(HTTPServerResponse &response, HttpStatus httpStatus, const string &errorMsg = "") noexcept
+    {
+        send(response, httpStatus, JSON_STATUS_ERROR, errorMsg);
+    }
+
+    /**
+     * @brief sendObject to client JSON object pass only data
+     */
+    inline static void sendObject(HTTPServerResponse &response, const string &data) noexcept
+    {
+        send(response, HttpStatus::OK, JSON_STATUS_OK, data);
+    }
+
+    /**
+     * @brief sendObject to client JSON object
+     */
+    static void sendObject(HTTPServerResponse &, HttpStatus httpStatus, const Object &) noexcept;
+
+
 
 private:
     HttpStatus httpStatus;
 
     inline explicit HttpStatusController(HttpStatus httpStatus) : httpStatus(httpStatus) {}
+
+    /**
+     * @brief sendErrorObject to client JSON error
+     */
+    static void send(HTTPServerResponse &, HttpStatus, const string & = JSON_STATUS_OK, const string & = "") noexcept;
 };
 
 }

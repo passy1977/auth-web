@@ -18,11 +18,11 @@
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `auth_web`.`domains` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(254) NOT NULL,
-  `secret` VARCHAR(254) NOT NULL COMMENT 'JWT secret key',
-  `status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
-  `expiration_date` VARCHAR(254) NULL,
-  `expiration_jwt` VARCHAR(254) NULL,
+  `domain_name` VARCHAR(254) NOT NULL,
+  `domain_secret` VARCHAR(254) NOT NULL COMMENT 'JWT secret key',
+  `domain_status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
+  `domain_expiration_date` VARCHAR(254) NULL,
+  `domain_expiration_jwt` INT UNSIGNED NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC))

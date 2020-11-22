@@ -85,6 +85,9 @@ int auth::Application::main(const vector<string> &args)
     ///Sets the maximum number of simultaneous threads available for this Server
     params->setMaxThreads(maxThreads);
 
+    ///set name
+    params->setServerName("auth-web");
+
     ///Instanciate HandlerFactory
     HTTPServer server(new Router(), ServerSocket(port), params);
 

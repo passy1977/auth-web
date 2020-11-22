@@ -42,14 +42,15 @@ using namespace auth::controllers;
 
 void AuthController::handleRESTRequest(const string &method, const string &partialUri, HTTPServerRequest &request, HTTPServerResponse &response)
 {
+    //response.setKeepAlive(true);
+
     response.setChunkedTransferEncoding(true);
 
     //Sets mime type text/html application/json etc.
-    response.setContentType(CONTENT_TYPE);
+    response.setContentType(HEADER_CONTENT_TYPE);
 
-    //Sets the response status 404, 200 etc.
-    response.setStatus("200");
-
+    //allow CORS
+    response.set(HEADER_CORS, "*");
 
     string body(std::istreambuf_iterator<char>(request.stream()), {});
 
@@ -59,32 +60,30 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
         if (method == HTTPServerRequest::HTTP_POST && partialUri == "auth")
         {
 
+            ///perform login and generate JWT
             auto &&[check, data] = authService.login(Parser().parse(body));
             if(check)
             {
-                Object jsonError;
-                jsonError.set("type", "ok");
-                jsonError.set("data", data);
-                jsonError.stringify(response.send());
+                HttpStatusController::sendObject(response, data);
             }
             else
             {
-                HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::UNAUTHIRIZED);
+                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::UNAUTHIRIZED, data);
             }
 
         } else
-            HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+            HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
 
     }
     catch(const JSONException& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
     }
     catch(const Poco::Exception& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
     }
 }
 

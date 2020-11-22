@@ -43,9 +43,20 @@ namespace auth
 ///config global param
 inline constexpr const char *PATH_CONFIG = "./config.ini";
 inline constexpr const char *FILE_LOCK_SERVICE = "./auth-web.pin";
-inline constexpr const char *CONTENT_TYPE = "application/json";
 inline constexpr const char *CHECK_DB = "SHOW TABLES LIKE 'users';";
 inline constexpr const char *API_V1 = "/api/v1/";
+
+///header param
+inline constexpr const char *HEADER_CONTENT_TYPE = "application/json";
+inline constexpr const char *HEADER_CORS = "Access-Control-Allow-Origin";
+
+///json response param
+inline constexpr const char *JSON_STATUS = "status";
+inline constexpr const char *JSON_STATUS_OK = "ok";
+inline constexpr const char *JSON_STATUS_ERROR = "error";
+inline constexpr const char *JSON_DATA = "data";
+inline constexpr const char *JSON_HTTP_STATUS = "httpStatus";
+
 
 ///config key param
 inline constexpr const char *CONFIG_PATH_LOG = "log.path";

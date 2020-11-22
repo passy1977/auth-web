@@ -141,7 +141,7 @@ public:
             string query = "SELECT * FROM " + table + " WHERE id = " + to_string(id);
             if constexpr (is_same_v<T, auth::pods::User>)
             {
-                query = "SELECT a.*, b.id b_id, b.name b_name, b.secret b_secret, b.status b_status, b.expiration b_expiration  FROM users a "
+                query = "SELECT a.*, a.*, b.id b_id, b.domain_name b_domain_name, b.domain_secret b_domain_secret, b.domain_status b_domain_status, b.domain_expiration_date b_domain_expiration_date, b.domain_expiration_jwt b_domain_expiration_jwt FROM users a "
                         "LEFT JOIN domains b ON a.id_domain  = b.id "
                         "WHERE a.id = " + to_string(id);
                 fieldPrefix = "b_";

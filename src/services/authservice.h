@@ -31,6 +31,9 @@ using namespace auth::daos;
 #include <Poco/Dynamic/Var.h>
 using Poco::Dynamic::Var;
 
+#include <Poco/UUIDGenerator.h>
+using Poco::UUIDGenerator;
+
 #include <tuple>
 using std::tuple;
 
@@ -58,9 +61,10 @@ public:
     void testDB(HTTPServerResponse &) const noexcept;
 
     /**
-     * @brief login with email, password and domain
+     * @brief login with email, password and domain,
      * @param jsonParsed from body
      * @throw Poco::Exception
+     * @return if true it return even JWT token
      */
     tuple<bool, string> login(Var &&jsonParsed) const;
 

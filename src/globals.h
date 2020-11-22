@@ -121,6 +121,16 @@ public:
     {
         return log;
     }
+
+    /**
+     * @brief getPassword for AES 256 chiper
+     * @return
+     */
+    inline string getPassword() const noexcept
+    {
+        return password;
+    }
+
 private:
 
     /**

@@ -38,9 +38,11 @@ using mariadb::exception::base;
 
 using namespace auth;
 
+
+
 bool Globals::init(const std::string &path) noexcept
 {
-
+    
     try
     {
 

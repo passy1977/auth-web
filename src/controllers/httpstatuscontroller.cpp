@@ -28,32 +28,40 @@ using namespace std;
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
-#include <Poco/JSON/Object.h>
-using Poco::JSON::Object;
-
 using namespace auth::controllers;
 
 void HttpStatusController::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
 {
     response.setChunkedTransferEncoding(true);
 
-    sendObject(response, httpStatus);
+    sendErrorObject(response, httpStatus);
 }
 
-void HttpStatusController::sendObject(HTTPServerResponse &response, HttpStatus httpStatus, const string &errorMsg) noexcept
+void HttpStatusController::sendObject(HTTPServerResponse &response, HttpStatus httpStatus, const Object &obj) noexcept
 {
-    //Sets mime type text/html application/json etc.
-    response.setContentType(CONTENT_TYPE);
+    //response.setKeepAlive(true);
 
     //Sets mime type text/html application/json etc.
-    response.setStatus(to_string(static_cast<uint16_t>(httpStatus)));
+    response.setContentType(HEADER_CONTENT_TYPE);
 
+    //Sets http status
+    response.setStatus(move(to_string(static_cast<uint16_t>(httpStatus))));
 
-    Object jsonError;
-    jsonError.set("type", "error");
+    //allow CORS
+    response.set(HEADER_CORS, "*");
+
+    obj.stringify(response.send());
+}
+
+void HttpStatusController::send(HTTPServerResponse &response, HttpStatus httpStatus, const string &jsonStatus, const string &errorMsg) noexcept
+{
+    ///build json object response
+    Object jsonObj;
+    jsonObj.set(JSON_STATUS, jsonStatus);
+    jsonObj.set(JSON_HTTP_STATUS, move(to_string(static_cast<uint16_t>(httpStatus))));
     if (errorMsg != "") {
-        jsonError.set("data", errorMsg);
+        jsonObj.set(JSON_DATA, errorMsg);
     }
-    jsonError.stringify(response.send());
+    sendObject(response, httpStatus, jsonObj);
 }
 

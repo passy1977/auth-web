@@ -73,3 +73,31 @@ void UserDAO::update(const UserPtr &) const
 {
 
 }
+
+auth::pods::UserPtr UserDAO::get(const string email, const string password, const string domain) const
+{
+    UserPtr ret = nullptr;
+
+    string query = "SELECT a.*, b.id b_id, b.domain_name b_domain_name, b.domain_secret b_domain_secret, b.domain_status b_domain_status, b.domain_expiration_date b_domain_expiration_date, b.domain_expiration_jwt b_domain_expiration_jwt FROM users a "
+                   "LEFT JOIN domains b ON a.id_domain  = b.id "
+                   "WHERE a.email = ? "
+                   "AND a.password = ? "
+                   "AND domain_name = ?";
+    string fieldPrefix = "b_";
+
+    AUTH_GLOBAL_LOG(DBG, query);
+
+    auto &&stm = connection->create_statement(query);
+    stm->set_string(0, email);
+    stm->set_string(1, password);
+    stm->set_string(2, domain);
+
+    auto &&rs = stm->query();
+    if (rs->next())
+    {
+        ret = deserialize(rs, fieldPrefix);
+    }
+
+
+    return ret;
+}

@@ -21,10 +21,21 @@
 // SOFTWARE.
 
 #include "authservice.h"
+using auth::pods::Domain;
 
 #include <Poco/JSON/Object.h>
 using namespace Poco::JSON;
 
+#include <Poco/JWT/Token.h>
+#include <Poco/JWT/Signer.h>
+using namespace Poco::JWT;
+
+#include <Poco/Crypto/Cipher.h>
+#include <Poco/Crypto/CipherFactory.h>
+#include <Poco/Crypto/CipherKey.h>
+using namespace Poco::Crypto;
+
+using namespace Poco;
 
 #include "../globals.h"
 
@@ -59,16 +70,57 @@ tuple<bool, string> AuthService::login(Var &&jsonParsed) const
                 && !object->isNull(User::FIELD_DOMAIN)
                 )
         {
-            auto &&email = object->get(User::FIELD_EMAIL);
-            auto &&password = object->get(User::FIELD_PASSWORD);
-            auto &&domain = object->get(User::FIELD_DOMAIN);
-            AUTH_GLOBAL_LOG(DBG, email);
-            AUTH_GLOBAL_LOG(DBG, password);
-            AUTH_GLOBAL_LOG(DBG, domain);
+            auto &&user = userDAO.get(
+                move(object->get(User::FIELD_EMAIL)),
+                move(object->get(User::FIELD_PASSWORD)),
+                move(object->get(User::FIELD_DOMAIN))
+            );
 
-            auto &&user =  userDAO.get(email, password, domain);
+            if (user != nullptr) {
 
-            return tuple(true, user->name);
+                auto &&now = Poco::Timestamp();
+
+                Token token;
+                token.getExpiration();
+                token.setType("JWT");
+                token.setId(move(UUIDGenerator().defaultGenerator().createRandom().toString()));
+                token.payload()
+                        .set(User::FIELD_ID, user->id)
+                        .set(User::FIELD_NAME, user->name)
+                        .set(User::FIELD_EMAIL, user->email)
+                        .set(User::FIELD_JSON_DATA, user->jsonData)
+                        .set(User::FIELD_EXPIRATION_DATE, user->expirationDate)
+                        .set(User::FIELD_PERMISSIONS, user->permissions)
+                        .set(User::FIELD_ID, user->id)
+                        .set(Domain::FIELD_NAME, user->domain->name)
+                        .set(Domain::FIELD_EXPIRATION_DATE, user->domain->expirationDate);
+                token.setIssuedAt(now);
+                if (user->domain->expirationJWT > 0) {
+                    auto &&expirationJWT = Timestamp();
+
+                    expirationJWT += Timespan(user->domain->expirationJWT, 0);
+
+                    token.setExpiration(expirationJWT);
+                }
+
+
+                auto &&factory = CipherFactory::defaultFactory();
+
+                // Creates a 256-bit AES cipher
+                Cipher* cipher = factory.createCipher(move(CipherKey("AES-256-ECB", Globals::getInstance()->getPassword())));
+
+                string secretDecript = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
+
+
+                Signer signer(secretDecript);
+                std::string jwt = signer.sign(token, Signer::ALGO_HS256);
+
+
+                delete cipher;
+
+                return tuple(true, jwt);
+            } else
+                return tuple(false, "user not found");
         } else
             throw Poco::Exception("no valid param to attempt login");
     } else

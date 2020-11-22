@@ -62,7 +62,7 @@ struct User final
     /**
      * @brief id PK
      */
-    int id;
+    uint32_t id;
 
     /**
      * @brief user name like Antonio Salsi
@@ -111,7 +111,7 @@ struct User final
 
 
     inline User(
-            int id,
+            uint32_t id,
             string name,
             string email,
             string password,

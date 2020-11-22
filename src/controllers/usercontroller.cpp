@@ -37,11 +37,16 @@ void UserController::handleRESTRequest(const string &method, const string &parti
 {
     response.setChunkedTransferEncoding(true);
 
+    //response.setKeepAlive(true);
+
     //Sets mime type text/html application/json etc.
-    response.setContentType(CONTENT_TYPE);
+    response.setContentType(HEADER_CONTENT_TYPE);
 
     //Sets the response status 404, 200 etc.
     response.setStatus("200");
+
+    //allow CORS
+    response.set(HEADER_CORS, "*");
 
     //opens the file stream
     ostream& responseStream = response.send();

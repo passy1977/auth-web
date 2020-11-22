@@ -37,11 +37,11 @@ struct Domain final
 {
 
     static inline constexpr const char *FIELD_ID = "id";
-    static inline constexpr const char *FIELD_NAME = "name";
-    static inline constexpr const char *FIELD_SECRET = "secret";
-    static inline constexpr const char *FIELD_STATUS = "status";
-    static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration_date";
-    static inline constexpr const char *FIELD_EXPIRATION_JWT = "expiration_jwt";
+    static inline constexpr const char *FIELD_NAME = "domain_name";
+    static inline constexpr const char *FIELD_SECRET = "domain_secret";
+    static inline constexpr const char *FIELD_STATUS = "domain_status";
+    static inline constexpr const char *FIELD_EXPIRATION_DATE = "domain_expiration_date";
+    static inline constexpr const char *FIELD_EXPIRATION_JWT = "domain_expiration_jwt";
 
     /**
      * @brief The Status enum status of Domain
@@ -55,7 +55,7 @@ struct Domain final
     /**
      * @brief id PK
      */
-    int id;
+    uint32_t id;
 
     /**
      * @brief domain name
@@ -65,7 +65,7 @@ struct Domain final
     /**
      * @brief seecret password for JWT
      */
-    string seecret;
+    string secret;
 
     /**
      * @brief last login date,
@@ -83,19 +83,19 @@ struct Domain final
      * @brief expiration JWT in millis after this date the token expire
      * @details if nullptr the feature i disable
      */
-    string expirationJWT;
+    uint32_t expirationJWT;
 
     inline Domain(
-            int id,
+            uint32_t id,
             string name,
             string seecret,
             Status status,
             string expirationDate,
-            string expirationJWT
+            uint32_t expirationJWT
             ) :
         id(move(id)),
         name(move(name)),
-        seecret(move(seecret)),
+        secret(move(seecret)),
         status(move(status)),
         expirationDate(move(expirationDate)),
         expirationJWT(move(expirationJWT))
