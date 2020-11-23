@@ -34,7 +34,7 @@ namespace auth::daos
 /**
  * @brief The UserDAO class CRUD oparetion on User
  */
-class UserDAO final : public DAO<User>
+class UserDAO final : private DAO<User>
 {
     static const constexpr inline char* COLLECTION_NAME = "users";
 public:

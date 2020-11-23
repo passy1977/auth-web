@@ -50,6 +50,10 @@ add_executable(
     src/daos/domaindao.cpp
     src/pods/user.h
     src/pods/domain.h
+    src/crypto/aes.h
+    src/crypto/aes.cpp
+    src/crypto/bytearray.h
+    src/crypto/bytearray.cpp
     src/services/lockservice.h
     src/services/lockservice.cpp
     src/services/logservice.h
@@ -72,4 +76,4 @@ add_executable(
 )
 
 #linking
-target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto mariadb ssl crypto)
+target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData mariadb ssl crypto)

@@ -23,7 +23,9 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 using std::string;
+using std::tuple;
 
 
 /**
@@ -44,3 +46,51 @@ bool endWith(const string &str, const string &&suffix) noexcept
 {
     return endWith(str, suffix);
 }
+
+/**
+ * @brief hexToString convert hex to string
+ * @param bytes
+ * @param size
+ * @param upperCase
+ * @return
+ */
+inline tuple<uint8_t *, size_t> stringToBytes(string str) noexcept
+{
+    return tuple<uint8_t *, size_t>{reinterpret_cast<uint8_t *>(&str[0]), str.size()};
+}
+string bytesToString(const uint8_t *, size_t ) noexcept;
+
+/**
+ * @brief hexToString convert hex to string
+ * @param bytes
+ * @param size
+ * @param upperCase
+ * @return
+ */
+inline string bytesToString(const tuple<uint8_t *, size_t> &bytes) noexcept
+{
+    auto &&[first, second] = bytes;
+    return bytesToString(first, second);
+}
+
+/**
+ * @brief hexToString convert hex to string
+ * @param bytes
+ * @param size
+ * @param upperCase
+ * @return
+ */
+inline string bytesToString(const tuple<uint8_t *, size_t> &&bytes) noexcept
+{
+    auto &&[first, second] = bytes;
+    return bytesToString(first, second);
+}
+
+/**
+ * @brief hexToString convert hex to string
+ * @param bytes
+ * @param size
+ * @param upperCase
+ * @return
+ */
+string hexToString(const uint8_t *bytes, size_t size, bool upperCase = true) noexcept;

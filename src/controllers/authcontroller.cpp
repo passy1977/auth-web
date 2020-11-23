@@ -77,13 +77,13 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
     }
     catch(const JSONException& e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
     }
     catch(const Poco::Exception& e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
     }
 }
 

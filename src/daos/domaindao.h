@@ -38,7 +38,7 @@ class UserDAO;
 /**
  * @brief The DomainDAO class CRUD oparetion on Domain
  */
-class DomainDAO final : public DAO<Domain>
+class DomainDAO final : private DAO<Domain>
 {
     static const constexpr inline char* COLLECTION_NAME = "domains";
 

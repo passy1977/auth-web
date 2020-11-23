@@ -22,9 +22,23 @@
 
 #include "utils.h"
 
-
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <iomanip>      // std::setfill, std::setw
+using namespace std;
 
 bool endWith(const string &str, const string &suffix) noexcept
 {
     return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+string hexToString(const uint8_t *bytes, size_t size, bool upperCase) noexcept
+{
+    ostringstream ret;
+    for (size_t i = 0; i < size; i++)
+    {
+        ret << hex << setfill('0') << setw(2) << (upperCase ? uppercase : nouppercase) << (int)bytes[i];
+    }
+    return ret.str();
 }
