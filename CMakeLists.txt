@@ -76,4 +76,4 @@ add_executable(
 )
 
 #linking
-target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData mariadb ssl crypto)
+target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto mariadb ssl crypto)

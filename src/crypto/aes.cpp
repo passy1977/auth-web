@@ -368,7 +368,7 @@ ByteArray AES::encryptECBMode(const ByteArray &plain) const
             func = &EVP_aes_192_ecb;
             break;
         case KeySize::K256:
-            func = &EVP_aes_256_cbc;
+            func = &EVP_aes_256_ecb;
             break;
     }
     
@@ -387,7 +387,7 @@ ByteArray AES::dencryptECBMode(const ByteArray &cipher) const
             func = &EVP_aes_192_ecb;
             break;
         case KeySize::K256:
-            func = &EVP_aes_256_cbc;
+            func = &EVP_aes_256_ecb;
             break;
     }
     
@@ -458,13 +458,13 @@ ByteArray AES::dencryptOFBMode(const ByteArray &cipher) const
     switch (this->keySize)
     {
         case KeySize::K128:
-            func = &EVP_aes_128_ctr;
+            func = &EVP_aes_128_ofb;
             break;
         case KeySize::K192:
-            func = &EVP_aes_192_ctr;
+            func = &EVP_aes_192_ofb;
             break;
         case KeySize::K256:
-            func = &EVP_aes_256_ctr;
+            func = &EVP_aes_256_ofb;
             break;
     }
     

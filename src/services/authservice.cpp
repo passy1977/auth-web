@@ -31,10 +31,12 @@ using namespace Poco::JSON;
 using namespace Poco::JWT;
 using namespace Poco;
 
+#include <Poco/Crypto/Cipher.h>
+#include <Poco/Crypto/CipherFactory.h>
+#include <Poco/Crypto/CipherKey.h>
+using namespace Poco::Crypto;
 
-#include "../crypto/aes.h"
 #include "../globals.h"
-using namespace auth::crypto;
 
 using namespace auth::services;
 
@@ -100,16 +102,22 @@ tuple<bool, string> AuthService::login(Var &&jsonParsed) const
                     token.setExpiration(expirationJWT);
                 }
 
-                AES cipher(Globals::getInstance()->getPassword(), "", AES::Type::ECB, AES::KeySize::K256);
+                user->lastLogin = DateTimeFormatter::format(Timestamp(),  DateTimeFormat::SORTABLE_FORMAT);
 
-                AUTH_GLOBAL_LOG(DBG, user->domain->secret);
+                userDAO.update(user);
 
+                CipherFactory& factory = CipherFactory::defaultFactory();
 
-                AUTH_GLOBAL_LOG(DBG, cipher.encrypt("3dHxlPS59o7958v4ehnj2B4cWp64DM7X").toHex());
+                // Creates a 256-bit AES cipher
+                Cipher* cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
 
-                auto  &&secretDecript = cipher.decrypt(user->domain->secret).fromBase64();
+//                AUTH_GLOBAL_LOG(DBG, user->domain->secret);
 
-                string jwt = Signer(secretDecript.toString()).sign(token, Signer::ALGO_HS256);
+                string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
+
+//                AUTH_GLOBAL_LOG(DBG, decrypted);
+
+                string jwt = Signer(decrypted).sign(token, Signer::ALGO_HS256);
 
                 return tuple(true, jwt);
             } else

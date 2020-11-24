@@ -22,9 +22,9 @@
 
 #include "userdao.h"
 
-#include <algorithm>    // copy
-#include <iterator>     // back_inserter
-#include <regex>        // regex, sregex_token_iterator
+#include "Poco/StringTokenizer.h"
+using Poco::StringTokenizer;
+
 #include <mariadb++/exceptions.hpp>
 
 #include "domaindao.h"
@@ -34,14 +34,20 @@ using namespace auth::daos;
 UserPtr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
 {
     vector<string> permissions;
-    string str = rs->get_string(User::FIELD_EXPIRATION_DATE);
-    regex re(",d+");
+    auto &&str = rs->get_string(User::FIELD_PERMISSIONS);
+    StringTokenizer token(str,
+                       ",",
+                       StringTokenizer::TOK_TRIM | StringTokenizer::TOK_IGNORE_EMPTY
+                       );
 
-    sregex_token_iterator
-        begin(str.begin(), str.end(), re),
-        end;
 
-    copy(begin, end, back_inserter(permissions));
+    for (auto s : token)
+    {
+        permissions.push_back(s);
+    }
+
+
+
 
     DomainPtr domain = nullptr;
     if (fieldPrefix != "")
@@ -64,14 +70,103 @@ UserPtr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix
                 );
 }
 
-void UserDAO::insert(const UserPtr &) const
+void UserDAO::insert(const UserPtr &user) const
 {
+    string query("INSERT INTO users (");
+           query += User::FIELD_NAME;
+           query += ", ";
+           query += User::FIELD_EMAIL;
+           query += ", ";
+           query += User::FIELD_PASSWORD;
+           query += ", ";
+           query += User::FIELD_JSON_DATA;
+           query += ", ";
+           query += User::FIELD_PERMISSIONS;
+           query += ", ";
+           query += User::FIELD_STATUS;
+           query += ", ";
+           query += User::FIELD_LAST_LOGIN;
+           query += ", ";
+           query += User::FIELD_EXPIRATION_DATE;
+           query += ", ";
+           query += User::FIELD_ID_DOMAIN;
+           query += ", ";
+           query += ") values (?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 
+           AUTH_GLOBAL_LOG(DBG, query);
+
+    string permissions;
+
+    for (auto &&s : user->permissions)
+    {
+        permissions += s;
+        permissions += ",";
+    }
+
+    if (permissions != "")
+        permissions = permissions.substr(0, permissions.size() - 1);
+
+    statement_ref stmt = connection->create_statement(query);
+    stmt->set_string(0, user->name);
+    stmt->set_string(1, user->email);
+    stmt->set_string(2, user->password);
+    stmt->set_string(3, user->jsonData);
+    stmt->set_string(4, permissions);
+    stmt->set_unsigned8(5, static_cast<uint8_t>(user->status));
+    stmt->set_string(6, user->lastLogin);
+    stmt->set_string(7, user->expirationDate);
+    stmt->set_unsigned32(9, user->domain->id);
+    stmt->insert();
 }
 
-void UserDAO::update(const UserPtr &) const
+void UserDAO::update(const UserPtr &user) const
 {
+    string query("UPDATE users SET ");
+           query += User::FIELD_NAME;
+           query += " = ?, ";
+           query += User::FIELD_EMAIL;
+           query += " = ?, ";
+           query += User::FIELD_PASSWORD;
+           query += " = ?, ";
+           query += User::FIELD_JSON_DATA;
+           query += " = ?, ";
+           query += User::FIELD_PERMISSIONS;
+           query += " = ?, ";
+           query += User::FIELD_STATUS;
+           query += " = ?, ";
+           query += User::FIELD_LAST_LOGIN;
+           query += " = ?, ";
+           query += User::FIELD_EXPIRATION_DATE;
+           query += " = ?, ";
+           query += User::FIELD_ID_DOMAIN;
+           query += " = ? ";
+           query += " WHERE id = ?";
 
+           AUTH_GLOBAL_LOG(DBG, query);
+
+    string permissions;
+
+    for (auto &&s : user->permissions)
+    {
+        permissions += s;
+        permissions += ",";
+    }
+
+    if (permissions != "")
+        permissions = permissions.substr(0, permissions.size() - 1);
+
+    statement_ref stmt = connection->create_statement(query);
+    stmt->set_string(0, user->name);
+    stmt->set_string(1, user->email);
+    stmt->set_string(2, user->password);
+    stmt->set_string(3, user->jsonData);
+    stmt->set_string(4, permissions);
+    stmt->set_unsigned8(5, static_cast<uint8_t>(user->status));
+    stmt->set_string(6, user->lastLogin);
+    stmt->set_string(7, user->expirationDate);
+    stmt->set_unsigned32(8, user->domain->id);
+    stmt->set_unsigned32(9, user->id);
+    stmt->insert();
 }
 
 auth::pods::UserPtr UserDAO::get(const string email, const string password, const string domain) const
