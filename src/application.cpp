@@ -86,7 +86,7 @@ int auth::Application::main(const vector<string> &args)
     params->setMaxThreads(maxThreads);
 
     ///set name
-    params->setServerName("auth-web");
+    params->setServerName(SERVER_NAME);
 
     ///Instanciate HandlerFactory
     HTTPServer server(new Router(), ServerSocket(port), params);

@@ -29,12 +29,8 @@ using namespace std;
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Parser.h>
-using namespace Poco::JSON;
-
-#include <Poco/Dynamic/Var.h>
-using Poco::Dynamic::Var;
+#include <Poco/JSON/JSONException.h>
+using Poco::JSON::JSONException;
 
 #include "httpstatuscontroller.h"
 
@@ -52,16 +48,14 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
     //allow CORS
     response.set(HEADER_CORS, "*");
 
-    string body(std::istreambuf_iterator<char>(request.stream()), {});
-
-
     try
     {
-        if (method == HTTPServerRequest::HTTP_POST && partialUri == "auth")
+        ///login request
+        if (method == HTTPServerRequest::HTTP_POST && partialUri == AUTH)
         {
 
             ///perform login and generate JWT
-            auto &&[check, data] = authService.login(Parser().parse(body));
+            auto &&[check, data] = authService.login(string(istreambuf_iterator<char>(request.stream()), {}));
             if(check)
             {
                 HttpStatusController::sendObject(response, data);
@@ -70,8 +64,26 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
             {
                 HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::UNAUTHIRIZED, data);
             }
+        }
 
-        } else
+        ///check JWT token request
+        else if (method == HTTPServerRequest::HTTP_GET && partialUri == AUTH_CHECK)
+        {
+
+            if (request.hasCredentials())
+            {
+                string scheme;
+                string authInfo;
+
+                request.getCredentials(scheme, authInfo);
+
+                HttpStatusController::sendObject(response, authService.check(scheme, authInfo) ? "true" : "false");
+            }
+            else
+                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+        }
+
+        else
             HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
 
     }

@@ -24,6 +24,7 @@
 using auth::pods::Domain;
 
 #include <Poco/JSON/Object.h>
+#include <Poco/JSON/Parser.h>
 using namespace Poco::JSON;
 
 #include <Poco/JWT/Token.h>
@@ -40,30 +41,18 @@ using namespace Poco::Crypto;
 
 using namespace auth::services;
 
-void AuthService::testDB(HTTPServerResponse &response) const noexcept
+tuple<bool, string> AuthService::login(string &&body) const
 {
 
-//    try
-//    {
-//        auto &&user = userDAO.get(1);
+    auto &&jsonParsed = Parser().parse(body);
 
-//        AUTH_GLOBAL_LOG(DBG, user->email);
-//        AUTH_GLOBAL_LOG(DBG, user->domain->name);
-//    }
-//    catch(const std::bad_alloc &e)
-//    {
-//         AUTH_GLOBAL_LOG(DBG, e.what());
-//    }
-
-}
-
-tuple<bool, string> AuthService::login(Var &&jsonParsed) const
-{
+    /// check obk type
     if (jsonParsed.type() == typeid(Object::Ptr))
     {
-
+        ///parse body request
         Object::Ptr object = jsonParsed.extract<Object::Ptr>();
 
+        ///check, extract data and retrive user
         if (!object->isNull(User::FIELD_EMAIL)
                 && !object->isNull(User::FIELD_PASSWORD)
                 && !object->isNull(User::FIELD_DOMAIN)
@@ -75,25 +64,32 @@ tuple<bool, string> AuthService::login(Var &&jsonParsed) const
                 move(object->get(User::FIELD_DOMAIN))
             );
 
+            ///check if  credential are oh
             if (user != nullptr) {
 
-                auto &&now = Poco::Timestamp();
+                ///decode secret for JWT token
+                CipherFactory &factory = CipherFactory::defaultFactory();
+                Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
+                string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
+
+                ///built JWT token
+                auto &&now = Timestamp();
 
                 Token token;
-                token.getExpiration();
                 token.setType("JWT");
                 token.setId(move(UUIDGenerator().defaultGenerator().createRandom().toString()));
+                token.setIssuer(SERVER_NAME);
                 token.payload()
-                        .set(User::FIELD_ID, user->id)
                         .set(User::FIELD_NAME, user->name)
                         .set(User::FIELD_EMAIL, user->email)
                         .set(User::FIELD_JSON_DATA, user->jsonData)
                         .set(User::FIELD_EXPIRATION_DATE, user->expirationDate)
                         .set(User::FIELD_PERMISSIONS, user->permissions)
-                        .set(User::FIELD_ID, user->id)
                         .set(Domain::FIELD_NAME, user->domain->name)
                         .set(Domain::FIELD_EXPIRATION_DATE, user->domain->expirationDate);
                 token.setIssuedAt(now);
+
+                ///set expiration token
                 if (user->domain->expirationJWT > 0) {
                     auto &&expirationJWT = Timestamp();
 
@@ -102,22 +98,17 @@ tuple<bool, string> AuthService::login(Var &&jsonParsed) const
                     token.setExpiration(expirationJWT);
                 }
 
-                user->lastLogin = DateTimeFormatter::format(Timestamp(),  DateTimeFormat::SORTABLE_FORMAT);
 
+                ///update user last login
+                user->lastLogin = DateTimeFormatter::format(Timestamp(),  DateTimeFormat::SORTABLE_FORMAT);
                 userDAO.update(user);
 
-                CipherFactory& factory = CipherFactory::defaultFactory();
+                ///sign JWT token
+                string &&jwt = Signer(decrypted).sign(token, Signer::ALGO_HS256);
 
-                // Creates a 256-bit AES cipher
-                Cipher* cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
-
-//                AUTH_GLOBAL_LOG(DBG, user->domain->secret);
-
-                string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
-
-//                AUTH_GLOBAL_LOG(DBG, decrypted);
-
-                string jwt = Signer(decrypted).sign(token, Signer::ALGO_HS256);
+//                Token token2("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb21haW5fZXhwaXJhdGlvbl9kYXRlIjoiIiwiZG9tYWluX25hbWUiOiJwZXJzb25hbC13ZWIiLCJlbWFpbCI6InBhc3N5LmxpbnV4QHpyZXNhLml0IiwiZXhwIjoxNjA2Mjk0NTEyLjQxMzE0MywiZXhwaXJhdGlvbl9kYXRlIjoiIiwiaWF0IjoxNjA2MjkwOTEyLjQxMzAwMSwiaWQiOjEsImpzb25fZGF0YSI6IntcInRlc3RcIjogXCJhIHN0cmluZ1wifSIsImp0aSI6ImM0NzNiZDVlLTU1MTEtNDcxNi05ZWEzLTk1ZDg3Y2Y4YjMwYyIsIm5hbWUiOiJBbnRvbmlvIFNhbHNpIiwicGVybWlzc2lvbnMiOlsgIlJPTEVfQURNSU4iLCAiUk9MRV9BVVRIX1dFQiIgXX0.36rUyr1G2LPLv1vm1RXRE7bRHOKyLpw_DOJuDFkyLq4");
+//                std::ostringstream stream;
+//                token2.payload().stringify(stream);
 
                 return tuple(true, jwt);
             } else
@@ -127,4 +118,16 @@ tuple<bool, string> AuthService::login(Var &&jsonParsed) const
     } else
         throw Poco::Exception("body request not contain object");
     return tuple(false, "");
+}
+
+bool AuthService::check(const string &scheme, const string &authInfo) const noexcept
+{
+    if (scheme != "Bearer" || authInfo == "")
+    {
+        return false;
+    }
+
+
+
+    return false;
 }

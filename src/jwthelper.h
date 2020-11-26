@@ -22,52 +22,12 @@
 
 #pragma once
 
-#include <Poco/Net/HTTPServerResponse.h>
-using namespace Poco::Net;
+#include <string>
+using std::string;
 
-#include "../daos/userdao.h"
-using namespace auth::daos;
-
-#include <Poco/Dynamic/Var.h>
-using Poco::Dynamic::Var;
-
-#include <Poco/UUIDGenerator.h>
-using Poco::UUIDGenerator;
-
-#include <tuple>
-using std::tuple;
-
-#include"../globals.h"
-
-namespace auth::services
+namespace auth
 {
 
-/**
- * @brief In AuthService class
- */
-class AuthService
-{
-
-    const UserDAO userDAO;
-
-public:
-    inline AuthService() :
-        userDAO(Globals::getInstance()->getConnection())
-    {
-
-    }
-    AUTH_NO_COPY_NO_MOVE(AuthService)
-
-    /**
-     * @brief login with email, password and domain
-     * @param jsonParsed from body
-     * @throw Poco::Exception
-     * @return if true it return even JWT token
-     */
-    tuple<bool, string> login(string &&jsonParsed) const;
-
-    bool check(const string &, const string &) const noexcept;
-
-};
+bool jwtCheck(const string &, const string &, const string &) noexcept;
 
 }

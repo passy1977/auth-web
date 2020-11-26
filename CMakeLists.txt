@@ -8,10 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #macro area
-#add_compile_definitions(POCO_LOG_DEBUG)
-
-#add mariadbpp cmake extension path
-#list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/3thparty/mariadbpp/cmake)
+#add_compile_definitions(DISABLE_PICOJSON)
 
 #lib include
 include_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/include)
@@ -26,6 +23,10 @@ include_directories(${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/include)
 file(GLOB mariadbclientpp_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/include/mariadb++/*)
 file(GLOB mariadbclientpp_PRIVATE_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/src/*.hpp)
 file(GLOB mariadbclientpp_SOURCES ${CMAKE_SOURCE_DIR}/src/3thparty/mariadbpp/src/*.cpp)
+#include_directories(${CMAKE_SOURCE_DIR}/src/3thparty/jwt-cpp/include)
+#file(GLOB jwt-cpp_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/jwt-cpp/include/jwt-cpp/*)
+#file(GLOB nlohmann_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/jwt-cpp/include/nlohmann/*)
+#file(GLOB picojson_PUBLIC_HEADERS ${CMAKE_SOURCE_DIR}/src/3thparty/jwt-cpp/include/picojson/*)
 
 #source definitions
 add_executable(
@@ -33,6 +34,9 @@ add_executable(
     ${mariadbclientpp_SOURCES}
     ${mariadbclientpp_PUBLIC_HEADERS}
     ${mariadbclientpp_PRIVATE_HEADERS}
+#    ${jwt-cpp_PUBLIC_HEADERS}
+#    ${nlohmann_PUBLIC_HEADERS}
+#    ${picojson_PUBLIC_HEADERS}
     src/main.cpp
     src/constants.h
     src/application.h
@@ -43,6 +47,8 @@ add_executable(
     src/router.cpp
     src/utils.h
     src/utils.cpp
+    src/jwthelper.h
+    src/jwthelper.cpp
     src/daos/dao.h
     src/daos/userdao.h
     src/daos/userdao.cpp
@@ -72,4 +78,4 @@ add_executable(
 )
 
 #linking
-target_link_libraries(auth-web PocoJWT PocoUtil PocoNet PocoJson PocoFoundation PocoData PocoCrypto mariadb ssl crypto)
+target_link_libraries(auth-web PocoCrypto PocoEncodings PocoFoundation PocoJson PocoJWT PocoNet PocoUtil mariadb ssl crypto)

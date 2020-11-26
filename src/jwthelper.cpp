@@ -20,54 +20,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "jwthelper.h"
 
-#include <Poco/Net/HTTPServerResponse.h>
-using namespace Poco::Net;
+#include <Poco/JWT/Token.h>
+#include <Poco/JWT/Signer.h>
+using namespace Poco::JWT;
+using Timestamp = Poco::Timestamp;
 
-#include "../daos/userdao.h"
-using namespace auth::daos;
+#include "pods/domain.h"
+#include "pods/user.h"
+using namespace auth::pods;
 
-#include <Poco/Dynamic/Var.h>
-using Poco::Dynamic::Var;
+using namespace auth;
 
-#include <Poco/UUIDGenerator.h>
-using Poco::UUIDGenerator;
-
-#include <tuple>
-using std::tuple;
-
-#include"../globals.h"
-
-namespace auth::services
+bool jwtCheck(const string &scheme, const string &authInfo, const string &domain) noexcept
 {
-
-/**
- * @brief In AuthService class
- */
-class AuthService
-{
-
-    const UserDAO userDAO;
-
-public:
-    inline AuthService() :
-        userDAO(Globals::getInstance()->getConnection())
+    if (scheme != "Bearer" || authInfo == "")
     {
-
+        return false;
     }
-    AUTH_NO_COPY_NO_MOVE(AuthService)
 
-    /**
-     * @brief login with email, password and domain
-     * @param jsonParsed from body
-     * @throw Poco::Exception
-     * @return if true it return even JWT token
-     */
-    tuple<bool, string> login(string &&jsonParsed) const;
+    Token token;
+    Signer signer;
+    signer.tryVerify(authInfo, token);
 
-    bool check(const string &, const string &) const noexcept;
 
-};
+    auto &&expiration = token.getExpiration();
 
+
+    if (Timestamp() > expiration)
+    {
+        return false;
+    }
+
+
+    if (token.payload().has(User::FIELD_DOMAIN))
+    {
+        if (token.payload().get(User::FIELD_DOMAIN).toString() != domain)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

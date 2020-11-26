@@ -42,7 +42,7 @@ struct User final
     static inline constexpr const char *FIELD_EMAIL = "email";
     static inline constexpr const char *FIELD_PASSWORD = "password";
     static inline constexpr const char *FIELD_JSON_DATA = "json_data";
-    static inline constexpr const char *FIELD_PERMISSIONS = "permissions";
+    static inline constexpr const char *FIELD_PERMISSIONS = "aud";
     static inline constexpr const char *FIELD_STATUS = "status";
     static inline constexpr const char *FIELD_LAST_LOGIN = "last_login";
     static inline constexpr const char *FIELD_EXPIRATION_DATE = "expiration_date";

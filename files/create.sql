@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `auth_web`.`users` (
   `email` VARCHAR(254) NOT NULL,
   `password` VARCHAR(254) NOT NULL,
   `json_data` VARCHAR(254) NULL,
-  `permissions` VARCHAR(254) NULL,
+  `aud` VARCHAR(254) NULL,
   `status` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1 COMMENT '0 = unactive\n1 = active\n2 = lock\n',
   `last_login` VARCHAR(254) NULL,
   `expiration_date` VARCHAR(254) NULL,
