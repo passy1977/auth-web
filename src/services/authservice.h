@@ -66,7 +66,14 @@ public:
      */
     tuple<bool, string> login(string &&jsonParsed) const;
 
-    bool check(const string &, const string &, const string &) const noexcept;
+    /**
+     * @brief check if JWT token is valid
+     * @param scheme of auth
+     * @param authInfo token JWT
+     * @param partialUri
+     * @return true if valid
+     */
+    bool check(const string &scheme, const string &authInfo, const string &partialUri) const noexcept;
 
 };
 

@@ -38,12 +38,57 @@ Domain::Ptr DomainDAO::deserialize(const result_set_ref &rs, const string &field
                 );
 }
 
-void DomainDAO::insert(const Domain::Ptr &) const
+void DomainDAO::insert(const Domain::Ptr &domain) const
 {
+    string query("INSERT INTO users (");
+           query += Domain::FIELD_NAME;
+           query += ", ";
+           query += Domain::FIELD_SECRET;
+           query += ", ";
+           query += Domain::FIELD_SECRET;
+           query += ", ";
+           query += Domain::FIELD_EXPIRATION_DATE;
+           query += ", ";
+           query += Domain::FIELD_EXPIRATION_JWT;
+           query += ", ";
+           query += ") values (?, ?, ?, ?, ?) ";
 
+           AUTH_GLOBAL_LOG(DBG, query);
+
+    statement_ref stmt = connection->create_statement(query);
+    stmt->set_string(0, domain->name);
+    stmt->set_string(1, domain->secret);
+    stmt->set_unsigned8(2, static_cast<uint8_t>(domain->status));
+    stmt->set_string(3, domain->expirationDate);
+    stmt->set_unsigned32(4, domain->expirationJWT);
+    stmt->insert();
 }
 
-void DomainDAO::update(const Domain::Ptr &) const
+void DomainDAO::update(const Domain::Ptr &domain) const
 {
+    string query("UPDATE users SET ");
+            query += Domain::FIELD_NAME;
+            query += " = ?, ";
+            query += Domain::FIELD_SECRET;
+            query += " = ?, ";
+            query += Domain::FIELD_SECRET;
+            query += " = ?, ";
+            query += Domain::FIELD_EXPIRATION_DATE;
+            query += " = ?, ";
+            query += Domain::FIELD_EXPIRATION_JWT;
+            query += " = ?, ";
+            query += " WHERE id = ?";
 
+           AUTH_GLOBAL_LOG(DBG, query);
+
+    string permissions;
+
+    statement_ref stmt = connection->create_statement(query);
+    stmt->set_string(0, domain->name);
+    stmt->set_string(1, domain->secret);
+    stmt->set_unsigned8(2, static_cast<uint8_t>(domain->status));
+    stmt->set_string(3, domain->expirationDate);
+    stmt->set_unsigned32(4, domain->expirationJWT);
+    stmt->set_unsigned32(5, domain->id);
+    stmt->insert();
 }
