@@ -26,7 +26,6 @@
 
 #include "../pods/user.h"
 using auth::pods::User;
-using auth::pods::UserPtr;
 
 namespace auth::daos
 {
@@ -45,23 +44,30 @@ public:
     AUTH_NO_COPY_NO_MOVE(UserDAO)
 
     /**
-     * @brief update T
+     * @brief update User
      * @exceptions
      */
-    void insert(const UserPtr &) const override;
+    void insert(const User::Ptr &) const override;
 
     /**
-     * @brief update T
+     * @brief update User
      * @exceptions
      */
-    void update(const UserPtr &) const override;
+    void update(const User::Ptr &) const override;
 
     /**
-     * @brief get T by id
-     * @return T instance, can be nullptr if not find T
+     * @brief get User by id
+     * @return UserPtr instance, can be nullptr if not find User
      * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    UserPtr get(const string email, const string password, const string domain) const;
+    User::Ptr get(const string &&email, const string &&password, const string &&domain) const;
+
+    /**
+     * @brief get User by id
+     * @return UserPtr instance, can be nullptr if not find User
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
+     */
+    User::Ptr get(const string &email, const string &domain) const;
 
 private:
     /**
@@ -71,7 +77,7 @@ private:
      * @return UserPtr
      * @exceptions mariadb::exception::base, std::out_of_range
      */
-    virtual UserPtr deserialize(const result_set_ref &, const string & = "") const override;
+    virtual User::Ptr deserialize(const result_set_ref &, const string & = "") const override;
 };
 
 }

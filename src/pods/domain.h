@@ -44,6 +44,11 @@ struct Domain final
     static inline constexpr const char *FIELD_EXPIRATION_JWT = "domain_expiration_jwt";
 
     /**
+     * @brief SPDomain shared pointer of Domain
+     */
+    typedef shared_ptr<Domain> Ptr;
+
+    /**
      * @brief The Status enum status of Domain
      */
     enum class Status : u_int8_t {
@@ -102,10 +107,5 @@ struct Domain final
     {}
 
 };
-
-/**
- * @brief SPDomain shared pointer of Domain
- */
-typedef shared_ptr<Domain> DomainPtr;
 
 }

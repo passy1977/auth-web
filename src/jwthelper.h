@@ -25,9 +25,13 @@
 #include <string>
 using std::string;
 
+#include "pods/user.h"
+using auth::pods::User;
+
 namespace auth
 {
 
-bool jwtCheck(const string &, const string &, const string &) noexcept;
+
+bool jwtCheck(const string &, const string &, const string &, User::Ptr &) noexcept;
 
 }

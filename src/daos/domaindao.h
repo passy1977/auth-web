@@ -26,7 +26,6 @@
 
 #include "../pods/domain.h"
 using auth::pods::Domain;
-using auth::pods::DomainPtr;
 
 
 namespace auth::daos
@@ -55,13 +54,13 @@ public:
      * @brief update T
      * @exceptions mariadb::exception::base, std::out_of_range
      */
-    void insert(const DomainPtr &) const override;
+    void insert(const Domain::Ptr &) const override;
 
     /**
      * @brief update T
      * @exceptions mariadb::exception::base, std::out_of_range
      */
-    void update(const DomainPtr &) const override;
+    void update(const Domain::Ptr &) const override;
 
 private:
 
@@ -72,7 +71,7 @@ private:
      * @return DomainPtr
      * @exceptions mariadb::exception::base, std::out_of_range
      */
-    virtual DomainPtr deserialize(const result_set_ref &, const string & = "") const override;
+    virtual Domain::Ptr deserialize(const result_set_ref &, const string & = "") const override;
 
     friend UserDAO;
 };

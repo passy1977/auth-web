@@ -66,7 +66,7 @@ public:
      */
     tuple<bool, string> login(string &&jsonParsed) const;
 
-    bool check(const string &, const string &) const noexcept;
+    bool check(const string &, const string &, const string &) const noexcept;
 
 };
 

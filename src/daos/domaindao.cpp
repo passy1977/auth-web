@@ -26,7 +26,7 @@
 
 using namespace auth::daos;
 
-DomainPtr DomainDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
+Domain::Ptr DomainDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
 {
     return make_shared<Domain>(
                 rs->get_unsigned32(fieldPrefix + Domain::FIELD_ID),
@@ -38,12 +38,12 @@ DomainPtr DomainDAO::deserialize(const result_set_ref &rs, const string &fieldPr
                 );
 }
 
-void DomainDAO::insert(const DomainPtr &) const
+void DomainDAO::insert(const Domain::Ptr &) const
 {
 
 }
 
-void DomainDAO::update(const DomainPtr &) const
+void DomainDAO::update(const Domain::Ptr &) const
 {
 
 }

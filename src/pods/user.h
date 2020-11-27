@@ -49,6 +49,10 @@ struct User final
     static inline constexpr const char *FIELD_ID_DOMAIN = "id_domain";
     static inline constexpr const char *FIELD_DOMAIN = "domain";
 
+    /**
+     * @brief SPUser shared pointer of User
+     */
+    typedef shared_ptr<User> Ptr;
 
     /**
      * @brief The Status enum status of User
@@ -62,53 +66,54 @@ struct User final
     /**
      * @brief id PK
      */
-    uint32_t id;
+    uint32_t id = 0;
 
     /**
      * @brief user name like Antonio Salsi
      */
-    string name;
+    string name = "";
 
     /**
      * @brief email composite key with domain
      */
-    string email;
+    string email = "";
 
-    string password;
+    string password = "";
 
     /**
      * @brief additional data in json format
      */
-    string jsonData;
+    string jsonData = "";
 
     /**
      * @brief permissions to service access
      */
-    vector<string> permissions;
+    vector<string> permissions = {};
 
     /**
      * @brief user status
      */
-    Status status;
+    Status status = Status::ACTIVE;
 
     /**
      * @brief last login date,
      * @details if nullptr never loged in
      */
-    string lastLogin;
+    string lastLogin = "";
 
     /**
      * @brief lastLogin expiration date permit to maintain allows the user to log in until a specific data
      * @details if nullptr the feature i disable
      */
-    string expirationDate;
+    string expirationDate = "";
 
     /**
      * @brief composite key with email
      * @details if nullptr the feature i disable
      */
-    DomainPtr domain;
+    Domain::Ptr domain = nullptr;
 
+    User() = default;
 
     inline User(
             uint32_t id,
@@ -120,7 +125,7 @@ struct User final
             Status status,
             string lastLogin,
             string expirationDate,
-            DomainPtr domain
+            Domain::Ptr domain
             ) :
         id(move(id)),
         name(move(name)),
@@ -135,11 +140,6 @@ struct User final
     {}
 
 };
-
-/**
- * @brief SPUser shared pointer of User
- */
-typedef shared_ptr<User> UserPtr;
 
 }
 

@@ -31,7 +31,7 @@ using Poco::StringTokenizer;
 
 using namespace auth::daos;
 
-UserPtr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
+User::Ptr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix) const
 {
     vector<string> permissions;
     auto &&str = rs->get_string(User::FIELD_PERMISSIONS);
@@ -49,7 +49,7 @@ UserPtr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix
 
 
 
-    DomainPtr domain = nullptr;
+    Domain::Ptr domain = nullptr;
     if (fieldPrefix != "")
     {
         DomainDAO domainDAO(connection);
@@ -70,7 +70,7 @@ UserPtr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPrefix
                 );
 }
 
-void UserDAO::insert(const UserPtr &user) const
+void UserDAO::insert(const User::Ptr &user) const
 {
     string query("INSERT INTO users (");
            query += User::FIELD_NAME;
@@ -119,7 +119,7 @@ void UserDAO::insert(const UserPtr &user) const
     stmt->insert();
 }
 
-void UserDAO::update(const UserPtr &user) const
+void UserDAO::update(const User::Ptr &user) const
 {
     string query("UPDATE users SET ");
            query += User::FIELD_NAME;
@@ -169,9 +169,9 @@ void UserDAO::update(const UserPtr &user) const
     stmt->insert();
 }
 
-auth::pods::UserPtr UserDAO::get(const string email, const string password, const string domain) const
+User::Ptr UserDAO::get(const string &&email, const string &&password, const string &&domain) const
 {
-    UserPtr ret = nullptr;
+    User::Ptr ret = nullptr;
 
     string query = "SELECT a.*, b.id b_id, b.domain_name b_domain_name, b.domain_secret b_domain_secret, b.domain_status b_domain_status, b.domain_expiration_date b_domain_expiration_date, b.domain_expiration_jwt b_domain_expiration_jwt FROM users a "
                    "LEFT JOIN domains b ON a.id_domain  = b.id "
@@ -193,6 +193,30 @@ auth::pods::UserPtr UserDAO::get(const string email, const string password, cons
         ret = deserialize(rs, fieldPrefix);
     }
 
+    return ret;
+}
+
+User::Ptr UserDAO::get(const string &email, const string &domain) const
+{
+    User::Ptr ret = nullptr;
+
+    string query = "SELECT a.*, b.id b_id, b.domain_name b_domain_name, b.domain_secret b_domain_secret, b.domain_status b_domain_status, b.domain_expiration_date b_domain_expiration_date, b.domain_expiration_jwt b_domain_expiration_jwt FROM users a "
+                   "LEFT JOIN domains b ON a.id_domain  = b.id "
+                   "WHERE a.email = ? "
+                   "AND domain_name = ?";
+    string fieldPrefix = "b_";
+
+    AUTH_GLOBAL_LOG(DBG, query);
+
+    auto &&stm = connection->create_statement(query);
+    stm->set_string(0, email);
+    stm->set_string(1, domain);
+
+    auto &&rs = stm->query();
+    if (rs->next())
+    {
+        ret = deserialize(rs, fieldPrefix);
+    }
 
     return ret;
 }

@@ -32,6 +32,11 @@ using namespace Poco::Net;
 #include <Poco/JSON/JSONException.h>
 using Poco::JSON::JSONException;
 
+#include <Poco/JWT/Token.h>
+#include <Poco/JWT/Signer.h>
+using namespace Poco::JWT;
+using Timestamp = Poco::Timestamp;
+
 #include "httpstatuscontroller.h"
 
 using namespace auth::controllers;
@@ -67,9 +72,8 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
         }
 
         ///check JWT token request
-        else if (method == HTTPServerRequest::HTTP_GET && partialUri == AUTH_CHECK)
+        else if (method == HTTPServerRequest::HTTP_GET && partialUri.rfind(AUTH_CHECK, 0) == 0)
         {
-
             if (request.hasCredentials())
             {
                 string scheme;
@@ -77,7 +81,7 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
 
                 request.getCredentials(scheme, authInfo);
 
-                HttpStatusController::sendObject(response, authService.check(scheme, authInfo) ? "true" : "false");
+                HttpStatusController::sendObject(response, authService.check(scheme, authInfo, partialUri) ? "true" : "false");
             }
             else
                 HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);

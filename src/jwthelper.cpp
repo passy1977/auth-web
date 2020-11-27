@@ -24,8 +24,13 @@
 
 #include <Poco/JWT/Token.h>
 #include <Poco/JWT/Signer.h>
+#include <Poco/JWT/JWTException.h>
 using namespace Poco::JWT;
 using Timestamp = Poco::Timestamp;
+
+#include<Poco/DateTimeParser.h>
+using namespace Poco;
+
 
 #include "pods/domain.h"
 #include "pods/user.h"
@@ -33,7 +38,7 @@ using namespace auth::pods;
 
 using namespace auth;
 
-bool jwtCheck(const string &scheme, const string &authInfo, const string &domain) noexcept
+bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, User::Ptr &user) noexcept
 {
     if (scheme != "Bearer" || authInfo == "")
     {
@@ -41,25 +46,62 @@ bool jwtCheck(const string &scheme, const string &authInfo, const string &domain
     }
 
     Token token;
-    Signer signer;
-    signer.tryVerify(authInfo, token);
+    Signer signer(seecret);
 
-
-    auto &&expiration = token.getExpiration();
-
-
-    if (Timestamp() > expiration)
-    {
+    try {
+        signer.tryVerify(authInfo, token);
+    }  catch (const SignatureGenerationException &e) {
         return false;
     }
 
 
-    if (token.payload().has(User::FIELD_DOMAIN))
+    Timestamp now;
+    auto &&payload = token.payload();
+
+    auto &&expiration = token.getExpiration();
+    if (now > expiration)
+        return false;
+
+    if (!payload.has(User::FIELD_EXPIRATION_DATE))
     {
-        if (token.payload().get(User::FIELD_DOMAIN).toString() != domain)
-        {
-            return false;
-        }
+        DateTime date;
+        int tzd = 0;
+        if (DateTimeParser::tryParse( DateTimeFormat::SORTABLE_FORMAT, payload.get(User::FIELD_EXPIRATION_DATE).toString(), date, tzd))
+            if (now > date.timestamp())
+                return false;
+    }
+
+    if (!payload.has(Domain::FIELD_EXPIRATION_DATE))
+    {
+        DateTime date;
+        int tzd = 0;
+        if (DateTimeParser::tryParse( DateTimeFormat::SORTABLE_FORMAT, payload.get(Domain::FIELD_EXPIRATION_DATE).toString(), date, tzd))
+            if (now > date.timestamp())
+                return false;
+    }
+
+
+    if (!payload.has(Domain::FIELD_NAME))
+        return false;
+
+    if (!payload.has(User::FIELD_NAME))
+        return false;
+
+    if (user != nullptr)
+    {
+
+        if(payload.has(User::FIELD_EMAIL))
+            user->email = payload.get(User::FIELD_EMAIL).toString();
+
+        if(payload.has(User::FIELD_EXPIRATION_DATE))
+            user->expirationDate = payload.get(User::FIELD_EXPIRATION_DATE).toString();
+
+        if(payload.has(User::FIELD_JSON_DATA))
+            user->expirationDate = payload.get(User::FIELD_JSON_DATA).toString();
+
+        if(payload.has(User::FIELD_JSON_DATA))
+            user->jsonData = payload.get(User::FIELD_JSON_DATA).toString();
+
     }
 
     return true;

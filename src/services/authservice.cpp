@@ -30,6 +30,8 @@ using namespace Poco::JSON;
 #include <Poco/JWT/Token.h>
 #include <Poco/JWT/Signer.h>
 using namespace Poco::JWT;
+
+#include <Poco/StringTokenizer.h>
 using namespace Poco;
 
 #include <Poco/Crypto/Cipher.h>
@@ -40,6 +42,8 @@ using namespace Poco::Crypto;
 #include "../globals.h"
 
 using namespace auth::services;
+
+extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, User::Ptr &user) noexcept;
 
 tuple<bool, string> AuthService::login(string &&body) const
 {
@@ -120,7 +124,7 @@ tuple<bool, string> AuthService::login(string &&body) const
     return tuple(false, "");
 }
 
-bool AuthService::check(const string &scheme, const string &authInfo) const noexcept
+bool AuthService::check(const string &scheme, const string &authInfo, const string &partialUri) const noexcept
 {
     if (scheme != "Bearer" || authInfo == "")
     {
@@ -128,6 +132,23 @@ bool AuthService::check(const string &scheme, const string &authInfo) const noex
     }
 
 
+    StringTokenizer token(partialUri,
+                       "/",
+                       StringTokenizer::TOK_TRIM | StringTokenizer::TOK_IGNORE_EMPTY
+                       );
 
-    return false;
+    if (token.count() != 4)
+        return false;
+
+    auto &&user = userDAO.get(token[2], token[3]);
+    if (user == nullptr)
+        return false;
+
+    ///decode secret for JWT token
+    CipherFactory &factory = CipherFactory::defaultFactory();
+    Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
+    string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
+
+    User::Ptr userFromJwt = nullptr;
+    return jwtCheck(scheme, authInfo, decrypted, userFromJwt);
 }
