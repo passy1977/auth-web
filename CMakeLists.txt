@@ -56,6 +56,8 @@ add_executable(
     src/daos/domaindao.cpp
     src/pods/user.h
     src/pods/domain.h
+    src/helpers/domainhelper.h
+    src/helpers/domainhelper.cpp
     src/services/lockservice.h
     src/services/lockservice.cpp
     src/services/logservice.h

@@ -25,6 +25,9 @@
 #include <iostream>
 using namespace std;
 
+#include <Poco/StringTokenizer.h>
+using namespace Poco;
+
 #include <Poco/Net/HTTPServerRequest.h>
 using namespace Poco::Net;
 
@@ -41,15 +44,25 @@ extern bool endWith(const string &str, const string &suffix) noexcept;
 HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &request)
 {
 
-    auto method = request.getMethod();
-    auto uri = request.getURI();
+    auto &&method = request.getMethod();
+    auto &&uri = request.getURI();
+
+    const StringTokenizer tokenizer(
+                move(uri.substr(strlen(API_V1), uri.size())),
+                "/",
+                StringTokenizer::TOK_TRIM | StringTokenizer::TOK_IGNORE_EMPTY
+                );
+
+
+    vector<string> uriSplitted;
+     uriSplitted.insert(end(uriSplitted), begin(tokenizer), end(tokenizer));
 
     if (uri.rfind(AuthController::PATH, 0) == 0) {
-        return new AuthController(uri, method);
+        return new AuthController(method, uriSplitted);
     } else if (uri.rfind(UserController::PATH, 0) == 0) {
-        return new UserController(uri, method);
+        return new UserController(method, uriSplitted);
     } else if (uri.rfind(DomainController::PATH, 0) == 0) {
-        return new DomainController(uri, method);
+        return new DomainController(method, uriSplitted);
     }
 
     return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);

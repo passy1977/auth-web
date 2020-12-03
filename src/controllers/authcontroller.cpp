@@ -22,9 +22,6 @@
 
 #include "authcontroller.h"
 
-#include <string>
-using namespace std;
-
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
@@ -32,31 +29,33 @@ using namespace Poco::Net;
 #include <Poco/JSON/JSONException.h>
 using Poco::JSON::JSONException;
 
-#include <Poco/JWT/Token.h>
-#include <Poco/JWT/Signer.h>
-using namespace Poco::JWT;
-using Timestamp = Poco::Timestamp;
-
 #include "httpstatuscontroller.h"
 
 using namespace auth::controllers;
 
-void AuthController::handleRESTRequest(const string &method, const string &partialUri, HTTPServerRequest &request, HTTPServerResponse &response)
+void AuthController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response)
 {
-    //response.setKeepAlive(true);
-
-    response.setChunkedTransferEncoding(true);
-
-    //Sets mime type text/html application/json etc.
-    response.setContentType(HEADER_CONTENT_TYPE);
-
-    //allow CORS
-    response.set(HEADER_CORS, "*");
-
     try
     {
+
+        ///check JWT token request
+        if (method == HTTPServerRequest::HTTP_GET && uriSplitted[0] == AUTH && uriSplitted[1] == AUTH_CHECK)
+        {
+            if (request.hasCredentials())
+            {
+                string scheme;
+                string authInfo;
+
+                request.getCredentials(scheme, authInfo);
+
+                HttpStatusController::sendObject(response, authService.check(scheme, authInfo, uriSplitted) ? "true" : "false");
+            }
+            else
+                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+        }
+
         ///login request
-        if (method == HTTPServerRequest::HTTP_POST && partialUri == AUTH)
+        else if (method == HTTPServerRequest::HTTP_POST && uriSplitted[0] == AUTH)
         {
 
             ///perform login and generate JWT
@@ -69,22 +68,6 @@ void AuthController::handleRESTRequest(const string &method, const string &parti
             {
                 HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::UNAUTHIRIZED, data);
             }
-        }
-
-        ///check JWT token request
-        else if (method == HTTPServerRequest::HTTP_GET && partialUri.rfind(AUTH_CHECK, 0) == 0)
-        {
-            if (request.hasCredentials())
-            {
-                string scheme;
-                string authInfo;
-
-                request.getCredentials(scheme, authInfo);
-
-                HttpStatusController::sendObject(response, authService.check(scheme, authInfo, partialUri) ? "true" : "false");
-            }
-            else
-                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
         }
 
         else

@@ -47,21 +47,32 @@ void HttpStatusController::sendObject(HTTPServerResponse &response, HttpStatus h
     //Sets http status
     response.setStatus(move(to_string(static_cast<uint16_t>(httpStatus))));
 
-    //allow CORS
-    response.set(HEADER_CORS, "*");
+    obj.stringify(response.send());
+}
+
+void HttpStatusController::sendObject(HTTPServerResponse &response, const Object &&obj) noexcept
+{
+    //Sets mime type text/html application/json etc.
+    response.setContentType(HEADER_CONTENT_TYPE);
+
+    //Sets http status
+    response.setStatus(move(to_string(static_cast<uint16_t>(HttpStatus::OK))));
 
     obj.stringify(response.send());
 }
 
-void HttpStatusController::send(HTTPServerResponse &response, HttpStatus httpStatus, const string &jsonStatus, const string &errorMsg) noexcept
+Object HttpStatusController::buildObject(HttpStatusController::HttpStatus httpStatus, const string &jsonStatus, const string &errorMsg) noexcept
 {
     ///build json object response
     Object jsonObj;
     jsonObj.set(JSON_STATUS, jsonStatus);
     jsonObj.set(JSON_HTTP_STATUS, move(to_string(static_cast<uint16_t>(httpStatus))));
-    if (errorMsg != "") {
+    if (errorMsg != "")
+    {
         jsonObj.set(JSON_DATA, errorMsg);
     }
-    sendObject(response, httpStatus, jsonObj);
+    return jsonObj;
 }
+
+
 

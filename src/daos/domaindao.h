@@ -62,6 +62,20 @@ public:
      */
     void update(const Domain::Ptr &) const override;
 
+    /**
+     * @brief get Domain by name
+     * @return DomainPtr instance, can be nullptr if not find User
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
+     */
+    Domain::Ptr get(const string &name) const;
+
+    /**
+     * @brief get last Daomain insered
+     * @return DomainPtr instance, can be nullptr if not find User
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
+     */
+    Domain::Ptr getLast() const;
+
 private:
 
     /**

@@ -22,33 +22,40 @@
 
 #pragma once
 
-#include "../services/authservice.h"
-using auth::services::AuthService;
+#include <Poco/JSON/Object.h>
+using namespace Poco::JSON;
 
-#include "controller.h"
+#include "../pods/domain.h"
+using auth::pods::Domain;
 
-namespace auth::controllers
+namespace auth::helpers
 {
 
-class AuthController final : public Controller
+/**
+ * @brief The DomainHelper class help to convert an instance of Domain in Json Object
+ */
+class DomainHelper final
 {
-    const AuthService authService;
-
 public:
-    static inline constexpr const char *PATH = "/api/v1/auth";
-    static inline constexpr const char *NAME = "auth";
 
-    inline AuthController(const string &method, const vector<string> &uriSplitted) noexcept try :
-        Controller(method, uriSplitted)
-    {}
-    catch(const Poco::Exception &e)
+    /**
+     * @brief domain to json object
+     * @return Json Object
+     */
+    static Object toJson(const Domain::Ptr &) noexcept;
+
+    /**
+     * @brief domain to json object
+     * @return Json Object
+     */
+    inline static Object toJson(const Domain::Ptr &&domain)  noexcept
     {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
+        return toJson(domain);
     }
-    AUTH_NO_COPY_NO_MOVE(AuthController)
 
-    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
-
+private:
+    DomainHelper() = default;
 };
+
 
 }

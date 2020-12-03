@@ -23,6 +23,10 @@
 #pragma once
 
 #include "controller.h"
+#include "../globals.h"
+
+#include "../services/domainservice.h"
+using auth::services::DomainService;
 
 namespace auth::controllers
 {
@@ -30,15 +34,22 @@ namespace auth::controllers
 class DomainController final : public Controller
 {
 
+    DomainService domainService;
+
 public:
     static inline constexpr const char *PATH = "/api/v1/domain";
     static inline constexpr const char *NAME = "domain";
 
-    inline explicit DomainController(const string &uri, const string &method) : Controller(uri, method)
+    inline DomainController(const string &method, const vector<string> &uriSplitted) noexcept try :
+        Controller(method, uriSplitted)
     {}
+    catch(const Poco::Exception &e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+    }
     AUTH_NO_COPY_NO_MOVE(DomainController)
 
-    void handleRESTRequest(const string &, const string &, HTTPServerRequest &, HTTPServerResponse &) override;
+    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
 };
 
 }

@@ -22,38 +22,102 @@
 
 #include "domaincontroller.h"
 
-#include <string>
-using namespace std;
-
+#include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
-#include <Poco/JSON/Object.h>
-using Poco::JSON::Object;
+#include <Poco/JSON/JSONException.h>
+using Poco::JSON::JSONException;
+
+#include "httpstatuscontroller.h"
+
 
 using namespace auth::controllers;
 
-void DomainController::handleRESTRequest(const string &method, const string &partialUri, HTTPServerRequest &, HTTPServerResponse &response)
+void DomainController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response)
 {
-    //response.setKeepAlive(true);
+    try
+    {
 
-    response.setChunkedTransferEncoding(true);
+        ///insert domain
+        if (method == HTTPServerRequest::HTTP_POST && uriSplitted[0] == _DOMAIN)
+        {
+            if (request.hasCredentials())
+            {
+                string scheme;
+                string authInfo;
 
-    //Sets mime type text/html application/json etc.
-    response.setContentType(HEADER_CONTENT_TYPE);
+                request.getCredentials(scheme, authInfo);
 
-    //Sets the response status 404, 200 etc.
-    response.setStatus("200");
+                HttpStatusController::sendObject(response,
+                                                 domainService.insert(
+                                                     scheme,
+                                                     authInfo,
+                                                     response,
+                                                     string(istreambuf_iterator<char>(request.stream()), {})
+                                                     )
+                                                 );
+            }
+            else
+                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+        }
 
-    //allow CORS
-    response.set(HEADER_CORS, "*");
+        ///update domain
+        else if (method == HTTPServerRequest::HTTP_PUT && uriSplitted[0] == _DOMAIN)
+        {
+            if (request.hasCredentials())
+            {
+                string scheme;
+                string authInfo;
 
-    //opens the file stream
-    ostream& responseStream = response.send();
+                request.getCredentials(scheme, authInfo);
 
-    Object jsonError;
-    jsonError.set("type", "domain");
-    jsonError.set("method", method);
-    jsonError.set("partialUri", partialUri);
-    jsonError.stringify(responseStream);
+                HttpStatusController::sendObject(response,
+                                                 domainService.update(
+                                                     scheme,
+                                                     authInfo,
+                                                     response,
+                                                     string(istreambuf_iterator<char>(request.stream()), {})
+                                                     )
+                                                 );
+            }
+            else
+                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+        }
+
+        else if (method == HTTPServerRequest::HTTP_GET && uriSplitted[0] == _DOMAIN)
+        {
+            if (request.hasCredentials())
+            {
+                string scheme;
+                string authInfo;
+
+                request.getCredentials(scheme, authInfo);
+
+                HttpStatusController::sendObject(response, domainService.get(scheme, authInfo, response, uriSplitted[1]));
+            }
+            else
+                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+        }
+
+        else
+            HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+
+    }
+    catch(const JSONException& e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
+    }
+    catch(const Poco::Exception& e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
+    }
+    catch(const out_of_range& e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.what());
+        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+    }
+
 }

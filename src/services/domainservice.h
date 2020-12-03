@@ -22,6 +22,15 @@
 
 #pragma once
 
+#include <tuple>
+using std::tuple;
+
+#include <Poco/Net/HTTPServerResponse.h>
+using Poco::Net::HTTPServerResponse;
+
+#include <Poco/JSON/Object.h>
+using Poco::JSON::Object;
+
 #include "../daos/domaindao.h"
 using namespace auth::daos;
 
@@ -30,8 +39,53 @@ namespace auth::services
 
 class DomainService
 {
+
+    const DomainDAO domainDAO;
+
 public:
+    inline DomainService() :
+        domainDAO(Globals::getInstance()->getConnection())
+    {
+    }
     AUTH_NO_COPY_NO_MOVE(DomainService)
+
+    /**
+     * @brief insert new domain
+     * @param scheme of auth
+     * @param authInfo JWT token
+     * @param body request
+     * @return domain insert
+     */
+    Object insert(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &&body) const noexcept;
+
+    /**
+     * @brief modify a domain
+     * @param scheme of auth
+     * @param authInfo JWT token
+     * @param body request
+     * @return domain modified
+     */
+    Object update(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &&body) const noexcept;
+
+    /**
+     * @brief get a domain
+     * @param scheme of auth
+     * @param authInfo JWT token
+     * @param domainName request
+     * @return domain request
+     */
+    Object get(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &domainName) const noexcept;
+
+private:
+
+    /**
+     * @brief before insert or update
+     * @param scheme of auth
+     * @param authInfo JWT token
+     * @param body request
+     */
+    tuple<Object, Object::Ptr> before(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &body) const noexcept;
+
 };
 
 }

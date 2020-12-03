@@ -87,9 +87,18 @@ public:
     /**
      * @brief sendObject to client JSON object
      */
-    static void sendObject(HTTPServerResponse &, HttpStatus httpStatus, const Object &) noexcept;
+    static void sendObject(HTTPServerResponse &, HttpStatus, const Object &) noexcept;
 
 
+    /**
+     * @brief sendObject to client JSON object
+     */
+    static void sendObject(HTTPServerResponse &, const Object &&) noexcept;
+
+    /**
+     * @brief buildObject
+     */
+    static Object buildObject(HttpStatus, const string &, const string & = "") noexcept;
 
 private:
     HttpStatus httpStatus;
@@ -99,7 +108,11 @@ private:
     /**
      * @brief sendErrorObject to client JSON error
      */
-    static void send(HTTPServerResponse &, HttpStatus, const string & = JSON_STATUS_OK, const string & = "") noexcept;
+    static void send(HTTPServerResponse &response, HttpStatus httpStatus, const string &jsonStatus, const string &errorMsg = "") noexcept
+    {
+        ///build json object response
+        sendObject(response, httpStatus, std::move(buildObject(httpStatus, jsonStatus, errorMsg)));
+    }
 };
 
 }

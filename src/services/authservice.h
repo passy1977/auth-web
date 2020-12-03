@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <Poco/StringTokenizer.h>
+using namespace Poco;
+
 #include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
@@ -60,11 +63,11 @@ public:
 
     /**
      * @brief login with email, password and domain
-     * @param jsonParsed from body
+     * @param json string from body request
      * @throw Poco::Exception
      * @return if true it return even JWT token
      */
-    tuple<bool, string> login(string &&jsonParsed) const;
+    tuple<bool, string> login(const string &&json) const;
 
     /**
      * @brief check if JWT token is valid
@@ -73,7 +76,7 @@ public:
      * @param partialUri
      * @return true if valid
      */
-    bool check(const string &scheme, const string &authInfo, const string &partialUri) const noexcept;
+    bool check(const string &scheme, const string &authInfo, const  vector<string> &uriSplitted) const noexcept;
 
 };
 

@@ -42,6 +42,7 @@ struct Domain final
     static inline constexpr const char *FIELD_STATUS = "domain_status";
     static inline constexpr const char *FIELD_EXPIRATION_DATE = "domain_expiration_date";
     static inline constexpr const char *FIELD_EXPIRATION_JWT = "domain_expiration_jwt";
+    static inline constexpr const char *SENDER = "domain_sender";
 
     /**
      * @brief SPDomain shared pointer of Domain

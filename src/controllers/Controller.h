@@ -22,37 +22,62 @@
 
 #pragma once
 
+#include <string>
+using std::string;
+
+#include <vector>
+using std::vector;
+
+#include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
-
-#include "../services/authservice.h"
-using auth::services::AuthService;
 
 #include "../constants.h"
 
 namespace auth::controllers
 {
 
+/**
+ * @brief The Controller basi class of all contreer, to semplify some action
+ */
 class Controller : public HTTPRequestHandler
 {
     const string method;
-    string partialUri;
+    const vector<string> uriSplitted;
 
 public:
-    inline Controller(const string &method, const string &uri) : method(method)
-    {
-        this->partialUri = move(uri.substr(strlen(API_V1), uri.size()));
-    }
+    inline Controller(const string &method, const vector<string> &uriSplitted);
     AUTH_NO_COPY_NO_MOVE(Controller)
 
-    virtual void handleRESTRequest(const string &, const string &, HTTPServerRequest &, HTTPServerResponse &) = 0;
+    /**
+     * @brief handleRESTRequest each controller impement this vitual method and iomplement business logic
+     */
+    virtual void handleRESTRequest(const string &, const  vector<string> &, HTTPServerRequest &, HTTPServerResponse &) = 0;
 
-    inline void handleRequest(HTTPServerRequest &request, HTTPServerResponse &response) override
-    {
-        handleRESTRequest(method, partialUri, request, response);
-    }
+    inline void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
 
 };
+
+Controller::Controller(const string &method, const vector<string> &uriSplitted) :
+    method(method),
+    uriSplitted(uriSplitted)
+{
+    if (uriSplitted.empty())
+        throw Poco::Exception("Uri splitted empty");
+}
+
+void Controller::handleRequest(HTTPServerRequest &request, HTTPServerResponse &response)
+{
+    response.setChunkedTransferEncoding(true);
+
+    //Sets mime type text/html application/json etc.
+    response.setContentType(HEADER_CONTENT_TYPE);
+
+    //allow CORS
+    response.set(HEADER_CORS, "*");
+
+    handleRESTRequest(method, uriSplitted, request, response);
+}
 
 
 }

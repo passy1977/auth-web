@@ -23,6 +23,7 @@
 #pragma once
 
 #include "controller.h"
+#include "../globals.h"
 
 namespace auth::controllers
 {
@@ -34,11 +35,14 @@ public:
     static inline constexpr const char *PATH = "/api/v1/user";
     static inline constexpr const char *NAME = "user";
 
-    inline explicit UserController(const string &uri, const string &method) : Controller(uri, method)
+    inline UserController(const string &method, const vector<string> &uriSplitted) noexcept try :
+        Controller(method, uriSplitted)
     {}
-    AUTH_NO_COPY_NO_MOVE(UserController)
-
-    void handleRESTRequest(const string &, const string &, HTTPServerRequest &, HTTPServerResponse &) override;
+    catch(const Poco::Exception &e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+    }
+    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
 };
 
 }

@@ -52,6 +52,7 @@ inline constexpr const char *SERVER_NAME = "auth-web";
 ///header param
 inline constexpr const char *HEADER_CONTENT_TYPE = "application/json";
 inline constexpr const char *HEADER_CORS = "Access-Control-Allow-Origin";
+inline constexpr const char *HEADER_AUTH_BEARER = "Bearer";
 
 ///json response param
 inline constexpr const char *JSON_STATUS = "status";
@@ -78,6 +79,7 @@ inline constexpr const char *CONFIG_DB_SCRIPT = "db.script";
 
 ///controller params
 inline constexpr const char *AUTH = "auth";
-inline constexpr const char *AUTH_CHECK = "auth/check";
+inline constexpr const char *AUTH_CHECK = "check";
+inline constexpr const char *_DOMAIN = "domain";
 
 }

@@ -32,6 +32,6 @@ namespace auth
 {
 
 
-bool jwtCheck(const string &, const string &, const string &, User::Ptr &) noexcept;
+bool jwtCheck(const string &, const string &, const string &) noexcept;
 
 }

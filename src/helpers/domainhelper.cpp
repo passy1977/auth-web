@@ -20,35 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#include "domainhelper.h"
 
-#include "../services/authservice.h"
-using auth::services::AuthService;
+using namespace auth::helpers;
 
-#include "controller.h"
-
-namespace auth::controllers
+Object auth::helpers::DomainHelper::toJson(const Domain::Ptr &domain) noexcept
 {
-
-class AuthController final : public Controller
-{
-    const AuthService authService;
-
-public:
-    static inline constexpr const char *PATH = "/api/v1/auth";
-    static inline constexpr const char *NAME = "auth";
-
-    inline AuthController(const string &method, const vector<string> &uriSplitted) noexcept try :
-        Controller(method, uriSplitted)
-    {}
-    catch(const Poco::Exception &e)
-    {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
-    }
-    AUTH_NO_COPY_NO_MOVE(AuthController)
-
-    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
-
-};
-
+    Object ret;
+    ret.set(Domain::FIELD_ID, domain->id);
+    ret.set(Domain::FIELD_NAME, domain->name);
+    ret.set(Domain::FIELD_STATUS, static_cast<uint8_t>(domain->status));
+    ret.set(Domain::FIELD_EXPIRATION_DATE, domain->expirationDate);
+    ret.set(Domain::FIELD_EXPIRATION_JWT, domain->expirationJWT);
+    return ret;
 }

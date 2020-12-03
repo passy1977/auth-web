@@ -92,3 +92,44 @@ void DomainDAO::update(const Domain::Ptr &domain) const
     stmt->set_unsigned32(5, domain->id);
     stmt->insert();
 }
+
+Domain::Ptr DomainDAO::get(const string &name) const
+{
+    Domain::Ptr ret = nullptr;
+
+    string query = "SELECT * FROM domain "
+                   "WHERE name = ? ";
+
+    AUTH_GLOBAL_LOG(DBG, query);
+
+    auto &&stm = connection->create_statement(query);
+    stm->set_string(0, name);
+
+    auto &&rs = stm->query();
+    if (rs->next())
+    {
+        ret = deserialize(rs);
+    }
+
+    return ret;
+}
+
+Domain::Ptr DomainDAO::getLast() const
+{
+    Domain::Ptr ret = nullptr;
+
+    string query = "SELECT * FROM domain "
+                   "ORDER BY id DESC";
+
+    AUTH_GLOBAL_LOG(DBG, query);
+
+    auto &&stm = connection->create_statement(query);
+
+    auto &&rs = stm->query();
+    if (rs->next())
+    {
+        ret = deserialize(rs);
+    }
+
+    return ret;
+}

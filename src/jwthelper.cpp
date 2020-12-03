@@ -38,7 +38,7 @@ using namespace auth::pods;
 
 using namespace auth;
 
-bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, User::Ptr &user) noexcept
+bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret) noexcept
 {
     if (scheme != "Bearer" || authInfo == "")
     {
@@ -87,22 +87,22 @@ bool jwtCheck(const string &scheme, const string &authInfo, const string &seecre
     if (!payload.has(User::FIELD_NAME))
         return false;
 
-    if (user != nullptr)
-    {
+//    if (user != nullptr)
+//    {
 
-        if(payload.has(User::FIELD_EMAIL))
-            user->email = payload.get(User::FIELD_EMAIL).toString();
+//        if(payload.has(User::FIELD_EMAIL))
+//            user->email = payload.get(User::FIELD_EMAIL).toString();
 
-        if(payload.has(User::FIELD_EXPIRATION_DATE))
-            user->expirationDate = payload.get(User::FIELD_EXPIRATION_DATE).toString();
+//        if(payload.has(User::FIELD_EXPIRATION_DATE))
+//            user->expirationDate = payload.get(User::FIELD_EXPIRATION_DATE).toString();
 
-        if(payload.has(User::FIELD_JSON_DATA))
-            user->expirationDate = payload.get(User::FIELD_JSON_DATA).toString();
+//        if(payload.has(User::FIELD_JSON_DATA))
+//            user->expirationDate = payload.get(User::FIELD_JSON_DATA).toString();
 
-        if(payload.has(User::FIELD_JSON_DATA))
-            user->jsonData = payload.get(User::FIELD_JSON_DATA).toString();
+//        if(payload.has(User::FIELD_JSON_DATA))
+//            user->jsonData = payload.get(User::FIELD_JSON_DATA).toString();
 
-    }
+//    }
 
     return true;
 }
