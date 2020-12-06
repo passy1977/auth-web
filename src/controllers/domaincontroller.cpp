@@ -44,13 +44,12 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
         {
             if (request.hasCredentials())
             {
-                string scheme;
-                string authInfo;
 
                 request.getCredentials(scheme, authInfo);
 
-                HttpStatusController::sendObject(response,
-                                                 domainService.insert(
+
+                HttpStatusController::sendObject(
+                                    response, domainService.insert(
                                                      scheme,
                                                      authInfo,
                                                      response,
@@ -59,7 +58,7 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                                                  );
             }
             else
-                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
         }
 
         ///update domain
@@ -67,8 +66,6 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
         {
             if (request.hasCredentials())
             {
-                string scheme;
-                string authInfo;
 
                 request.getCredentials(scheme, authInfo);
 
@@ -82,42 +79,40 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                                                  );
             }
             else
-                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
         }
 
         else if (method == HTTPServerRequest::HTTP_GET && uriSplitted[0] == _DOMAIN)
         {
             if (request.hasCredentials())
             {
-                string scheme;
-                string authInfo;
 
                 request.getCredentials(scheme, authInfo);
 
                 HttpStatusController::sendObject(response, domainService.get(scheme, authInfo, response, uriSplitted[1]));
             }
             else
-                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
         }
 
         else
-            HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+            HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
 
     }
     catch(const JSONException& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.message());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
     }
     catch(const Poco::Exception& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.message());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
+        HttpStatusController::sendErrorObject(response,HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
     }
     catch(const out_of_range& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
     }
 
 }

@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPRequestHandler.h>
 using namespace Poco::Net;
 
@@ -40,19 +41,6 @@ class HttpStatusController final : public HTTPRequestHandler
 {
 public:
 
-    enum class HttpStatus : uint16_t {
-        OK = 200,
-        CREATED = 201,
-        ACCEPTED = 202,
-        BAD_REQUEST = 400,
-        UNAUTHIRIZED = 401,
-        FORBIDDEN = 403,
-        NOT_FOUND = 404,
-        METHOD_NOT_ALOWED = 405,
-        INTERNAL_SERVER_ERROR = 500,
-        SERVICE_UNAVAILABLE = 503,
-    };
-
     HttpStatusController() = delete;
     AUTH_NO_COPY_NO_MOVE(HttpStatusController)
 
@@ -64,14 +52,14 @@ public:
      * @param error HttpStatus
      * @return controller
      */
-    static inline HttpStatusController * build(HttpStatus error) noexcept {
-        return new HttpStatusController(error);
+    static inline HttpStatusController * build(HTTPResponse::HTTPStatus status) noexcept {
+        return new HttpStatusController(status);
     }
 
     /**
      * @brief sendErrorObject to client JSON error
      */
-    inline static void sendErrorObject(HTTPServerResponse &response, HttpStatus httpStatus, const string &errorMsg = "") noexcept
+    inline static void sendErrorObject(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const string &errorMsg = "") noexcept
     {
         send(response, httpStatus, JSON_STATUS_ERROR, errorMsg);
     }
@@ -81,37 +69,45 @@ public:
      */
     inline static void sendObject(HTTPServerResponse &response, const string &data) noexcept
     {
-        send(response, HttpStatus::OK, JSON_STATUS_OK, data);
+        send(response, HTTPResponse::HTTP_OK, JSON_STATUS_OK, data);
     }
 
     /**
      * @brief sendObject to client JSON object
      */
-    static void sendObject(HTTPServerResponse &, HttpStatus, const Object &) noexcept;
+    static void sendObject(HTTPServerResponse &, HTTPResponse::HTTPStatus, const Object &) noexcept;
 
 
     /**
      * @brief sendObject to client JSON object
      */
-    static void sendObject(HTTPServerResponse &, const Object &&) noexcept;
+    static void sendObject(HTTPServerResponse &, const Object &) noexcept;
+
+    /**
+     * @brief sendObject to client JSON object
+     */
+    static inline void sendObject(HTTPServerResponse &response, const Object &&object) noexcept
+    {
+        sendObject(response, object);
+    }
 
     /**
      * @brief buildObject
      */
-    static Object buildObject(HttpStatus, const string &, const string & = "") noexcept;
+    static Object buildObject(const string &, const string & = "") noexcept;
 
 private:
-    HttpStatus httpStatus;
+    HTTPResponse::HTTPStatus httpStatus;
 
-    inline explicit HttpStatusController(HttpStatus httpStatus) : httpStatus(httpStatus) {}
+    inline explicit HttpStatusController(HTTPResponse::HTTPStatus httpStatus) : httpStatus(httpStatus) {}
 
     /**
      * @brief sendErrorObject to client JSON error
      */
-    static void send(HTTPServerResponse &response, HttpStatus httpStatus, const string &jsonStatus, const string &errorMsg = "") noexcept
+    static void send(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const string &jsonStatus, const string &errorMsg = "") noexcept
     {
         ///build json object response
-        sendObject(response, httpStatus, std::move(buildObject(httpStatus, jsonStatus, errorMsg)));
+        sendObject(response, httpStatus, std::move(buildObject(jsonStatus, errorMsg)));
     }
 };
 

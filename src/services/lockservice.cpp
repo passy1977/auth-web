@@ -60,9 +60,9 @@ LockService::LockService() noexcept :
 bool LockService::start() noexcept
 {
     ///if another instance run return false
-    if (serrviceOnMessage != "") {
-        return false;
-    }
+//    if (serrviceOnMessage != "") {
+//        return false;
+//    }
 
     ///then write lock file whith porocess pid
     FileOutputStream out;

@@ -25,8 +25,9 @@
 #include <tuple>
 using std::tuple;
 
+#include <Poco/Net/HTTPResponse.h>
 #include <Poco/Net/HTTPServerResponse.h>
-using Poco::Net::HTTPServerResponse;
+using namespace Poco::Net;
 
 #include <Poco/JSON/Object.h>
 using Poco::JSON::Object;
@@ -84,7 +85,7 @@ private:
      * @param authInfo JWT token
      * @param body request
      */
-    tuple<Object, Object::Ptr> before(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &body) const noexcept;
+    tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus> before(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &body) const noexcept;
 
 };
 

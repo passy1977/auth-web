@@ -55,7 +55,7 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
 
 
     vector<string> uriSplitted;
-     uriSplitted.insert(end(uriSplitted), begin(tokenizer), end(tokenizer));
+    uriSplitted.insert(end(uriSplitted), begin(tokenizer), end(tokenizer));
 
     if (uri.rfind(AuthController::PATH, 0) == 0) {
         return new AuthController(method, uriSplitted);
@@ -65,7 +65,7 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
         return new DomainController(method, uriSplitted);
     }
 
-    return HttpStatusController::build(HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+    return HttpStatusController::build(HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
 }
 
 

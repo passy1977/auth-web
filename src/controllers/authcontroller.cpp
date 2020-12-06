@@ -48,10 +48,16 @@ void AuthController::handleRESTRequest(const string &method, const vector<string
 
                 request.getCredentials(scheme, authInfo);
 
-                HttpStatusController::sendObject(response, authService.check(scheme, authInfo, uriSplitted) ? "true" : "false");
+                 auto &&obj = HttpStatusController::buildObject(JSON_STATUS_OK);
+                 obj.set(
+                             JSON_DATA,
+                             authService.check(scheme, authInfo, uriSplitted)
+                         );
+
+                HttpStatusController::sendObject(response, obj);
             }
             else
-                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::FORBIDDEN);
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
         }
 
         ///login request
@@ -66,28 +72,28 @@ void AuthController::handleRESTRequest(const string &method, const vector<string
             }
             else
             {
-                HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::UNAUTHIRIZED, data);
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_UNAUTHORIZED, data);
             }
         }
 
         else
-            HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::METHOD_NOT_ALOWED);
+            HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
 
     }
     catch(const JSONException& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.message());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
     }
     catch(const Poco::Exception& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.message());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.message());
+        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
     }
     catch(const out_of_range& e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendErrorObject(response, HttpStatusController::HttpStatus::INTERNAL_SERVER_ERROR, e.what());
+        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
     }
 }
 

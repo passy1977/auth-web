@@ -35,7 +35,8 @@ class DomainController final : public Controller
 {
 
     DomainService domainService;
-
+    string scheme;
+    string authInfo;
 public:
     static inline constexpr const char *PATH = "/api/v1/domain";
     static inline constexpr const char *NAME = "domain";
