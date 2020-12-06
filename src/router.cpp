@@ -44,6 +44,8 @@ extern bool endWith(const string &str, const string &suffix) noexcept;
 HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &request)
 {
 
+    AUTH_GLOBAL_LOG(DBG, "Router::createRequestHandler");
+
     auto &&method = request.getMethod();
     auto &&uri = request.getURI();
 

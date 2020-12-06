@@ -56,8 +56,8 @@ inline constexpr const char *HEADER_AUTH_BEARER = "Bearer";
 
 ///json response param
 inline constexpr const char *JSON_STATUS = "status";
-inline constexpr const char *JSON_STATUS_OK = "ok";
-inline constexpr const char *JSON_STATUS_ERROR = "error";
+inline constexpr const bool JSON_STATUS_OK = true;
+inline constexpr const bool JSON_STATUS_ERROR = false;
 inline constexpr const char *JSON_DATA = "data";
 inline constexpr const char *JSON_HTTP_STATUS = "httpStatus";
 

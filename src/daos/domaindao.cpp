@@ -97,8 +97,8 @@ Domain::Ptr DomainDAO::get(const string &name) const
 {
     Domain::Ptr ret = nullptr;
 
-    string query = "SELECT * FROM domain "
-                   "WHERE name = ? ";
+    string query = "SELECT * FROM domains "
+                   "WHERE domain_name = ? ";
 
     AUTH_GLOBAL_LOG(DBG, query);
 

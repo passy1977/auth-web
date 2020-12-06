@@ -94,7 +94,7 @@ public:
     /**
      * @brief buildObject
      */
-    static Object buildObject(const string &, const string & = "") noexcept;
+    static Object buildObject(bool, const string & = "") noexcept;
 
 private:
     HTTPResponse::HTTPStatus httpStatus;
@@ -104,7 +104,7 @@ private:
     /**
      * @brief sendErrorObject to client JSON error
      */
-    static void send(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const string &jsonStatus, const string &errorMsg = "") noexcept
+    static void send(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const bool jsonStatus, const string &errorMsg = "") noexcept
     {
         ///build json object response
         sendObject(response, httpStatus, std::move(buildObject(jsonStatus, errorMsg)));

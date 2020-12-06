@@ -40,7 +40,7 @@ using namespace Poco::Crypto;
 
 using namespace auth::services;
 
-extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret) noexcept;
+extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, const User::Ptr &user) noexcept;
 
 tuple<bool, string> AuthService::login(const string &&body) const
 {
@@ -72,6 +72,9 @@ tuple<bool, string> AuthService::login(const string &&body) const
                 CipherFactory &factory = CipherFactory::defaultFactory();
                 Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
                 string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
+                delete cipher;
+
+                //AUTH_GLOBAL_LOG(DBG, decrypted);
 
                 ///built JWT token
                 auto &&now = Timestamp();
@@ -99,17 +102,12 @@ tuple<bool, string> AuthService::login(const string &&body) const
                     token.setExpiration(expirationJWT);
                 }
 
-
                 ///update user last login
                 user->lastLogin = DateTimeFormatter::format(Timestamp(),  DateTimeFormat::SORTABLE_FORMAT);
                 userDAO.update(user);
 
                 ///sign JWT token
                 string &&jwt = Signer(decrypted).sign(token, Signer::ALGO_HS256);
-
-//                Token token2("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb21haW5fZXhwaXJhdGlvbl9kYXRlIjoiIiwiZG9tYWluX25hbWUiOiJwZXJzb25hbC13ZWIiLCJlbWFpbCI6InBhc3N5LmxpbnV4QHpyZXNhLml0IiwiZXhwIjoxNjA2Mjk0NTEyLjQxMzE0MywiZXhwaXJhdGlvbl9kYXRlIjoiIiwiaWF0IjoxNjA2MjkwOTEyLjQxMzAwMSwiaWQiOjEsImpzb25fZGF0YSI6IntcInRlc3RcIjogXCJhIHN0cmluZ1wifSIsImp0aSI6ImM0NzNiZDVlLTU1MTEtNDcxNi05ZWEzLTk1ZDg3Y2Y4YjMwYyIsIm5hbWUiOiJBbnRvbmlvIFNhbHNpIiwicGVybWlzc2lvbnMiOlsgIlJPTEVfQURNSU4iLCAiUk9MRV9BVVRIX1dFQiIgXX0.36rUyr1G2LPLv1vm1RXRE7bRHOKyLpw_DOJuDFkyLq4");
-//                std::ostringstream stream;
-//                token2.payload().stringify(stream);
 
                 return tuple(true, jwt);
             } else
@@ -141,5 +139,5 @@ bool AuthService::check(const string &scheme, const string &authInfo, const vect
     Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
     string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
 
-    return jwtCheck(scheme, authInfo, decrypted);
+    return jwtCheck(scheme, authInfo, decrypted, nullptr);
 }

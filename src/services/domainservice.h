@@ -26,7 +26,6 @@
 using std::tuple;
 
 #include <Poco/Net/HTTPResponse.h>
-#include <Poco/Net/HTTPServerResponse.h>
 using namespace Poco::Net;
 
 #include <Poco/JSON/Object.h>
@@ -34,6 +33,9 @@ using Poco::JSON::Object;
 
 #include "../daos/domaindao.h"
 using namespace auth::daos;
+
+#include "../pods/user.h"
+using auth::pods::User;
 
 namespace auth::services
 {
@@ -50,6 +52,8 @@ public:
     }
     AUTH_NO_COPY_NO_MOVE(DomainService)
 
+    typedef tuple<Object, HTTPResponse::HTTPStatus> Response;
+
     /**
      * @brief insert new domain
      * @param scheme of auth
@@ -57,7 +61,7 @@ public:
      * @param body request
      * @return domain insert
      */
-    Object insert(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &&body) const noexcept;
+     Response insert(const string &scheme, const string &authInfo, const string &&body) const;
 
     /**
      * @brief modify a domain
@@ -66,7 +70,7 @@ public:
      * @param body request
      * @return domain modified
      */
-    Object update(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &&body) const noexcept;
+     Response update(const string &scheme, const string &authInfo, const string &&body) const;
 
     /**
      * @brief get a domain
@@ -75,7 +79,7 @@ public:
      * @param domainName request
      * @return domain request
      */
-    Object get(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &domainName) const noexcept;
+     Response get(const string &scheme, const string &authInfo, const string &domainName) const;
 
 private:
 
@@ -84,8 +88,9 @@ private:
      * @param scheme of auth
      * @param authInfo JWT token
      * @param body request
+     * @return domain request
      */
-    tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus> before(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &body) const noexcept;
+    tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> before(const string &scheme, const string &authInfo, const string &domainName) const;
 
 };
 

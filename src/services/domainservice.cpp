@@ -37,12 +37,15 @@ using auth::helpers::DomainHelper;
 #include "../controllers/httpstatuscontroller.h"
 using auth::controllers::HttpStatusController;
 
+#include "../pods/user.h"
+using auth::pods::User;
+
 using namespace auth::services;
 
-extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret) noexcept;
+extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, const User::Ptr &) noexcept;
 
 
-Object DomainService::insert(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &&body) const noexcept
+DomainService::Response DomainService::insert(const string &scheme, const string &authInfo, const string &&body) const
 {
 //    auto &&[jsonObj, object, status] = before(scheme, authInfo, response, body);
 //    if (status != HTTPServerResponse::HTTP_OK)
@@ -69,7 +72,7 @@ Object DomainService::insert(const string &scheme, const string &authInfo, HTTPS
 //    return jsonObj;
 }
 
-Object DomainService::update(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &&body) const noexcept
+DomainService::Response DomainService::update(const string &scheme, const string &authInfo, const string &&body) const
 {
 
 //    if (scheme != HEADER_AUTH_BEARER|| authInfo == "")
@@ -136,78 +139,63 @@ Object DomainService::update(const string &scheme, const string &authInfo, HTTPS
 //    return jsonObj;
 }
 
-Object DomainService::get(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &domainName) const noexcept
+DomainService::Response DomainService::get(const string &scheme, const string &authInfo, const string &domainName) const
 {
-//    if (scheme != HEADER_AUTH_BEARER|| authInfo == "")
-//    {
-//        response.setStatus(move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_UNAUTHORIZED))));
-//        return HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR);
-//    }
+    auto &&[jsonObj, status, user] = before(scheme, authInfo, domainName);
 
-//    Object jsonObj;
-//    jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
-//    //domainDAO.get();
+    if (user != nullptr)
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
+        jsonObj.set(JSON_DATA, user->domain->toObject());
+    }
 
-
-    //jsonObj.set(JSON_DATA, errorMsg);
-//    return jsonObj;
+    return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
 }
 
-tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus> DomainService::before(const string &scheme, const string &authInfo, HTTPServerResponse &response, const string &body) const noexcept
+tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> DomainService::before(const string &scheme, const string &authInfo, const string &domainName) const
 {
-//    if (scheme != HEADER_AUTH_BEARER || authInfo == "")
-//    {
-//        return tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus>(
-//                    HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "auth header not valid"),
-//                    nullptr,
-//                    HTTPResponse::HTTP_UNAUTHORIZED
-//                    );
-//    }
+    Object jsonObj;
+
+    if (scheme != HEADER_AUTH_BEARER || authInfo == "")
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObj.set(JSON_DATA, "auth header not valid");
+        return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
+    }
 
 
-//    ///parse body request
-//    Object::Ptr object = Parser().parse(body).extract<Object::Ptr>();
-//    if (!object->has(Domain::SENDER))
-//    {
-//        return tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus>(
-//                    HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "sender not found"),
-//                    object,
-//                    HTTPResponse::HTTP_UNAUTHORIZED
-//                );
-//    }
+    ///get domain
+    auto &&domain = domainDAO.get(domainName);
+    if (domain == nullptr)
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
+    }
 
-//    ///get domain
-//    auto &&domain = domainDAO.get(move(object->get(Domain::SENDER).toString()));
-//    if (domain == nullptr)
-//    {
-//        response.setStatus(move(to_string(HTTPResponse::HTTP_UNAUTHORIZED)));
-//        return tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus>(
-//                    HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "domain sender not found"),
-//                    object,
-//                    HTTPResponse::HTTP_UNAUTHORIZED
-//                );
-//    }
+    ///decode secret for JWT token
+    CipherFactory &factory = CipherFactory::defaultFactory();
+    Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
+    string &&decrypted = cipher->decryptString(domain->secret, Cipher::ENC_BASE64);
+    delete cipher;
 
-//    ///decode secret for JWT token
-//    CipherFactory &factory = CipherFactory::defaultFactory();
-//    Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
-//    string &&decrypted = cipher->decryptString(domain->secret, Cipher::ENC_BASE64);
+    ///get user info and check tocken
+    User::Ptr user = make_shared<User>();
+    if (!jwtCheck(scheme, authInfo, decrypted, user))
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObj.set(JSON_DATA, "token not valid");
+        return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
+    }
 
-//    ///check il JWT is valid token
-//    if (!jwtCheck(scheme, authInfo, decrypted))
-//    {
-//        response.setStatus(move(to_string(HTTPResponse::HTTP_UNAUTHORIZED)));
-//        return tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus>(
-//                    HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "JWT toke nont valid"),
-//                    object,
-//                    HTTPResponse::HTTP_UNAUTHORIZED
-//                );
-//    }
+    if (std::find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB) == user->permissions.end())
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObj.set(JSON_DATA, "user no has role");
+        return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
+    }
 
-//    response.setStatus(move(to_string(HTTPResponse::HTTP_OK)));
-//    return tuple<Object, Object::Ptr, HTTPResponse::HTTPStatus>(
-//                HttpStatusController::buildObject(HTTPResponse::HTTP_OK, JSON_STATUS_OK),
-//                object,
-//                HTTPResponse::HTTP_OK
-//           );
+    user->domain = domain;
+
+    return make_tuple(jsonObj, HTTPResponse::HTTP_OK, user);
+
 }

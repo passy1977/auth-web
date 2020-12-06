@@ -26,6 +26,12 @@
 #include <string>
 using namespace std;
 
+namespace Poco::JSON
+{
+class Object;
+}
+using Poco::JSON::Object;
+
 namespace auth::pods
 {
 
@@ -106,6 +112,8 @@ struct Domain final
         expirationDate(move(expirationDate)),
         expirationJWT(move(expirationJWT))
     {}
+
+    Object toObject();
 
 };
 

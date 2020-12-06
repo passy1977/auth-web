@@ -31,14 +31,15 @@ using Timestamp = Poco::Timestamp;
 #include<Poco/DateTimeParser.h>
 using namespace Poco;
 
-
 #include "pods/domain.h"
 #include "pods/user.h"
 using namespace auth::pods;
 
+#include "globals.h"
+
 using namespace auth;
 
-bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret) noexcept
+bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, const User::Ptr &user) noexcept
 {
     if (scheme != "Bearer" || authInfo == "")
     {
@@ -49,19 +50,19 @@ bool jwtCheck(const string &scheme, const string &authInfo, const string &seecre
     Signer signer(seecret);
 
     try {
-        signer.tryVerify(authInfo, token);
+        if (!signer.tryVerify(authInfo, token))
+            return false;
     }  catch (const SignatureGenerationException &e) {
         return false;
     }
 
 
-    Timestamp now;
-    auto &&payload = token.payload();
-
+    auto &&now = Timestamp();
     auto &&expiration = token.getExpiration();
     if (now > expiration)
         return false;
 
+    auto &&payload = token.payload();
     if (!payload.has(User::FIELD_EXPIRATION_DATE))
     {
         DateTime date;
@@ -84,25 +85,38 @@ bool jwtCheck(const string &scheme, const string &authInfo, const string &seecre
     if (!payload.has(Domain::FIELD_NAME))
         return false;
 
-    if (!payload.has(User::FIELD_NAME))
+    if (!payload.has(User::FIELD_EMAIL))
         return false;
 
-//    if (user != nullptr)
-//    {
+    if (user != nullptr)
+    {
 
-//        if(payload.has(User::FIELD_EMAIL))
-//            user->email = payload.get(User::FIELD_EMAIL).toString();
+        user->email = payload.get(User::FIELD_EMAIL).toString();
 
-//        if(payload.has(User::FIELD_EXPIRATION_DATE))
-//            user->expirationDate = payload.get(User::FIELD_EXPIRATION_DATE).toString();
+        if(payload.has(User::FIELD_EXPIRATION_DATE))
+            user->expirationDate = payload.get(User::FIELD_EXPIRATION_DATE).toString();
 
-//        if(payload.has(User::FIELD_JSON_DATA))
-//            user->expirationDate = payload.get(User::FIELD_JSON_DATA).toString();
+        if(payload.has(User::FIELD_JSON_DATA))
+            user->expirationDate = payload.get(User::FIELD_JSON_DATA).toString();
 
-//        if(payload.has(User::FIELD_JSON_DATA))
-//            user->jsonData = payload.get(User::FIELD_JSON_DATA).toString();
+        if(payload.has(User::FIELD_JSON_DATA))
+            user->jsonData = payload.get(User::FIELD_JSON_DATA).toString();
 
-//    }
+        user->permissions = token.getAudience();
+
+        user->domain = make_shared<Domain>(
+                    0,
+                    payload.get(User::FIELD_NAME).toString(),
+                    "",
+                    Domain::Status::ACTIVE,
+                    "",
+                    0
+                    );
+
+        if(payload.has(Domain::FIELD_EXPIRATION_DATE))
+            user->domain->expirationDate = payload.get(Domain::FIELD_EXPIRATION_DATE).toString();
+
+    }
 
     return true;
 }

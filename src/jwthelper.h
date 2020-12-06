@@ -31,7 +31,11 @@ using auth::pods::User;
 namespace auth
 {
 
+bool jwtCheck(const string &, const string &, const string &, const User::Ptr &) noexcept;
 
-bool jwtCheck(const string &, const string &, const string &) noexcept;
+inline bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret) noexcept
+{
+    return jwtCheck(scheme, authInfo, authInfo, nullptr);
+}
 
 }

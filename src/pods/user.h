@@ -29,6 +29,12 @@ using namespace std;
 
 #import "domain.h"
 
+namespace Poco::JSON
+{
+class Object;
+}
+using Poco::JSON::Object;
+
 namespace auth::pods
 {
 
@@ -139,6 +145,7 @@ struct User final
         domain(move(domain))
     {}
 
+    Object toObject();
 };
 
 }

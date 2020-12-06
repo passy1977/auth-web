@@ -39,7 +39,7 @@ void HttpStatusController::handleRequest(HTTPServerRequest &, HTTPServerResponse
 
 void HttpStatusController::sendObject(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const Object &obj) noexcept
 {
-    //response.setKeepAlive(true);
+    response.setChunkedTransferEncoding(true);
 
     //Sets mime type text/html application/json etc.
     response.setContentType(HEADER_CONTENT_TYPE);
@@ -52,6 +52,8 @@ void HttpStatusController::sendObject(HTTPServerResponse &response, HTTPResponse
 
 void HttpStatusController::sendObject(HTTPServerResponse &response, const Object &obj) noexcept
 {
+    response.setChunkedTransferEncoding(true);
+
     //Sets mime type text/html application/json etc.
     response.setContentType(HEADER_CONTENT_TYPE);
 
@@ -61,7 +63,7 @@ void HttpStatusController::sendObject(HTTPServerResponse &response, const Object
     obj.stringify(response.send());
 }
 
-Object HttpStatusController::buildObject(const string &jsonStatus, const string &errorMsg) noexcept
+Object HttpStatusController::buildObject(const bool jsonStatus, const string &errorMsg) noexcept
 {
     ///build json object response
     Object jsonObj;

@@ -47,15 +47,13 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
 
                 request.getCredentials(scheme, authInfo);
 
+                auto &&[obj, status] = domainService.insert(
+                         scheme,
+                         authInfo,
+                         string(istreambuf_iterator<char>(request.stream()), {})
+                         );
 
-                HttpStatusController::sendObject(
-                                    response, domainService.insert(
-                                                     scheme,
-                                                     authInfo,
-                                                     response,
-                                                     string(istreambuf_iterator<char>(request.stream()), {})
-                                                     )
-                                                 );
+                HttpStatusController::sendObject(response, status, obj);
             }
             else
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
@@ -69,14 +67,14 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
 
                 request.getCredentials(scheme, authInfo);
 
-                HttpStatusController::sendObject(response,
-                                                 domainService.update(
-                                                     scheme,
-                                                     authInfo,
-                                                     response,
-                                                     string(istreambuf_iterator<char>(request.stream()), {})
-                                                     )
-                                                 );
+
+                auto &&[obj, status] = domainService.update(
+                         scheme,
+                         authInfo,
+                         string(istreambuf_iterator<char>(request.stream()), {})
+                         );
+
+                HttpStatusController::sendObject(response, status, obj);
             }
             else
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
@@ -89,7 +87,13 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
 
                 request.getCredentials(scheme, authInfo);
 
-                HttpStatusController::sendObject(response, domainService.get(scheme, authInfo, response, uriSplitted[1]));
+                auto &&[obj, status] = domainService.get(
+                        scheme,
+                        authInfo,
+                        uriSplitted[1]
+                        );
+
+                HttpStatusController::sendObject(response, status, obj);
             }
             else
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
