@@ -90,7 +90,7 @@ private:
      * @param body request
      * @return domain request
      */
-    tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> before(const string &scheme, const string &authInfo, const string &domainName) const;
+    tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> check(const string &scheme, const string &authInfo, const string &domainName) const;
 
 };
 

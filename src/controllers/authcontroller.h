@@ -47,7 +47,7 @@ public:
     }
     AUTH_NO_COPY_NO_MOVE(AuthController)
 
-    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
+    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) noexcept override;
 
 };
 

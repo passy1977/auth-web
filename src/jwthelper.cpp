@@ -115,7 +115,6 @@ bool jwtCheck(const string &scheme, const string &authInfo, const string &seecre
 
         if(payload.has(Domain::FIELD_EXPIRATION_DATE))
             user->domain->expirationDate = payload.get(Domain::FIELD_EXPIRATION_DATE).toString();
-
     }
 
     return true;

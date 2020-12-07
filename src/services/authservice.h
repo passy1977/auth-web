@@ -76,7 +76,7 @@ public:
      * @param partialUri
      * @return true if valid
      */
-    bool check(const string &scheme, const string &authInfo, const  vector<string> &uriSplitted) const noexcept;
+    bool check(const string &scheme, const string &authInfo, const  vector<string> &uriSplitted) const;
 
 };
 

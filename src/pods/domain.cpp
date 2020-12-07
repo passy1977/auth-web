@@ -32,6 +32,7 @@ Object Domain::toObject()
     Object ret;
     ret.set(FIELD_ID, id);
     ret.set(FIELD_NAME, name);
+    ret.set(FIELD_SECRET, secret);
     ret.set(FIELD_STATUS, static_cast<int>(status));
     ret.set(FIELD_EXPIRATION_DATE, expirationDate);
     ret.set(FIELD_EXPIRATION_JWT, expirationJWT);

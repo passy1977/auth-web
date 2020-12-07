@@ -33,7 +33,7 @@ using Poco::JSON::Object;
 
 using namespace auth::controllers;
 
-void UserController::handleRESTRequest(const string &method, const  vector<string> &uriSplitted, HTTPServerRequest &, HTTPServerResponse &response)
+void UserController::handleRESTRequest(const string &method, const  vector<string> &uriSplitted, HTTPServerRequest &, HTTPServerResponse &response) noexcept
 {
     //opens the file stream
     ostream& responseStream = response.send();

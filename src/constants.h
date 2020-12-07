@@ -46,7 +46,8 @@ inline constexpr const char *FILE_LOCK_SERVICE = "./auth-web.pin";
 inline constexpr const char *CHECK_DB = "SHOW TABLES LIKE 'users';";
 inline constexpr const char *API_V1 = "/api/v1/";
 inline constexpr const char *AES_CBC_IV = "Mn2jc06xXBCJtBas";
-inline constexpr const char *ROLE_AUTH_WEB = "ROLE_AUTH_WEB";
+inline constexpr const char *ROLE_AUTH_WEB_READ = "ROLE_AUTH_WEB_READ";
+inline constexpr const char *ROLE_AUTH_WEB_WRITE = "ROLE_AUTH_WEB_WRITE";
 inline constexpr const char *SERVER_NAME = "auth-web";
 
 ///header param

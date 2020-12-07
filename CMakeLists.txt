@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #macro area
-#add_compile_definitions(DISABLE_PICOJSON)
+add_compile_definitions(NO_CHECK_PID)
 
 #lib include
 include_directories(${CMAKE_SOURCE_DIR}/lib/macos/poco/include)

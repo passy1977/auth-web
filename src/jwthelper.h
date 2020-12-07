@@ -31,8 +31,24 @@ using auth::pods::User;
 namespace auth
 {
 
+
+/**
+ * @brief jwtCheck check the JWT token
+ * @param scheme Bearer needed
+ * @param authInfo tokem
+ * @param seecret seecret form domain record
+ * @param user feel user data
+ * @return true if JTK token is valid
+ */
 bool jwtCheck(const string &, const string &, const string &, const User::Ptr &) noexcept;
 
+/**
+ * @brief jwtCheck check the JWT token
+ * @param scheme Bearer needed
+ * @param authInfo tokem
+ * @param seecret seecret form domain record
+ * @return true if JTK token is valid
+ */
 inline bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret) noexcept
 {
     return jwtCheck(scheme, authInfo, authInfo, nullptr);

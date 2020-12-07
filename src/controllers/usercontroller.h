@@ -42,7 +42,7 @@ public:
     {
         AUTH_GLOBAL_LOG(ERROR, e.message());
     }
-    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
+    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) noexcept override;
 };
 
 }

@@ -33,7 +33,7 @@ using Poco::JSON::JSONException;
 
 using namespace auth::controllers;
 
-void AuthController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response)
+void AuthController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response) noexcept
 {
     try
     {
@@ -41,38 +41,56 @@ void AuthController::handleRESTRequest(const string &method, const vector<string
         ///check JWT token request
         if (method == HTTPServerRequest::HTTP_GET && uriSplitted[0] == AUTH && uriSplitted[1] == AUTH_CHECK)
         {
-            if (request.hasCredentials())
+            try
             {
-                string scheme;
-                string authInfo;
+                if (request.hasCredentials())
+                {
+                    string scheme;
+                    string authInfo;
 
-                request.getCredentials(scheme, authInfo);
+                    request.getCredentials(scheme, authInfo);
 
-                 auto &&obj = HttpStatusController::buildObject(JSON_STATUS_OK);
-                 obj.set(
-                             JSON_DATA,
-                             authService.check(scheme, authInfo, uriSplitted)
-                         );
+                     auto &&obj = HttpStatusController::buildObject(JSON_STATUS_OK);
+                     obj.set(
+                                 JSON_DATA,
+                                 authService.check(scheme, authInfo, uriSplitted)
+                             );
 
-                HttpStatusController::sendObject(response, obj);
+                    HttpStatusController::sendObject(response, obj);
+                }
+                else
+                    HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
             }
-            else
-                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
+            catch(const exception &e)
+            {
+                AUTH_GLOBAL_LOG(ERROR, e.what());
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+            }
         }
 
         ///login request
         else if (method == HTTPServerRequest::HTTP_POST && uriSplitted[0] == AUTH)
         {
 
-            ///perform login and generate JWT
-            auto &&[check, data] = authService.login(string(istreambuf_iterator<char>(request.stream()), {}));
-            if(check)
+            try
             {
-                HttpStatusController::sendObject(response, data);
+
+                ///perform login and generate JWT
+                auto &&[check, data] = authService.login(string(istreambuf_iterator<char>(request.stream()), {}));
+                if(check)
+                {
+                    HttpStatusController::sendObject(response, data);
+                }
+                else
+                {
+                    HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_UNAUTHORIZED, data);
+                }
+
             }
-            else
+            catch(const exception &e)
             {
-                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_UNAUTHORIZED, data);
+                AUTH_GLOBAL_LOG(ERROR, e.what());
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
 

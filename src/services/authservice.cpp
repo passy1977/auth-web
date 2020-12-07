@@ -119,18 +119,17 @@ tuple<bool, string> AuthService::login(const string &&body) const
     return tuple(false, "");
 }
 
-bool AuthService::check(const string &scheme, const string &authInfo, const vector<string> &uriSplitted) const noexcept
+bool AuthService::check(const string &scheme, const string &authInfo, const vector<string> &uriSplitted) const
 {
     if (scheme != HEADER_AUTH_BEARER|| authInfo == "")
     {
         return false;
     }
 
-
     if (uriSplitted.size() != 4)
         return false;
 
-    auto &&user = userDAO.get(uriSplitted[2], uriSplitted[3]);
+    auto &&user = userDAO.get(move(uriSplitted[2]), move(uriSplitted[3]));
     if (user == nullptr)
         return false;
 
@@ -138,6 +137,7 @@ bool AuthService::check(const string &scheme, const string &authInfo, const vect
     CipherFactory &factory = CipherFactory::defaultFactory();
     Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
     string &&decrypted = cipher->decryptString(user->domain->secret, Cipher::ENC_BASE64);
+    delete cipher;
 
     return jwtCheck(scheme, authInfo, decrypted, nullptr);
 }

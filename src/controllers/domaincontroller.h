@@ -35,8 +35,7 @@ class DomainController final : public Controller
 {
 
     DomainService domainService;
-    string scheme;
-    string authInfo;
+
 public:
     static inline constexpr const char *PATH = "/api/v1/domain";
     static inline constexpr const char *NAME = "domain";
@@ -50,7 +49,7 @@ public:
     }
     AUTH_NO_COPY_NO_MOVE(DomainController)
 
-    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) override;
+    void handleRESTRequest(const string &, const vector<string> &, HTTPServerRequest &, HTTPServerResponse &) noexcept override;
 };
 
 }

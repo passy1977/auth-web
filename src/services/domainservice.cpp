@@ -47,112 +47,154 @@ extern bool jwtCheck(const string &scheme, const string &authInfo, const string 
 
 DomainService::Response DomainService::insert(const string &scheme, const string &authInfo, const string &&body) const
 {
-//    auto &&[jsonObj, object, status] = before(scheme, authInfo, response, body);
-//    if (status != HTTPServerResponse::HTTP_OK)
-//    {
-//        return jsonObj;
-//    }
+    Object jsonObjErr;
 
+    ///parse body request
+    auto object = Parser().parse(body).extract<Object::Ptr>();
+    if (!object->has(Domain::SENDER) || !object->has(Domain::FIELD_NAME))
+    {
+        jsonObjErr.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObjErr.set(JSON_DATA, "user no has read role");
+        return DomainService::Response(jsonObjErr, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
 
-//    response.setStatus(to_string(status));
+    ///check JWT token and get user info
+    auto &&[jsonObj, status, user] = check(scheme, authInfo, move(object->get(Domain::FIELD_NAME)));
 
-//    Domain::Ptr domainToInsert = std::make_shared<Domain>(
-//                0,
-//                object->get(Domain::FIELD_NAME),
-//                object->get(Domain::FIELD_SECRET),
-//                static_cast<Domain::Status>(status),
-//                object->get(Domain::FIELD_EXPIRATION_DATE),
-//                object->get(Domain::FIELD_EXPIRATION_JWT)
-//                );
+    ///check if user is nullptr
+    if (user)
+    {
 
-//    domainDAO.insert(domainToInsert);
+        ///check user role
+        if (std::find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB_WRITE) == user->permissions.end())
+        {
+            jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+            jsonObj.set(JSON_DATA, "user no has read role");
+            return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
+        }
+        else
+        {
+            ///build object to insert
+            int status = object->get(Domain::FIELD_STATUS);
+            Domain::Ptr domainToInsert = std::make_shared<Domain>(
+                        0,
+                        object->get(Domain::FIELD_NAME),
+                        object->get(Domain::FIELD_SECRET),
+                        static_cast<Domain::Status>(status),
+                        object->get(Domain::FIELD_EXPIRATION_DATE),
+                        object->get(Domain::FIELD_EXPIRATION_JWT)
+                        );
 
-//    jsonObj.set(JSON_DATA, move(DomainHelper::toJson(domainDAO.getLast())));
+            ///insert into db
+            domainDAO.insert(domainToInsert);
 
-//    return jsonObj;
+            ///add data do json obj
+            jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
+            jsonObj.set(JSON_DATA, move(domainDAO.getLast()));
+
+            return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
+        }
+    }
+    else
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObj.set(JSON_DATA, "user in token not valid");
+        return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
+    }
 }
 
 DomainService::Response DomainService::update(const string &scheme, const string &authInfo, const string &&body) const
 {
+    Object jsonObjErr;
 
-//    if (scheme != HEADER_AUTH_BEARER|| authInfo == "")
-//    {
-//        response.setStatus(move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_UNAUTHORIZED))));
-//        return HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "auth header not valid");
-//    }
+    ///parse body request
+    auto object = Parser().parse(body).extract<Object::Ptr>();
+    if (!object->has(Domain::SENDER) || !object->has(Domain::FIELD_NAME))
+    {
+        jsonObjErr.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObjErr.set(JSON_DATA, "user no has read role");
+        return DomainService::Response(jsonObjErr, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+    }
 
+    ///check JWT token and get user info
+    auto &&[jsonObj, status, user] = check(scheme, authInfo, move(object->get(Domain::FIELD_NAME)));
 
-//    ///parse body request
-//    auto object = Parser().parse(body).extract<Object::Ptr>();
-//    if (!object->has(Domain::SENDER))
-//    {
-//        response.setStatus(move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_UNAUTHORIZED))));
-//        return HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "sender not found");
-//    }
+    ///check if user is nullptr
+    if (user)
+    {
 
-//    ///get domain
-//    auto &&domain = domainDAO.get(move(object->get(Domain::SENDER).toString()));
-//    if (domain == nullptr)
-//    {
-//        response.setStatus(move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_UNAUTHORIZED))));
-//        return HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "domain sender not found");
-//    }
+        ///check user role
+        if (std::find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB_WRITE) == user->permissions.end())
+        {
+            jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+            jsonObj.set(JSON_DATA, "user no has read role");
+            return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
+        }
+        else
+        {
+//            ///build object to insert
+//            int status = object->get(Domain::FIELD_STATUS);
+//            Domain::Ptr domainToInsert = std::make_shared<Domain>(
+//                        0,
+//                        object->get(Domain::FIELD_NAME),
+//                        object->get(Domain::FIELD_SECRET),
+//                        static_cast<Domain::Status>(status),
+//                        object->get(Domain::FIELD_EXPIRATION_DATE),
+//                        object->get(Domain::FIELD_EXPIRATION_JWT)
+//                        );
 
-//    ///decode secret for JWT token
-//    CipherFactory &factory = CipherFactory::defaultFactory();
-//    Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
-//    string &&decrypted = cipher->decryptString(domain->secret, Cipher::ENC_BASE64);
+//            ///insert into db
+//            domainDAO.insert(domainToInsert);
 
-//    ///check il JWT is valid token
-//    if (!jwtCheck(scheme, authInfo, decrypted))
-//    {
-//        response.setStatus(move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_UNAUTHORIZED))));
-//        return HttpStatusController::buildObject(HTTPResponse::HTTP_UNAUTHORIZED, JSON_STATUS_ERROR, "JWT toke nont valid");
-//    }
+//            ///add data do json obj
+//            jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
+//            jsonObj.set(JSON_DATA, move(domainDAO.getLast()));
 
-//    ///set http response status
-//    response.setStatus(move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_OK))));
-
-//    ///build json response object
-//    Object jsonObj;
-//    jsonObj.set(JSON_HTTP_STATUS, move(to_string(static_cast<uint16_t>(HTTPResponse::HTTP_OK))));
-//    jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
-
-
-//    int status = object->get(Domain::FIELD_STATUS);
-
-//    Domain::Ptr domainToInsert = std::make_shared<Domain>(
-//                0,
-//                object->get(Domain::FIELD_NAME),
-//                object->get(Domain::FIELD_SECRET),
-//                static_cast<Domain::Status>(status),
-//                object->get(Domain::FIELD_EXPIRATION_DATE),
-//                object->get(Domain::FIELD_EXPIRATION_JWT)
-//                );
-
-
-//    domainDAO.insert(domainToInsert);
-
-//    domainDAO.getLast();
-
-//    //jsonObj.set(JSON_DATA, );
-//    return jsonObj;
+//            return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
+        }
+    }
+    else
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObj.set(JSON_DATA, "user in token not valid");
+        return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
+    }
 }
 
 DomainService::Response DomainService::get(const string &scheme, const string &authInfo, const string &domainName) const
 {
-    auto &&[jsonObj, status, user] = before(scheme, authInfo, domainName);
+    ///check JWT token and get user info
+    auto &&[jsonObj, status, user] = check(scheme, authInfo, domainName);
 
-    if (user != nullptr)
+    ///check if user is nullptr
+    if (user)
     {
-        jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
-        jsonObj.set(JSON_DATA, user->domain->toObject());
+        ///check user role
+        if (std::find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB_READ) == user->permissions.end())
+        {
+            jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+            jsonObj.set(JSON_DATA, "user no has read role");
+            return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
+        }
+        else
+        {
+            ///add data do json obj
+            jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
+            jsonObj.set(JSON_DATA, user->domain->toObject());
+            return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
+        }
+    }
+    else
+    {
+        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+        jsonObj.set(JSON_DATA, "user in token not valid");
+        return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
     }
 
-    return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
+
 }
 
-tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> DomainService::before(const string &scheme, const string &authInfo, const string &domainName) const
+tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> DomainService::check(const string &scheme, const string &authInfo, const string &domainName) const
 {
     Object jsonObj;
 
@@ -187,15 +229,10 @@ tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> DomainService::before(const s
         return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
     }
 
-    if (std::find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB) == user->permissions.end())
-    {
-        jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
-        jsonObj.set(JSON_DATA, "user no has role");
-        return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
-    }
+    ///add secret decrypted
+    domain->secret = move(decrypted);
 
     user->domain = domain;
 
     return make_tuple(jsonObj, HTTPResponse::HTTP_OK, user);
-
 }

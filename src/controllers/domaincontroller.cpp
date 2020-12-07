@@ -34,18 +34,25 @@ using Poco::JSON::JSONException;
 
 using namespace auth::controllers;
 
-void DomainController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response)
+void DomainController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response) noexcept
 {
-    try
+
+
+
+    if (request.hasCredentials())
     {
+
+        string scheme;
+        string authInfo;
+
+        request.getCredentials(scheme, authInfo);
+
 
         ///insert domain
         if (method == HTTPServerRequest::HTTP_POST && uriSplitted[0] == _DOMAIN)
         {
-            if (request.hasCredentials())
+            try
             {
-
-                request.getCredentials(scheme, authInfo);
 
                 auto &&[obj, status] = domainService.insert(
                          scheme,
@@ -54,20 +61,20 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                          );
 
                 HttpStatusController::sendObject(response, status, obj);
+
             }
-            else
-                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
+            catch(const exception &e)
+            {
+                AUTH_GLOBAL_LOG(ERROR, e.what());
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+            }
         }
 
         ///update domain
         else if (method == HTTPServerRequest::HTTP_PUT && uriSplitted[0] == _DOMAIN)
         {
-            if (request.hasCredentials())
+            try
             {
-
-                request.getCredentials(scheme, authInfo);
-
-
                 auto &&[obj, status] = domainService.update(
                          scheme,
                          authInfo,
@@ -75,14 +82,19 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                          );
 
                 HttpStatusController::sendObject(response, status, obj);
+
             }
-            else
-                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
+            catch(const exception &e)
+            {
+                AUTH_GLOBAL_LOG(ERROR, e.what());
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+            }
         }
 
+        ///get domain
         else if (method == HTTPServerRequest::HTTP_GET && uriSplitted[0] == _DOMAIN)
         {
-            if (request.hasCredentials())
+            try
             {
 
                 request.getCredentials(scheme, authInfo);
@@ -94,29 +106,25 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                         );
 
                 HttpStatusController::sendObject(response, status, obj);
+
             }
-            else
-                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
+            catch(const exception &e)
+            {
+                AUTH_GLOBAL_LOG(ERROR, e.what());
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+            }
         }
 
+        ///in other cases
         else
             HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
 
+
     }
-    catch(const JSONException& e)
-    {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
-        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
-    }
-    catch(const Poco::Exception& e)
-    {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
-        HttpStatusController::sendErrorObject(response,HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
-    }
-    catch(const out_of_range& e)
-    {
-        AUTH_GLOBAL_LOG(ERROR, e.what());
-        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
-    }
+
+    ///no credential
+    else
+        HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
+
 
 }

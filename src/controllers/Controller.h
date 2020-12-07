@@ -52,7 +52,7 @@ public:
     /**
      * @brief handleRESTRequest each controller impement this vitual method and iomplement business logic
      */
-    virtual void handleRESTRequest(const string &, const  vector<string> &, HTTPServerRequest &, HTTPServerResponse &) = 0;
+    virtual void handleRESTRequest(const string &, const  vector<string> &, HTTPServerRequest &, HTTPServerResponse &) noexcept = 0;
 
     inline void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
 
