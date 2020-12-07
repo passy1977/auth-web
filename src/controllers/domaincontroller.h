@@ -40,9 +40,12 @@ public:
     static inline constexpr const char *PATH = "/api/v1/domain";
     static inline constexpr const char *NAME = "domain";
 
-    inline DomainController(const string &method, const vector<string> &uriSplitted) noexcept try :
+    inline DomainController(const string &method, const vector<string> &uriSplitted) try :
         Controller(method, uriSplitted)
-    {}
+    {
+        if (uriSplitted.size() != 2)
+            throw Poco::Exception("uri splitted must have 2 value");
+    }
     catch(const Poco::Exception &e)
     {
         AUTH_GLOBAL_LOG(ERROR, e.message());

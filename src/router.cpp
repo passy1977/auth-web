@@ -59,13 +59,21 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
     vector<string> uriSplitted;
     uriSplitted.insert(end(uriSplitted), begin(tokenizer), end(tokenizer));
 
-    if (uri.rfind(AuthController::PATH, 0) == 0) {
-        return new AuthController(method, uriSplitted);
-    } else if (uri.rfind(UserController::PATH, 0) == 0) {
-        return new UserController(method, uriSplitted);
-    } else if (uri.rfind(DomainController::PATH, 0) == 0) {
-        return new DomainController(method, uriSplitted);
+    try
+    {
+        if (uri.rfind(AuthController::PATH, 0) == 0) {
+            return new AuthController(method, uriSplitted);
+        } else if (uri.rfind(UserController::PATH, 0) == 0) {
+            return new UserController(method, uriSplitted);
+        } else if (uri.rfind(DomainController::PATH, 0) == 0) {
+            return new DomainController(method, uriSplitted);
+        }
     }
+    catch (const Poco::Exception &e)
+    {
+        AUTH_GLOBAL_LOG(ERROR, e.message());
+    }
+
 
     return HttpStatusController::build(HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
 }

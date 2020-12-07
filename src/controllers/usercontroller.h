@@ -35,7 +35,7 @@ public:
     static inline constexpr const char *PATH = "/api/v1/user";
     static inline constexpr const char *NAME = "user";
 
-    inline UserController(const string &method, const vector<string> &uriSplitted) noexcept try :
+    inline UserController(const string &method, const vector<string> &uriSplitted) try :
         Controller(method, uriSplitted)
     {}
     catch(const Poco::Exception &e)

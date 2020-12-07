@@ -38,7 +38,7 @@ public:
     static inline constexpr const char *PATH = "/api/v1/auth";
     static inline constexpr const char *NAME = "auth";
 
-    inline AuthController(const string &method, const vector<string> &uriSplitted) noexcept try :
+    inline AuthController(const string &method, const vector<string> &uriSplitted) try :
         Controller(method, uriSplitted)
     {}
     catch(const Poco::Exception &e)

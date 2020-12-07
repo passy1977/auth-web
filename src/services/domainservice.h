@@ -58,10 +58,11 @@ public:
      * @brief insert new domain
      * @param scheme of auth
      * @param authInfo JWT token
+     * @param domainName request
      * @param body request
      * @return domain insert
      */
-     Response insert(const string &scheme, const string &authInfo, const string &&body) const;
+     Response insert(const string &scheme, const string &authInfo, const string &domainName, const string &&body) const;
 
     /**
      * @brief modify a domain

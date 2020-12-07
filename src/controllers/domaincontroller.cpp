@@ -37,8 +37,6 @@ using namespace auth::controllers;
 void DomainController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response) noexcept
 {
 
-
-
     if (request.hasCredentials())
     {
 
@@ -57,6 +55,7 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                 auto &&[obj, status] = domainService.insert(
                          scheme,
                          authInfo,
+                         uriSplitted[1],
                          string(istreambuf_iterator<char>(request.stream()), {})
                          );
 

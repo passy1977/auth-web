@@ -45,21 +45,11 @@ using namespace auth::services;
 extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, const User::Ptr &) noexcept;
 
 
-DomainService::Response DomainService::insert(const string &scheme, const string &authInfo, const string &&body) const
+DomainService::Response DomainService::insert(const string &scheme, const string &authInfo, const string &domainName, const string &&body) const
 {
-    Object jsonObjErr;
-
-    ///parse body request
-    auto object = Parser().parse(body).extract<Object::Ptr>();
-    if (!object->has(Domain::SENDER) || !object->has(Domain::FIELD_NAME))
-    {
-        jsonObjErr.set(JSON_STATUS, JSON_STATUS_ERROR);
-        jsonObjErr.set(JSON_DATA, "user no has read role");
-        return DomainService::Response(jsonObjErr, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-    }
 
     ///check JWT token and get user info
-    auto &&[jsonObj, status, user] = check(scheme, authInfo, move(object->get(Domain::FIELD_NAME)));
+    auto &&[jsonObj, status, user] = check(scheme, authInfo, domainName);
 
     ///check if user is nullptr
     if (user)
@@ -69,30 +59,56 @@ DomainService::Response DomainService::insert(const string &scheme, const string
         if (std::find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB_WRITE) == user->permissions.end())
         {
             jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
-            jsonObj.set(JSON_DATA, "user no has read role");
-            return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
+            jsonObj.set(JSON_DATA, "user no has write role");
+            return DomainService::Response(jsonObj, HTTPResponse::HTTP_FORBIDDEN);
         }
         else
         {
-            ///build object to insert
-            int status = object->get(Domain::FIELD_STATUS);
-            Domain::Ptr domainToInsert = std::make_shared<Domain>(
-                        0,
-                        object->get(Domain::FIELD_NAME),
-                        object->get(Domain::FIELD_SECRET),
-                        static_cast<Domain::Status>(status),
-                        object->get(Domain::FIELD_EXPIRATION_DATE),
-                        object->get(Domain::FIELD_EXPIRATION_JWT)
-                        );
 
-            ///insert into db
-            domainDAO.insert(domainToInsert);
+            ///parse body request
+            auto object = Parser().parse(body).extract<Object::Ptr>();
 
-            ///add data do json obj
-            jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
-            jsonObj.set(JSON_DATA, move(domainDAO.getLast()));
+            ///check if domain fields are full fill
+            if(
+                    object->has(Domain::FIELD_STATUS)
+                    && object->get(Domain::FIELD_NAME)
+                    && object->get(Domain::FIELD_STATUS)
+                    && object->get(Domain::FIELD_EXPIRATION_DATE)
+                    && object->get(Domain::FIELD_EXPIRATION_JWT)
+                )
+            {
+                ///encrypt secret for JWT token
+                CipherFactory &factory = CipherFactory::defaultFactory();
+                Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
+                string &&encrypt = cipher->encryptString(object->get(Domain::FIELD_SECRET), Cipher::ENC_BASE64);
+                delete cipher;
 
-            return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
+                ///build object to insert
+                int status = object->get(Domain::FIELD_STATUS);
+                Domain::Ptr domainToInsert = std::make_shared<Domain>(
+                            0,
+                            object->get(Domain::FIELD_NAME),
+                            encrypt,
+                            static_cast<Domain::Status>(status),
+                            object->get(Domain::FIELD_EXPIRATION_DATE),
+                            object->get(Domain::FIELD_EXPIRATION_JWT)
+                            );
+
+                ///insert into db
+                domainDAO.insert(domainToInsert);
+
+                ///add data do json obj
+                jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
+                jsonObj.set(JSON_DATA, move(domainDAO.getLast()));
+
+                return DomainService::Response(jsonObj, HTTPResponse::HTTP_OK);
+            }
+            else
+            {
+                jsonObj.set(JSON_STATUS, JSON_STATUS_ERROR);
+                jsonObj.set(JSON_DATA, "domain not complete");
+                return DomainService::Response(jsonObj, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
     }
     else
@@ -214,7 +230,7 @@ tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> DomainService::check(const st
         return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
     }
 
-    ///decode secret for JWT token
+    ///decrypt secret for JWT token
     CipherFactory &factory = CipherFactory::defaultFactory();
     Cipher *cipher = factory.createCipher(CipherKey("aes-256-ecb", Globals::getInstance()->getPassword()));
     string &&decrypted = cipher->decryptString(domain->secret, Cipher::ENC_BASE64);
