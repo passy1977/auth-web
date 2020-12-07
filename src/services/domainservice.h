@@ -58,7 +58,7 @@ public:
      * @brief insert new domain
      * @param scheme of auth
      * @param authInfo JWT token
-     * @param domainName request
+     * @param domainName caller
      * @param body request
      * @return domain insert
      */
@@ -68,19 +68,31 @@ public:
      * @brief modify a domain
      * @param scheme of auth
      * @param authInfo JWT token
+     * @param domainName caller
      * @param body request
      * @return domain modified
      */
-     Response update(const string &scheme, const string &authInfo, const string &&body) const;
+     Response update(const string &scheme, const string &authInfo, const string &domainName, const string &&body) const;
 
     /**
      * @brief get a domain
      * @param scheme of auth
      * @param authInfo JWT token
-     * @param domainName request
+     * @param domainName caller
+     * @param domainToDel domain to del
      * @return domain request
      */
-     Response get(const string &scheme, const string &authInfo, const string &domainName) const;
+     Response get(const string &scheme, const string &authInfo, const string &domainName, const string &domainToGet) const;
+
+     /**
+      * @brief get a domain
+      * @param scheme of auth
+      * @param authInfo JWT token
+      * @param domainName caller
+      * @param domainToDel domain to del
+      * @return domain request
+      */
+      Response del(const string &scheme, const string &authInfo, const string &domainName, const string &domainToDel) const;
 
 private:
 

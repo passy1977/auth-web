@@ -52,7 +52,7 @@ class DAO
 
 protected:
 
-    const string &table;
+    const string table;
 
     const connection_ref &connection;
 
@@ -106,25 +106,23 @@ public:
      * @brief delete T
      * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    inline void remove(shared_ptr<T> &&t) const
+    inline u64 del(shared_ptr<T> &&t) const
     {
-        remove(t);
+        return del(t);
     }
 
     /**
      * @brief delete T
      * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
-    void remove(const shared_ptr<T> &t) const
+    u64 del(const shared_ptr<T> &t) const
     {
-        if constexpr (!std::is_same_v<T, auth::pods::User> && !std::is_same_v<T, auth::pods::Domain> )
-        {
-            string query = "DELETE FROM " + table + " WHERE id = " + t.id;
-            AUTH_GLOBAL_LOG(DBG, query);
-            connection->query(query);
-        }
-        else
-            throw Poco::Exception("Not valid object");
+
+        string query = "DELETE FROM " + table + " WHERE id = ?";
+        AUTH_GLOBAL_LOG(DBG, query);
+        statement_ref stmt = connection->create_statement(query);
+        stmt->set_unsigned32(0, t->id);
+        return stmt->execute();
     }
 
     /**
@@ -156,7 +154,7 @@ public:
 
         }
         else
-            throw Poco::Exception("Not valid object");
+            throw Poco::Exception("not valid object");
         return t;
     }
 

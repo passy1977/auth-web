@@ -23,7 +23,8 @@
 #include "user.h"
 
 #include <Poco/JSON/Object.h>
-using Poco::JSON::Object;
+#include <Poco/JSON/Parser.h>
+using namespace Poco::JSON;
 
 using namespace auth::pods;
 
@@ -34,7 +35,11 @@ Object User::toObject()
     ret.set(FIELD_NAME, name);
     ret.set(FIELD_EMAIL, email);
     ret.set(FIELD_PASSWORD, password);
-    ret.set(FIELD_JSON_DATA, jsonData);
+    if (jsonData != "")
+    {
+        auto &&jsonData = Parser().parse(this->jsonData).extract<Object::Ptr>();
+        ret.set(FIELD_JSON_DATA, jsonData);
+    }
     ret.set(FIELD_PERMISSIONS, permissions);
     ret.set(FIELD_STATUS, static_cast<int>(status));
     ret.set(FIELD_LAST_LOGIN, lastLogin);

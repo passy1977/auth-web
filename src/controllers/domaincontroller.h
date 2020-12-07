@@ -43,7 +43,7 @@ public:
     inline DomainController(const string &method, const vector<string> &uriSplitted) try :
         Controller(method, uriSplitted)
     {
-        if (uriSplitted.size() != 2)
+        if (uriSplitted.size() < 2)
             throw Poco::Exception("uri splitted must have 2 value");
     }
     catch(const Poco::Exception &e)

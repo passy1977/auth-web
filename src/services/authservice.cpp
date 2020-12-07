@@ -66,7 +66,7 @@ tuple<bool, string> AuthService::login(const string &&body) const
             );
 
             ///check if  credential are oh
-            if (user != nullptr) {
+            if (user.get()) {
 
                 ///decode secret for JWT token
                 CipherFactory &factory = CipherFactory::defaultFactory();

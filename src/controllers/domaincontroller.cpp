@@ -47,7 +47,7 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
 
 
         ///insert domain
-        if (method == HTTPServerRequest::HTTP_POST && uriSplitted[0] == _DOMAIN)
+        if (method == HTTPServerRequest::HTTP_POST && uriSplitted.size() == 2 && uriSplitted[0] == _DOMAIN)
         {
             try
             {
@@ -70,13 +70,14 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
         }
 
         ///update domain
-        else if (method == HTTPServerRequest::HTTP_PUT && uriSplitted[0] == _DOMAIN)
+        else if (method == HTTPServerRequest::HTTP_PUT && uriSplitted.size() == 2 && uriSplitted[0] == _DOMAIN)
         {
             try
             {
                 auto &&[obj, status] = domainService.update(
                          scheme,
                          authInfo,
+                         uriSplitted[1],
                          string(istreambuf_iterator<char>(request.stream()), {})
                          );
 
@@ -91,7 +92,7 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
         }
 
         ///get domain
-        else if (method == HTTPServerRequest::HTTP_GET && uriSplitted[0] == _DOMAIN)
+        else if (method == HTTPServerRequest::HTTP_GET && uriSplitted.size() == 3 && uriSplitted[0] == _DOMAIN)
         {
             try
             {
@@ -101,7 +102,33 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                 auto &&[obj, status] = domainService.get(
                         scheme,
                         authInfo,
-                        uriSplitted[1]
+                        uriSplitted[1],
+                        uriSplitted[2]
+                        );
+
+                HttpStatusController::sendObject(response, status, obj);
+
+            }
+            catch(const exception &e)
+            {
+                AUTH_GLOBAL_LOG(ERROR, e.what());
+                HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
+            }
+        }
+
+        ///delete domain
+        else if (method == HTTPServerRequest::HTTP_DELETE && uriSplitted.size() == 3 && uriSplitted[0] == _DOMAIN)
+        {
+            try
+            {
+
+                request.getCredentials(scheme, authInfo);
+
+                auto &&[obj, status] = domainService.del(
+                        scheme,
+                        authInfo,
+                        uriSplitted[1],
+                        uriSplitted[2]
                         );
 
                 HttpStatusController::sendObject(response, status, obj);

@@ -46,9 +46,6 @@ User::Ptr UserDAO::deserialize(const result_set_ref &rs, const string &fieldPref
         permissions.push_back(s);
     }
 
-
-
-
     Domain::Ptr domain = nullptr;
     if (fieldPrefix != "")
     {
@@ -90,7 +87,6 @@ void UserDAO::insert(const User::Ptr &user) const
            query += User::FIELD_EXPIRATION_DATE;
            query += ", ";
            query += User::FIELD_ID_DOMAIN;
-           query += ", ";
            query += ") values (?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 
            AUTH_GLOBAL_LOG(DBG, query);

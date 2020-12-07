@@ -50,6 +50,8 @@ public:
     }
     AUTH_NO_COPY_NO_MOVE(DomainDAO)
 
+    using DAO::del;
+
     /**
      * @brief update T
      * @exceptions mariadb::exception::base, std::out_of_range
@@ -68,6 +70,13 @@ public:
      * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
      */
     Domain::Ptr get(const string &name) const;
+
+    /**
+     * @brief delete domain by name
+     * @exceptions Poco::Exception, mariadb::exception::base, std::out_of_range
+     */
+    u64 del(const string &name) const;
+
 
     /**
      * @brief get last Daomain insered

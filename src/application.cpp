@@ -35,7 +35,7 @@ int auth::Application::main(const vector<string> &args)
     ///check if service alterady run
     if (!lockService.start())
     {
-        poco_critical_f1(Logger::root(), "service already run on %s",  lockService.getSerrviceOnMessage());
+        poco_critical_f1(Logger::root(), "service already run on %s",  lockService.getStatusMessage());
         return EXIT_NOINPUT;
     }
 
@@ -68,7 +68,7 @@ int auth::Application::main(const vector<string> &args)
     }
 
 
-    string msg = "Server conf port:";
+    string msg = "server conf port:";
     msg += to_string(port);
     msg += " maxQueued:";
     msg += to_string(maxQueued);

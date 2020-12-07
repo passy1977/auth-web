@@ -40,17 +40,16 @@ Domain::Ptr DomainDAO::deserialize(const result_set_ref &rs, const string &field
 
 void DomainDAO::insert(const Domain::Ptr &domain) const
 {
-    string query("INSERT INTO users (");
+    string query("INSERT INTO domains (");
            query += Domain::FIELD_NAME;
            query += ", ";
            query += Domain::FIELD_SECRET;
            query += ", ";
-           query += Domain::FIELD_SECRET;
+           query += Domain::FIELD_STATUS;
            query += ", ";
            query += Domain::FIELD_EXPIRATION_DATE;
            query += ", ";
            query += Domain::FIELD_EXPIRATION_JWT;
-           query += ", ";
            query += ") values (?, ?, ?, ?, ?) ";
 
            AUTH_GLOBAL_LOG(DBG, query);
@@ -66,17 +65,17 @@ void DomainDAO::insert(const Domain::Ptr &domain) const
 
 void DomainDAO::update(const Domain::Ptr &domain) const
 {
-    string query("UPDATE users SET ");
+    string query("UPDATE domains SET ");
             query += Domain::FIELD_NAME;
             query += " = ?, ";
             query += Domain::FIELD_SECRET;
             query += " = ?, ";
-            query += Domain::FIELD_SECRET;
+            query += Domain::FIELD_STATUS;
             query += " = ?, ";
             query += Domain::FIELD_EXPIRATION_DATE;
             query += " = ?, ";
             query += Domain::FIELD_EXPIRATION_JWT;
-            query += " = ?, ";
+            query += " = ? ";
             query += " WHERE id = ?";
 
            AUTH_GLOBAL_LOG(DBG, query);
@@ -114,12 +113,20 @@ Domain::Ptr DomainDAO::get(const string &name) const
     return ret;
 }
 
+u64 DomainDAO::del(const string &name) const
+{
+    string query = "DELETE FROM " + table + " WHERE " + Domain::FIELD_NAME + " = ? ";
+    AUTH_GLOBAL_LOG(DBG, query);
+    statement_ref stmt = connection->create_statement(query);
+    stmt->set_string(0, name);
+    return stmt->execute();
+}
+
 Domain::Ptr DomainDAO::getLast() const
 {
     Domain::Ptr ret = nullptr;
 
-    string query = "SELECT * FROM domain "
-                   "ORDER BY id DESC";
+    string query = "SELECT * FROM domains ORDER BY id DESC";
 
     AUTH_GLOBAL_LOG(DBG, query);
 

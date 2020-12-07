@@ -38,7 +38,7 @@ class LockService
 {
     File lockFile;
 
-    string serrviceOnMessage = "";
+    string statusMessage = "";
 public:
     LockService() noexcept;
 
@@ -54,12 +54,12 @@ public:
     void stop() noexcept;
 
     /**
-     * @brief getSerrviceOnMessage check if a service it'a already run
+     * @brief getStatusMessage check if a service it'a already run
      * @return "" if not run
      */
-    inline const string & getSerrviceOnMessage() const noexcept
+    inline const string & getStatusMessage() const noexcept
     {
-        return serrviceOnMessage;
+        return statusMessage;
     }
 };
 
