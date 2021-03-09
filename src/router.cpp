@@ -49,6 +49,10 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
     auto &&method = request.getMethod();
     auto &&uri = request.getURI();
 
+    if (uri.find(API_V1) == string::npos) {
+        return HttpStatusController::build(HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
+    }
+
     const StringTokenizer tokenizer(
                 move(uri.substr(strlen(API_V1), uri.size())),
                 "/",
