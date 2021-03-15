@@ -31,7 +31,6 @@ using Poco::JSON::JSONException;
 
 #include "httpstatuscontroller.h"
 
-
 using namespace auth::controllers;
 
 void DomainController::handleRESTRequest(const string &method, const vector<string> &uriSplitted, HTTPServerRequest &request, HTTPServerResponse &response) noexcept
@@ -45,7 +44,6 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
 
         request.getCredentials(scheme, authInfo);
 
-
         ///insert domain
         if (method == HTTPServerRequest::HTTP_POST && uriSplitted.size() == 2 && uriSplitted[0] == _DOMAIN)
         {
@@ -53,18 +51,16 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
             {
 
                 auto &&[obj, status] = domainService.insert(
-                         scheme,
-                         authInfo,
-                         uriSplitted[1],
-                         string(istreambuf_iterator<char>(request.stream()), {})
-                         );
+                    scheme,
+                    authInfo,
+                    uriSplitted[1],
+                    string(istreambuf_iterator<char>(request.stream()), {}));
 
                 HttpStatusController::sendObject(response, status, obj);
-
             }
-            catch(const exception &e)
+            catch (const exception &e)
             {
-                AUTH_GLOBAL_LOG(ERROR, e.what());
+                AUTH_GLOBAL_LOG(ERR, e.what());
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
@@ -75,18 +71,16 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
             try
             {
                 auto &&[obj, status] = domainService.update(
-                         scheme,
-                         authInfo,
-                         uriSplitted[1],
-                         string(istreambuf_iterator<char>(request.stream()), {})
-                         );
+                    scheme,
+                    authInfo,
+                    uriSplitted[1],
+                    string(istreambuf_iterator<char>(request.stream()), {}));
 
                 HttpStatusController::sendObject(response, status, obj);
-
             }
-            catch(const exception &e)
+            catch (const exception &e)
             {
-                AUTH_GLOBAL_LOG(ERROR, e.what());
+                AUTH_GLOBAL_LOG(ERR, e.what());
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
@@ -100,18 +94,16 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                 request.getCredentials(scheme, authInfo);
 
                 auto &&[obj, status] = domainService.get(
-                        scheme,
-                        authInfo,
-                        uriSplitted[1],
-                        uriSplitted[2]
-                        );
+                    scheme,
+                    authInfo,
+                    uriSplitted[1],
+                    uriSplitted[2]);
 
                 HttpStatusController::sendObject(response, status, obj);
-
             }
-            catch(const exception &e)
+            catch (const exception &e)
             {
-                AUTH_GLOBAL_LOG(ERROR, e.what());
+                AUTH_GLOBAL_LOG(ERR, e.what());
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
@@ -125,18 +117,16 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
                 request.getCredentials(scheme, authInfo);
 
                 auto &&[obj, status] = domainService.del(
-                        scheme,
-                        authInfo,
-                        uriSplitted[1],
-                        uriSplitted[2]
-                        );
+                    scheme,
+                    authInfo,
+                    uriSplitted[1],
+                    uriSplitted[2]);
 
                 HttpStatusController::sendObject(response, status, obj);
-
             }
-            catch(const exception &e)
+            catch (const exception &e)
             {
-                AUTH_GLOBAL_LOG(ERROR, e.what());
+                AUTH_GLOBAL_LOG(ERR, e.what());
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
@@ -144,13 +134,9 @@ void DomainController::handleRESTRequest(const string &method, const vector<stri
         ///in other cases
         else
             HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
-
-
     }
 
     ///no credential
     else
         HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
-
-
 }

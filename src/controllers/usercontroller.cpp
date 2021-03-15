@@ -38,9 +38,9 @@ void UserController::handleRESTRequest(const string &method, const  vector<strin
     //opens the file stream
     ostream& responseStream = response.send();
 
-    Object jsonError;
-    jsonError.set("type", "user");
-    jsonError.set("method", method);
-    jsonError.set("partialUri", uriSplitted.size());
-    jsonError.stringify(responseStream);
+    Object jsonErr;
+    jsonErr.set("type", "user");
+    jsonErr.set("method", method);
+    jsonErr.set("partialUri", uriSplitted.size());
+    jsonErr.stringify(responseStream);
 }

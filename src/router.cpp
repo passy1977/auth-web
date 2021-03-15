@@ -75,7 +75,7 @@ HTTPRequestHandler *Router::createRequestHandler(const HTTPServerRequest &reques
     }
     catch (const Poco::Exception &e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
+        AUTH_GLOBAL_LOG(ERR, e.message());
     }
 
 

@@ -31,7 +31,7 @@ namespace auth
 {
 
 /**
- * @brief The Router class base compoment that manage routing to other con trotters
+ * @brief The Router class base compoment that manage routing to other ruoter class
  * @author Antonio Salsi
  */
 class Router final : public HTTPRequestHandlerFactory

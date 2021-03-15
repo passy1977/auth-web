@@ -32,35 +32,47 @@ using namespace auth::controllers;
 
 void HttpStatusController::handleRequest(HTTPServerRequest &, HTTPServerResponse &response)
 {
-    response.setChunkedTransferEncoding(true);
+    //response.setChunkedTransferEncoding(true);
 
     sendErrorObject(response, httpStatus);
 }
 
 void HttpStatusController::sendObject(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const Object &obj) noexcept
 {
-    response.setChunkedTransferEncoding(true);
+    //response.setChunkedTransferEncoding(true);
 
-    //Sets mime type text/html application/json etc.
-    response.setContentType(HEADER_CONTENT_TYPE);
+    response.setKeepAlive(false);
 
     //Sets http status
     response.setStatus(move(to_string(httpStatus)));
 
-    obj.stringify(response.send());
+    //Sets mime type text/html application/json etc.
+    response.setContentType(HEADER_CONTENT_TYPE);
+
+    auto &&out = response.send();
+
+    obj.stringify(out);
+
+    out.flush();
 }
 
 void HttpStatusController::sendObject(HTTPServerResponse &response, const Object &obj) noexcept
 {
-    response.setChunkedTransferEncoding(true);
+    //response.setChunkedTransferEncoding(true);
 
-    //Sets mime type text/html application/json etc.
-    response.setContentType(HEADER_CONTENT_TYPE);
+    response.setKeepAlive(false);
 
     //Sets http status
     response.setStatus(move(to_string(HTTPResponse::HTTP_OK)));
 
-    obj.stringify(response.send());
+    //Sets mime type text/html application/json etc.
+    response.setContentType(HEADER_CONTENT_TYPE);
+
+    auto &&out = response.send();
+
+    obj.stringify(out);
+
+    out.flush();
 }
 
 Object HttpStatusController::buildObject(const bool jsonStatus, const string &errorMsg) noexcept
@@ -74,6 +86,3 @@ Object HttpStatusController::buildObject(const bool jsonStatus, const string &er
     }
     return jsonObj;
 }
-
-
-

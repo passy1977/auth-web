@@ -37,79 +37,76 @@ using std::string;
 namespace auth::controllers
 {
 
-class HttpStatusController final : public HTTPRequestHandler
-{
-public:
+    class HttpStatusController final : public HTTPRequestHandler
+    {
+    public:
+        HttpStatusController() = delete;
+        AUTH_NO_COPY_NO_MOVE(HttpStatusController)
 
-    HttpStatusController() = delete;
-    AUTH_NO_COPY_NO_MOVE(HttpStatusController)
+        void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
 
-
-    void handleRequest(HTTPServerRequest &, HTTPServerResponse &) override;
-
-    /**
+        /**
      * @brief build error constroller
      * @param error HttpStatus
      * @return controller
      */
-    static inline HttpStatusController * build(HTTPResponse::HTTPStatus status) noexcept {
-        return new HttpStatusController(status);
-    }
+        static inline HttpStatusController *build(HTTPResponse::HTTPStatus status) noexcept
+        {
+            return new HttpStatusController(status);
+        }
 
-    /**
+        /**
      * @brief sendErrorObject to client JSON error
      */
-    inline static void sendErrorObject(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const string &errorMsg = "") noexcept
-    {
-        send(response, httpStatus, JSON_STATUS_ERROR, errorMsg);
-    }
+        inline static void sendErrorObject(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const string &errorMsg = "") noexcept
+        {
+            send(response, httpStatus, JSON_STATUS_ERROR, errorMsg);
+        }
 
-    /**
+        /**
      * @brief sendObject to client JSON object pass only data
      */
-    inline static void sendObject(HTTPServerResponse &response, const string &data) noexcept
-    {
-        send(response, HTTPResponse::HTTP_OK, JSON_STATUS_OK, data);
-    }
+        inline static void sendObject(HTTPServerResponse &response, const string &data) noexcept
+        {
+            send(response, HTTPResponse::HTTP_OK, JSON_STATUS_OK, data);
+        }
 
-    /**
+        /**
      * @brief sendObject to client JSON object
      */
-    static void sendObject(HTTPServerResponse &, HTTPResponse::HTTPStatus, const Object &) noexcept;
+        static void sendObject(HTTPServerResponse &, HTTPResponse::HTTPStatus, const Object &) noexcept;
 
-
-    /**
+        /**
      * @brief sendObject to client JSON object
      */
-    static void sendObject(HTTPServerResponse &, const Object &) noexcept;
+        static void sendObject(HTTPServerResponse &, const Object &) noexcept;
 
-    /**
+        /**
      * @brief sendObject to client JSON object
      */
-    static inline void sendObject(HTTPServerResponse &response, const Object &&object) noexcept
-    {
-        sendObject(response, object);
-    }
+        static inline void sendObject(HTTPServerResponse &response, const Object &&object) noexcept
+        {
+            sendObject(response, object);
+        }
 
-    /**
+        /**
      * @brief buildObject
      */
-    static Object buildObject(bool, const string & = "") noexcept;
+        static Object buildObject(bool, const string & = "") noexcept;
 
-private:
-    HTTPResponse::HTTPStatus httpStatus;
+    private:
+        HTTPResponse::HTTPStatus httpStatus;
 
-    inline explicit HttpStatusController(HTTPResponse::HTTPStatus httpStatus) : httpStatus(httpStatus) {}
+        inline explicit HttpStatusController(HTTPResponse::HTTPStatus httpStatus) : httpStatus(httpStatus) {}
 
-    /**
+        /**
      * @brief sendErrorObject to client JSON error
      */
-    static void send(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const bool jsonStatus, const string &errorMsg = "") noexcept
-    {
-        ///build json object response
-        sendObject(response, httpStatus, std::move(buildObject(jsonStatus, errorMsg)));
-    }
-};
+        static void send(HTTPServerResponse &response, HTTPResponse::HTTPStatus httpStatus, const bool jsonStatus, const string &errorMsg = "") noexcept
+        {
+            ///build json object response
+            sendObject(response, httpStatus, std::move(buildObject(jsonStatus, errorMsg)));
+        }
+    };
 
 }
-

@@ -34,19 +34,28 @@ using namespace Poco;
 using namespace auth::services;
 
 
-LogService::LogService(const AutoPtr<IniFileConfiguration> &config) noexcept : config(config)
+LogService::LogService(const AutoPtr<IniFileConfiguration> &config) : 
+    config(config)
 {
-    ///configure log if needed
-//    if (config->has(CONFIG_PATH_LOG) && config->has(CONFIG_LOG_ROTATION))
-//    {
-//        AutoPtr<SimpleFileChannel> logChannel = AutoPtr<SimpleFileChannel>(new SimpleFileChannel);
-//        logChannel->setProperty("path", move(config->getString(CONFIG_PATH_LOG)));
-//        logChannel->setProperty("rotation", move(config->getString(CONFIG_LOG_ROTATION)));
-//        Logger::root().setChannel(logChannel);
-//    }
-
+#ifdef HIDE_CONSOLE
+    open();
+#endif
 }
 
+
+void LogService::open() const
+{
+#ifdef HIDE_CONSOLE
+    logFile.open(CONFIG_FILE_LOG);
+#endif
+}
+
+void LogService::close() const
+{
+#ifdef HIDE_CONSOLE
+    logFile.close();
+#endif
+}
 
 void LogService::write(LogService::Level &&level, unsigned int line, const string & source, string message) const noexcept
 {
@@ -73,7 +82,7 @@ void LogService::write(LogService::Level &&level, unsigned int line, const strin
     case LogService::Level::WARN:
         strLevel = "WARN";
         break;
-    case LogService::Level::ERROR:
+    case LogService::Level::ERR:
         strLevel = "ERROR";
         break;
     case LogService::Level::FATAL:
@@ -90,7 +99,10 @@ void LogService::write(LogService::Level &&level, unsigned int line, const strin
     ret += " - ";
     ret += message;
 
-    if (level == LogService::Level::ERROR || level == LogService::Level::FATAL)
+#ifdef HIDE_CONSOLE
+    logFile << ret << endl;
+#else
+    if (level == LogService::Level::ERR || level == LogService::Level::FATAL)
     {
         cerr << ret << endl;
     }
@@ -98,4 +110,5 @@ void LogService::write(LogService::Level &&level, unsigned int line, const strin
     {
         cout << ret << endl;
     }
+#endif
 }

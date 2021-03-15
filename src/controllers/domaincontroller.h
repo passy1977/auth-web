@@ -48,7 +48,7 @@ public:
     }
     catch(const Poco::Exception &e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
+        AUTH_GLOBAL_LOG(ERR, e.message());
     }
     AUTH_NO_COPY_NO_MOVE(DomainController)
 

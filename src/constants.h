@@ -25,9 +25,9 @@
 ///default catch exceptions
 #define AUTH_CATCH_EXCEPTIONS \
     catch (const mariadb::exception::base &e) { \
-        AUTH_GLOBAL_LOG(ERROR, e.what()); \
+        AUTH_GLOBAL_LOG(ERR, e.what()); \
     }  catch (const std::out_of_range &e) { \
-        AUTH_GLOBAL_LOG(ERROR, e.what());\
+        AUTH_GLOBAL_LOG(ERR, e.what());\
     }
 
 /// Disable copy and reference constructror

@@ -61,7 +61,7 @@ bool LockService::start() noexcept
 {
 #ifndef NO_CHECK_PID
     ///if another instance run return false
-    if (serrviceOnMessage != "") {
+    if (statusMessage != "") {
         return false;
     }
 #endif

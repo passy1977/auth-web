@@ -40,7 +40,7 @@ namespace auth::services
 {
 
 /**
- * @brief The LogService class Log helper fo berer log managing
+ * @brief The LogService class log helper to managing message to user, if HIDE_CONSOLE macro is enabled printo only on file otherwise on console
  * @author Antonio Salsi
  */
 class LogService
@@ -48,6 +48,9 @@ class LogService
 
     const AutoPtr<IniFileConfiguration> &config;
 
+#ifdef HIDE_CONSOLE
+    mutable ofstream logFile;
+#endif // HIDE_CONSOLE
 public:
 
     /**
@@ -59,12 +62,30 @@ public:
         DBG,
         INFO,
         WARN,
-        ERROR,
+        ERR,
         FATAL
     };
 
-    LogService(const AutoPtr<IniFileConfiguration> &) noexcept;
+    explicit LogService(const AutoPtr<IniFileConfiguration> &);
+    inline ~LogService() 
+    {
+#ifdef HIDE_CONSOLE
+        if (logFile.is_open()) {
+            close();
+        }
+#endif // HIDE_CONSOLE
+    }
     AUTH_NO_COPY_NO_MOVE(LogService)
+
+    /**
+    * Open log file
+    */
+    void open() const;
+
+    /**
+    * Close log file
+    */
+    void close() const;
 
     /**
      * @brief LogService::write message to log

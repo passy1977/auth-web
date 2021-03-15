@@ -35,7 +35,9 @@ int auth::Application::main(const vector<string> &args)
     ///check if service alterady run
     if (!lockService.start())
     {
+#ifndef HIDE_CONSOLE
         poco_critical_f1(Logger::root(), "service already run on %s",  lockService.getStatusMessage());
+#endif
         return EXIT_NOINPUT;
     }
 

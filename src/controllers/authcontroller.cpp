@@ -50,20 +50,19 @@ void AuthController::handleRESTRequest(const string &method, const vector<string
 
                     request.getCredentials(scheme, authInfo);
 
-                     auto &&obj = HttpStatusController::buildObject(JSON_STATUS_OK);
-                     obj.set(
-                                 JSON_DATA,
-                                 authService.check(scheme, authInfo, uriSplitted)
-                             );
+                    auto &&obj = HttpStatusController::buildObject(JSON_STATUS_OK);
+                    obj.set(
+                        JSON_DATA,
+                        authService.check(scheme, authInfo, uriSplitted));
 
                     HttpStatusController::sendObject(response, obj);
                 }
                 else
                     HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_FORBIDDEN);
             }
-            catch(const exception &e)
+            catch (const exception &e)
             {
-                AUTH_GLOBAL_LOG(ERROR, e.what());
+                AUTH_GLOBAL_LOG(ERR, e.what());
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
@@ -77,7 +76,7 @@ void AuthController::handleRESTRequest(const string &method, const vector<string
 
                 ///perform login and generate JWT
                 auto &&[check, data] = authService.login(string(istreambuf_iterator<char>(request.stream()), {}));
-                if(check)
+                if (check)
                 {
                     HttpStatusController::sendObject(response, data);
                 }
@@ -85,34 +84,30 @@ void AuthController::handleRESTRequest(const string &method, const vector<string
                 {
                     HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_UNAUTHORIZED, data);
                 }
-
             }
-            catch(const exception &e)
+            catch (const exception &e)
             {
-                AUTH_GLOBAL_LOG(ERROR, e.what());
+                AUTH_GLOBAL_LOG(ERR, e.what());
                 HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
             }
         }
 
         else
             HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
-
     }
-    catch(const JSONException& e)
+    catch (const JSONException &e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
+        AUTH_GLOBAL_LOG(ERR, e.message());
         HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
     }
-    catch(const Poco::Exception& e)
+    catch (const Poco::Exception &e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.message());
+        AUTH_GLOBAL_LOG(ERR, e.message());
         HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.message());
     }
-    catch(const out_of_range& e)
+    catch (const out_of_range &e)
     {
-        AUTH_GLOBAL_LOG(ERROR, e.what());
+        AUTH_GLOBAL_LOG(ERR, e.what());
         HttpStatusController::sendErrorObject(response, HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, e.what());
     }
 }
-
-

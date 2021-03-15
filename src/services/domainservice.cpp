@@ -44,7 +44,6 @@ using namespace auth::services;
 
 extern bool jwtCheck(const string &scheme, const string &authInfo, const string &seecret, const User::Ptr &) noexcept;
 
-
 DomainService::Response DomainService::insert(const string &scheme, const string &authInfo, const string &domainName, const string &&body) const
 {
 
@@ -69,13 +68,8 @@ DomainService::Response DomainService::insert(const string &scheme, const string
             auto object = Parser().parse(body).extract<Object::Ptr>();
 
             ///check if domain fields are full fill
-            if(
-                    object->has(Domain::FIELD_STATUS)
-                    && object->has(Domain::FIELD_NAME)
-                    && object->has(Domain::FIELD_STATUS)
-                    && object->has(Domain::FIELD_EXPIRATION_DATE)
-                    && object->has(Domain::FIELD_EXPIRATION_JWT)
-                )
+            if (
+                object->has(Domain::FIELD_STATUS) && object->has(Domain::FIELD_NAME) && object->has(Domain::FIELD_STATUS) && object->has(Domain::FIELD_EXPIRATION_DATE) && object->has(Domain::FIELD_EXPIRATION_JWT))
             {
                 ///encrypt secret for JWT token
                 CipherFactory &factory = CipherFactory::defaultFactory();
@@ -86,13 +80,12 @@ DomainService::Response DomainService::insert(const string &scheme, const string
                 ///build object to insert
                 int status = object->get(Domain::FIELD_STATUS);
                 Domain::Ptr domainToInsert = std::make_shared<Domain>(
-                            0,
-                            object->get(Domain::FIELD_NAME),
-                            encrypt,
-                            static_cast<Domain::Status>(status),
-                            object->get(Domain::FIELD_EXPIRATION_DATE),
-                            object->get(Domain::FIELD_EXPIRATION_JWT)
-                            );
+                    0,
+                    object->get(Domain::FIELD_NAME),
+                    encrypt,
+                    static_cast<Domain::Status>(status),
+                    object->get(Domain::FIELD_EXPIRATION_DATE),
+                    object->get(Domain::FIELD_EXPIRATION_JWT));
 
                 ///insert into db
                 domainDAO.insert(domainToInsert);
@@ -142,14 +135,8 @@ DomainService::Response DomainService::update(const string &scheme, const string
             auto object = Parser().parse(body).extract<Object::Ptr>();
 
             ///check if domain fields are full fill
-            if(
-                    object->has(Domain::FIELD_ID)
-                    && object->has(Domain::FIELD_STATUS)
-                    && object->has(Domain::FIELD_NAME)
-                    && object->has(Domain::FIELD_STATUS)
-                    && object->has(Domain::FIELD_EXPIRATION_DATE)
-                    && object->has(Domain::FIELD_EXPIRATION_JWT)
-                )
+            if (
+                object->has(Domain::FIELD_ID) && object->has(Domain::FIELD_STATUS) && object->has(Domain::FIELD_NAME) && object->has(Domain::FIELD_STATUS) && object->has(Domain::FIELD_EXPIRATION_DATE) && object->has(Domain::FIELD_EXPIRATION_JWT))
             {
                 ///encrypt secret for JWT token
                 CipherFactory &factory = CipherFactory::defaultFactory();
@@ -160,13 +147,12 @@ DomainService::Response DomainService::update(const string &scheme, const string
                 ///build object to insert
                 int status = object->get(Domain::FIELD_STATUS);
                 Domain::Ptr domainToInsert = std::make_shared<Domain>(
-                            object->get(Domain::FIELD_ID),
-                            object->get(Domain::FIELD_NAME),
-                            encrypt,
-                            static_cast<Domain::Status>(status),
-                            object->get(Domain::FIELD_EXPIRATION_DATE),
-                            object->get(Domain::FIELD_EXPIRATION_JWT)
-                            );
+                    object->get(Domain::FIELD_ID),
+                    object->get(Domain::FIELD_NAME),
+                    encrypt,
+                    static_cast<Domain::Status>(status),
+                    object->get(Domain::FIELD_EXPIRATION_DATE),
+                    object->get(Domain::FIELD_EXPIRATION_JWT));
 
                 ///insert into db
                 domainDAO.update(domainToInsert);
@@ -225,9 +211,7 @@ DomainService::Response DomainService::get(const string &scheme, const string &a
                 domain->secret = decrypted;
 
                 if (
-                        find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB_WRITE) != user->permissions.end()
-                        || domain->name == user->domain->name
-                   )
+                    find(user->permissions.begin(), user->permissions.end(), ROLE_AUTH_WEB_WRITE) != user->permissions.end() || domain->name == user->domain->name)
                 {
                     ///add data do json obj
                     jsonObj.set(JSON_STATUS, JSON_STATUS_OK);
@@ -240,7 +224,6 @@ DomainService::Response DomainService::get(const string &scheme, const string &a
                     jsonObj.set(JSON_DATA, "user no has write role");
                     return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
                 }
-
             }
             else
             {
@@ -258,7 +241,6 @@ DomainService::Response DomainService::get(const string &scheme, const string &a
         return DomainService::Response(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED);
     }
 }
-
 
 DomainService::Response DomainService::del(const string &scheme, const string &authInfo, const string &domainName, const string &domainToDel) const
 {
@@ -301,7 +283,6 @@ tuple<Object, HTTPResponse::HTTPStatus, User::Ptr> DomainService::check(const st
         jsonObj.set(JSON_DATA, "auth header not valid");
         return make_tuple(jsonObj, HTTPResponse::HTTP_UNAUTHORIZED, nullptr);
     }
-
 
     ///get domain
     auto &&domain = domainDAO.get(domainName);
