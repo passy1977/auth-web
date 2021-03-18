@@ -47,7 +47,7 @@ tuple<bool, string> AuthService::login(const string &&body) const
 
     auto &&jsonParsed = Parser().parse(body);
 
-    /// check obk type
+    /// check ok type
     if (jsonParsed.type() == typeid(Object::Ptr))
     {
         ///parse body request
