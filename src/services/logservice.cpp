@@ -29,6 +29,10 @@ using namespace std;
 #include<Poco/DateTimeFormat.h>
 using namespace Poco;
 
+#include<Poco/Path.h>
+using Poco::Path;
+
+
 #include "../constants.h"
 
 using namespace auth::services;
@@ -62,7 +66,7 @@ void LogService::write(LogService::Level &&level, unsigned int line, const strin
 
     ///message building
     string src;
-    size_t position = source.rfind('/');
+    size_t position = source.rfind(Path::separator());
     if (position) {
         position++;
         src = source.substr(position, source.size());
